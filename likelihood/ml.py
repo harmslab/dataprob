@@ -56,7 +56,7 @@ class MLFitter(Fitter):
             is assigned an error of 1/num_obs
         param_names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to 
+        **kwargs : any remaining keywaord arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
@@ -105,6 +105,7 @@ class MLFitter(Fitter):
             for i in range(P):
                 self._ninetyfive.append([c1[i],c2[i]])
             self._ninetyfive = np.array(self._ninetyfive)
+
         except np.linalg.LinAlgError:
             warning = "\n\nJacobian matrix was singular.\n"
             warning += "Could not estimate parameter uncertainty.\n"
@@ -155,8 +156,8 @@ class MLFitter(Fitter):
                 warning += "Consider using the Bayesian sampler.\n"
                 warnings.warn(warning)
 
-                self._samples = np.array([])
-                return self._samples
+                #self._samples = np.nan*np.ones((1,len(self.estimate)))
+                return None
 
             self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                           chol_cov.shape[0])),

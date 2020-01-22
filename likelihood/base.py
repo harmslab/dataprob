@@ -148,6 +148,12 @@ class Fitter:
 
         s = self.samples
 
+        # Make sure that fit actually returned samples. (Will fail, for example
+        # if Jacobian misbehaves in ML fit)
+        if s is None:
+            err = "\n\nFit did not produce samples for generation of a corner plot.\nCheck warnings.\n"
+            raise RuntimeError(err)
+
         keep_indexes = []
         corner_range = []
         param_names = []

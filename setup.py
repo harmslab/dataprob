@@ -20,5 +20,4 @@ setup(name='likelihood',
       download_url='',
       zip_safe=False,
       install_requires=["numpy","scipy","pandas","matplotlib","emcee","corner"],
-      classifiers=['Programming Language :: Python'],
-      ext_modules=[ext])
+      classifiers=['Programming Language :: Python'])
