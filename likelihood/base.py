@@ -144,6 +144,11 @@ class Fitter:
             the parameter is *excluded* from the plot.
         """
 
+        # If the user passes a string (instead of a list or tuple of patterns),
+        # convert it to a list up front.
+        if type(filter_params) is str:
+            filter_params = (filter_params,)
+
         skip_pattern = re.compile("|".join(filter_params))
 
         s = self.samples
@@ -162,6 +167,7 @@ class Fitter:
 
             # look for patterns to skip
             if skip_pattern.search(self._param_names[i]):
+                print("not doing corner plot for parameter ",self._param_names[i])
                 continue
 
             param_names.append(self._param_names[i])
