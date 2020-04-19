@@ -22,14 +22,15 @@ def binding_curve_test_data():
     json_file = os.path.join(example_dir,"binding-curves.json")
     json_data = json.load(open(json_file,"r"))
 
-    input_params = json_data["input_params"]
-
     test_file = json_data["test_file"]
 
     f = os.path.join(example_dir,test_file)
-    test_df = pd.read_csv(f,index_col=0)
 
-    return input_params, binding_curve, test_df
+    json_data["df"] = pd.read_csv(f,index_col=0)
+    lm = likelihood.ModelWrapper(binding_curve,kwargs={"X":json_data["df"].X})
+    json_data["model"] = lm.observable
+
+    return json_data
 
 @pytest.fixture(scope="module")
 def fit_tolerance_fixture():

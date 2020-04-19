@@ -10,7 +10,7 @@ class ModelWrapper:
     3. T
     """
 
-    def __init__(self,real_model,*args,**kwargs):
+    def __init__(self,real_model,args=[],kwargs={}):
 
         self._real_model = real_model
         self._model_args = args
