@@ -35,7 +35,7 @@ class MLFitter(Fitter):
         self.fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
-    def fit(self,model,parameters,bounds,y_obs,y_err,param_names=None,**kwargs):
+    def fit(self,model,parameters,y_obs,bounds=None,param_names=None,y_err=None,**kwargs):
         """
         Fit the parameters.
 
@@ -47,25 +47,32 @@ class MLFitter(Fitter):
             this should (usually) be GlobalFit._y_calc
         parameters : array of floats
             parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
         y_obs : array of floats
             observations in an concatenated array
+        bounds : list
+            list of two lists containing lower and upper bounds.  If None,
+            bounds are set to -np.inf and np.inf
+        param_names : array of str
+            names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_err : array of floats or None
             standard deviation of each observation.  if None, each observation
             is assigned an error of 1/num_obs
-        param_names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
         **kwargs : any remaining keywaord arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
         self._model = model
-        self._bounds = bounds
         self._y_obs = y_obs
-        self._y_err = y_err
 
-        self._success = None
+        if bounds is None:
+            tmp = np.ones(len(parameters))
+            bounds = [-np.inf*tmp,np.inf*tmp]
+        self._bounds = np.array(bounds)
+
+        if param_names is None:
+            self._param_names = ["p{}".format(i) for i in range(len(parameters))]
+        else:
+            self._param_names = param_names[:]
 
         # If no error is specified, assign the error as 1/N, identical for all
         # points
@@ -73,10 +80,7 @@ class MLFitter(Fitter):
         if y_err is None:
             self._y_err = np.array([1/len(self._y_obs) for i in range(len(self._y_obs))])
 
-        if param_names is None:
-            self._param_names = ["p{}".format(i) for i in range(len(parameters))]
-        else:
-            self._param_names = param_names[:]
+        self._success = None
 
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)

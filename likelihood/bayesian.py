@@ -121,7 +121,7 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model,parameters,bounds,y_obs,y_err=None,param_names=None,**kwargs):
+    def fit(self,model,parameters,y_obs,bounds=None,param_names=None,y_err=None,**kwargs):
         """
         Fit the parameters.
 
@@ -133,15 +133,15 @@ class BayesianFitter(Fitter):
             this should (usually) be GlobalFit._y_calc
         parameters : array of floats
             parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
         y_obs : array of floats
             observations in an concatenated array
+        bounds : list
+            list of two lists containing lower and upper bounds
+        param_names : array of str
+            names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_err : array of floats or None
             standard deviation of each observation.  if None, each observation
             is assigned an error of 1/num_obs
-        param_names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
         **kwargs : keyword arguments to pass to emcee.EnsembleSampler
         """
 
@@ -149,6 +149,9 @@ class BayesianFitter(Fitter):
         self._y_obs = y_obs
 
         # Convert the bounds (list of lower and upper lists) into a 2d numpy array
+        if bounds is None:
+            tmp = np.ones(len(parameters))
+            bounds = [-np.inf*tmp,np.inf*tmp]
         self._bounds = np.array(bounds)
 
         # If no error is specified, assign the error as 1/N, identical for all

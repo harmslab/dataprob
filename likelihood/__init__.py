@@ -4,8 +4,9 @@ Fitters for doing fits with likelihood functions.
 """
 __author__ = "Michael J. Harms"
 __date__ = "2017-05-09"
-__all__ = [] 
+__all__ = []
 
-from .ml import MLFitter 
-from .bootstrap import BootstrapFitter 
+from .ml import MLFitter
+from .bootstrap import BootstrapFitter
 from .bayesian import BayesianFitter
+from .utils import ModelWrapper

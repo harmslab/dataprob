@@ -46,7 +46,7 @@ class BootstrapFitter(Fitter):
 
         self.fit_type = "bootstrap"
 
-    def fit(self,model,parameters,bounds,y_obs,y_err=None,param_names=None,**kwargs):
+    def fit(self,model,parameters,y_obs,bounds=None,param_names=None,y_err=None,**kwargs):
         """
         Fit the parameters.
 
@@ -58,16 +58,16 @@ class BootstrapFitter(Fitter):
             this should (usually) be GlobalFit._y_calc
         parameters : array of floats
             parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
         y_obs : array of floats
             observations in an concatenated array
+        bounds : list
+            list of two lists containing lower and upper bounds
+        param_names : array of str
+            names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_err : array of floats or None
             standard deviation of each observation.  if None, each observation
             is assigned an error of 1/num_obs
-        param_names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to 
+        **kwargs : any remaining keywaord arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
@@ -78,14 +78,20 @@ class BootstrapFitter(Fitter):
 
         self._success = None
 
-        if y_err is None or self._exp_err == False:
-            self._y_err = np.array([self._perturb_size
-                                    for i in range(len(self._y_obs))])
+        # Convert the bounds (list of lower and upper lists) into a 2d numpy array
+        if bounds is None:
+            tmp = np.ones(len(parameters))
+            bounds = [-np.inf*tmp,np.inf*tmp]
+        self._bounds = bounds
 
         if param_names is None:
             self._param_names = ["p{}".format(i) for i in range(len(parameters))]
         else:
             self._param_names = param_names[:]
+
+        if y_err is None or self._exp_err == False:
+            self._y_err = np.array([self._perturb_size
+                                    for i in range(len(self._y_obs))])
 
         # Create array to store bootstrap replicates
         self._samples = np.zeros((self._num_bootstrap,len(parameters)),
