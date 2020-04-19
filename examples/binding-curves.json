@@ -1,1 +1,1 @@
-{"input_params": [0.5], "test_files": ["binding-curves_noise-0.000.csv", "binding-curves_noise-0.050.csv", "binding-curves_noise-0.100.csv"]}
+{"input_params": [0.5], "test_file": "binding-curves_noise-0.050.csv"}

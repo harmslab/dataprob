@@ -160,8 +160,8 @@ class MLFitter(Fitter):
                 warning += "Consider using the Bayesian sampler.\n"
                 warnings.warn(warning)
 
-                #self._samples = np.nan*np.ones((1,len(self.estimate)))
-                return None
+                # Return empty array
+                return np.array([])
 
             self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                           chol_cov.shape[0])),

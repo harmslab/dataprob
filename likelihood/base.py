@@ -82,7 +82,7 @@ class Fitter:
             is assigned an error of 1/num_obs
         """
 
-        pass
+        return None
 
     @property
     def estimate(self):
@@ -90,7 +90,10 @@ class Fitter:
         Estimates of fit parameters.
         """
 
-        return self._estimate
+        try:
+            return self._estimate
+        except AttributeError:
+            return None
 
     @property
     def stdev(self):
@@ -98,7 +101,10 @@ class Fitter:
         Standard deviations on estimates of fit parameters.
         """
 
-        return self._stdev
+        try:
+            return self._stdev
+        except AttributeError:
+            return None
 
     @property
     def ninetyfive(self):
@@ -106,7 +112,10 @@ class Fitter:
         Ninety-five perecent confidence intervals on the estimates.
         """
 
-        return self._ninetyfive
+        try:
+            return self._ninetyfive
+        except AttributeError:
+            return None
 
     @property
     def fit_result(self):
@@ -114,7 +123,10 @@ class Fitter:
         Full fit results (will depend on exact fit type what is placed here).
         """
 
-        return self._fit_result
+        try:
+            return self._fit_result
+        except AttributeError:
+            return None
 
     @property
     def success(self):
@@ -122,7 +134,10 @@ class Fitter:
         Whether the fit was successful.
         """
 
-        return self._success
+        try:
+            return self._success
+        except AttributeError:
+            return None
 
     @property
     def fit_info(self):
@@ -131,6 +146,17 @@ class Fitter:
         """
 
         return {}
+
+    @property
+    def samples(self):
+        """
+        Samples from stochastic fits.
+        """
+
+        try:
+            return self._samples
+        except AttributeError:
+            return None
 
     def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
         """
@@ -183,11 +209,3 @@ class Fitter:
                             truths=est_values,*args,**kwargs)
 
         return fig
-
-    @property
-    def samples(self):
-        """
-        Samples from stochastic fits.
-        """
-
-        return self._samples

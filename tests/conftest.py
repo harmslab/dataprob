@@ -24,25 +24,16 @@ def binding_curve_test_data():
 
     input_params = json_data["input_params"]
 
-    test_files = json_data["test_files"]
-    test_files.sort()
+    test_file = json_data["test_file"]
 
-    test_data_frames = []
-    for test_file in test_files:
-        f = os.path.join(example_dir,test_file)
-        test_data_frames.append(pd.read_csv(f,index_col=0))
+    f = os.path.join(example_dir,test_file)
+    test_df = pd.read_csv(f,index_col=0)
 
-    return input_params, binding_curve, test_data_frames
+    return input_params, binding_curve, test_df
 
 @pytest.fixture(scope="module")
-def ml_object(binding_curves):
-
-    f = likelihood.MLFitter()
-
-    lm = LikelihoodModel(model,**{"X":df.X})
-    f.fit(lm.observable,params,df.Y)
-
-    return f
+def fit_tolerance_fixture():
+    return 0.1
 
 
 

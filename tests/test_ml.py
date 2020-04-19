@@ -3,35 +3,14 @@ import likelihood
 import numpy as np
 import os
 
+from test_base import TestBaseFitter
 
-class TestMLFitter:
+class TestMLFitter(TestBaseFitter):
 
     def test_init(self,binding_curve_test_data):
 
-        self._fitter_instance = likelihood.MLFitter()
-        assert self._fitter_instance.fit_type == "maximum likelihood"
-
-    def test_fit(self,binding_curve_test_data):
-
-        FIT_TOLERANCE = 0.1
-
-        input_params = np.array(binding_curve_test_data[0])
-        binding_curve_model = binding_curve_test_data[1]
-        test_data_frames = binding_curve_test_data[2]
-
-        f = likelihood.MLFitter()
-
-        for df in test_data_frames:
-
-            lm = likelihood.ModelWrapper(binding_curve_model,
-                                         **{"X":df.X})
-            f.fit(lm.observable,input_params,df.Y)
-
-            assert f.success
-            assert np.allclose(f.estimate,
-                               input_params,
-                               rtol=FIT_TOLERANCE,
-                               atol=FIT_TOLERANCE*input_params)
+        self._f = likelihood.MLFitter()
+        assert self._f.fit_type == "maximum likelihood"
 
 
     def test_unweighted_residuals(self):
