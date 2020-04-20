@@ -3,6 +3,7 @@ import pytest
 import likelihood
 
 import pandas as pd
+import numpy as np
 import os, json, pickle
 
 # Fixtures pointing to test files
@@ -36,6 +37,22 @@ def binding_curve_test_data():
 def fit_tolerance_fixture():
     return 0.01
 
+@pytest.fixture(scope="module")
+def fitter_object(binding_curve_test_data):
+
+    f = likelihood.MLFitter()
+
+    model = binding_curve_test_data["model"]
+    guesses = binding_curve_test_data["guesses"]
+    df = binding_curve_test_data["df"]
+    input_params = np.array(binding_curve_test_data["input_params"])
+
+    f.fit(model,guesses,df.Y)
+
+    if not f.success:
+        raise RuntimeError("test fit did not converge!")
+
+    return f
 
 
 
