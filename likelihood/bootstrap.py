@@ -46,7 +46,7 @@ class BootstrapFitter(Fitter):
 
         self.fit_type = "bootstrap"
 
-    def fit(self,model,parameters,bounds,y_obs,y_err=None,param_names=None,**kwargs):
+    def fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
@@ -54,38 +54,24 @@ class BootstrapFitter(Fitter):
         ----------
 
         model : callable
-            model to fit.  model should take "parameters" as its only argument.
-            this should (usually) be GlobalFit._y_calc
-        parameters : array of floats
-            parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
+            model to fit.  model should take "guesses" as its only argument.
+        guesses : array of floats
+            guesses for parameters to be optimized.
         y_obs : array of floats
             observations in an concatenated array
-        y_err : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1/num_obs
+        bounds : list
+            list of two lists containing lower and upper bounds.  If None,
+            bounds are set to -np.inf and np.inf
         param_names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to 
+        y_stdev : array of floats or None
+            standard deviation of each observation.  if None, each observation
+            is assigned an error of 1
+        **kwargs : any remaining keywaord arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
-        self._model = model
-        self._bounds= bounds
-        self._y_obs = y_obs
-        self._y_err = y_err
-
-        self._success = None
-
-        if y_err is None or self._exp_err == False:
-            self._y_err = np.array([self._perturb_size
-                                    for i in range(len(self._y_obs))])
-
-        if param_names is None:
-            self._param_names = ["p{}".format(i) for i in range(len(parameters))]
-        else:
-            self._param_names = param_names[:]
+        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
 
         # Create array to store bootstrap replicates
         self._samples = np.zeros((self._num_bootstrap,len(parameters)),
@@ -101,7 +87,7 @@ class BootstrapFitter(Fitter):
                 sys.stdout.flush()
 
             # Add random error to each sample
-            self._y_obs = original_y_obs + np.random.normal(0.0,y_err)
+            self._y_obs = original_y_obs + np.random.normal(0.0,y_stdev)
 
             # Do the fit
             fit = scipy.optimize.least_squares(self.unweighted_residuals,

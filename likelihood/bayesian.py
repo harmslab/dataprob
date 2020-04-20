@@ -121,54 +121,44 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model,parameters,bounds,y_obs,y_err=None,param_names=None,**kwargs):
+    def fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
         Parameters
         ----------
 
+        Fit the parameters.
+
+        Parameters
+        ----------
+
         model : callable
-            model to fit.  model should take "parameters" as its only argument.
-            this should (usually) be GlobalFit._y_calc
-        parameters : array of floats
-            parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
+            model to fit.  model should take "guesses" as its only argument.
+        guesses : array of floats
+            guesses for parameters to be optimized.
         y_obs : array of floats
             observations in an concatenated array
-        y_err : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1/num_obs
+        bounds : list
+            list of two lists containing lower and upper bounds.  If None,
+            bounds are set to -np.inf and np.inf
         param_names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
+        y_stdev : array of floats or None
+            standard deviation of each observation.  if None, each observation
+            is assigned an error of 1
         **kwargs : keyword arguments to pass to emcee.EnsembleSampler
         """
 
-        self._model = model
-        self._y_obs = y_obs
+        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
 
-        # Convert the bounds (list of lower and upper lists) into a 2d numpy array
-        self._bounds = np.array(bounds)
-
-        # If no error is specified, assign the error as 1/N, identical for all
-        # points
-        self._y_err = y_err
-        if y_err is None:
-            self._y_err = np.array([1/len(self._y_obs) for i in range(len(self._y_obs))])
-
-        if param_names is None:
-            self._param_names = ["p{}".format(i) for i in range(len(parameters))]
-        else:
-            self._param_names = param_names[:]
-
-        # Make initial guess (ML or just whatever the paramters sent in were)
+        # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
             fn = lambda *args: -self.weighted_residuals(*args)
             ml_fit = optimize.least_squares(fn,x0=parameters,bounds=self._bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
-            self._initial_guess = np.copy(parameters)
+            self._initial_guess = np.copy(self._guesses)
 
         # Create walker positions
 

@@ -35,7 +35,7 @@ class MLFitter(Fitter):
         self.fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
-    def fit(self,model,parameters,bounds,y_obs,y_err,param_names=None,**kwargs):
+    def fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
@@ -43,45 +43,29 @@ class MLFitter(Fitter):
         ----------
 
         model : callable
-            model to fit.  model should take "parameters" as its only argument.
-            this should (usually) be GlobalFit._y_calc
-        parameters : array of floats
-            parameters to be optimized.  usually constructed by GlobalFit._prep_fit
-        bounds : list
-            list of two lists containing lower and upper bounds
+            model to fit.  model should take "guesses" as its only argument.
+        guesses : array of floats
+            guesses for parameters to be optimized.
         y_obs : array of floats
             observations in an concatenated array
-        y_err : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1/num_obs
+        bounds : list
+            list of two lists containing lower and upper bounds.  If None,
+            bounds are set to -np.inf and np.inf
         param_names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
+        y_stdev : array of floats or None
+            standard deviation of each observation.  if None, each observation
+            is assigned an error of 1
         **kwargs : any remaining keywaord arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
-        self._model = model
-        self._bounds = bounds
-        self._y_obs = y_obs
-        self._y_err = y_err
-
-        self._success = None
-
-        # If no error is specified, assign the error as 1/N, identical for all
-        # points
-        self._y_err = y_err
-        if y_err is None:
-            self._y_err = np.array([1/len(self._y_obs) for i in range(len(self._y_obs))])
-
-        if param_names is None:
-            self._param_names = ["p{}".format(i) for i in range(len(parameters))]
-        else:
-            self._param_names = param_names[:]
+        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
 
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
-                                                  x0=parameters,
+                                                  x0=self._guesses,
                                                   bounds=self._bounds,
                                                   **kwargs)
         self._estimate = self._fit_result.x
@@ -156,8 +140,8 @@ class MLFitter(Fitter):
                 warning += "Consider using the Bayesian sampler.\n"
                 warnings.warn(warning)
 
-                #self._samples = np.nan*np.ones((1,len(self.estimate)))
-                return None
+                # Return empty array
+                return np.array([])
 
             self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                           chol_cov.shape[0])),
