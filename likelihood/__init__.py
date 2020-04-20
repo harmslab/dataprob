@@ -11,3 +11,4 @@ from .ml import MLFitter
 from .bootstrap import BootstrapFitter
 from .bayesian import BayesianFitter
 from .utils import ModelWrapper
+from .fit_param import FitParameter
