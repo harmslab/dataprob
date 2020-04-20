@@ -35,7 +35,7 @@ class MLFitter(Fitter):
         self.fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
-    def fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 

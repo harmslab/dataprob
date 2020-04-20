@@ -121,7 +121,7 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
@@ -155,7 +155,7 @@ class BayesianFitter(Fitter):
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
             fn = lambda *args: -self.weighted_residuals(*args)
-            ml_fit = optimize.least_squares(fn,x0=parameters,bounds=self._bounds)
+            ml_fit = optimize.least_squares(fn,x0=self._guesses,bounds=self._bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
             self._initial_guess = np.copy(self._guesses)
@@ -165,7 +165,7 @@ class BayesianFitter(Fitter):
         # Size of perturbation in parameter depends on the scale of the parameter
         perturb_size = self._initial_guess*self._initial_walker_spread
 
-        ndim = len(parameters)
+        ndim = len(self._guesses)
         pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
                for i in range(self._num_walkers)]
 
