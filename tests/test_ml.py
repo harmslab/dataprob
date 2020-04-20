@@ -1,29 +1,46 @@
+import pytest
 
 import likelihood
 
+import numpy as np
 
-def xtest_fit(binding_curve_test_data,fit_tolerance_fixture):
+
+def test_init():
+
+    f = likelihood.MLFitter()
+    assert f.fit_type == "maximum likelihood"
+
+def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     """
     Test the ability to fit the test data in binding_curve_test_data.
     """
 
-    # Construct fitter instance; return if this is base class
-    self.test_init(binding_curve_test_data)
-    if self._f.fit_type == "":
-        return
+    f = likelihood.MLFitter()
 
-    input_params = np.array(binding_curve_test_data[0])
-    binding_curve_model = binding_curve_test_data[1]
-    test_df = binding_curve_test_data[2]
+    model = binding_curve_test_data["model"]
+    guesses = binding_curve_test_data["guesses"]
+    df = binding_curve_test_data["df"]
+    input_params = np.array(binding_curve_test_data["input_params"])
 
-    # Do the fit on this data frame
-    lm = likelihood.ModelWrapper(binding_curve_model,
-                                 **{"X":test_df.X})
-    self._f.fit(lm.observable,input_params,test_df.Y)
 
-    # Fit should converge and give right value
-    assert self._f.success
+    f.fit(model,guesses,df.Y)
+
+    # Make sure fit worked
+    assert f.success
+
+    # Make sure fit gave right answer
     assert np.allclose(f.estimate,
                        input_params,
                        rtol=fit_tolerance_fixture,
                        atol=fit_tolerance_fixture*input_params)
+
+    # Make sure mean of sampled uncertainty gives right answer
+    sampled = np.mean(f.samples,axis=0)
+    assert np.allclose(f.estimate,
+                       sampled,
+                       rtol=fit_tolerance_fixture,
+                       atol=fit_tolerance_fixture*input_params)
+
+    # Make sure corner plot call works and generates a plot
+    corner_fig = f.corner_plot()
+    assert corner_fig is not None

@@ -34,7 +34,7 @@ def binding_curve_test_data():
 
 @pytest.fixture(scope="module")
 def fit_tolerance_fixture():
-    return 0.1
+    return 0.01
 
 
 

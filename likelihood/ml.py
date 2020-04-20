@@ -65,7 +65,7 @@ class MLFitter(Fitter):
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
-                                                  x0=parameters,
+                                                  x0=self._guesses,
                                                   bounds=self._bounds,
                                                   **kwargs)
         self._estimate = self._fit_result.x
