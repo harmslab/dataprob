@@ -18,6 +18,7 @@ class ModelWrapper:
     # __setattr__ and need to look inside this as soon as we start
     # setting attributes.
     _mw_fit_parameters = {}
+    _mw_other_arguments = {}
 
     def __init__(self,model_to_fit):
         """
@@ -29,7 +30,6 @@ class ModelWrapper:
 
     def _mw_load_model(self):
         """
-
         """
 
         self._mw_fit_parameters = {}
@@ -69,7 +69,6 @@ class ModelWrapper:
                     except (TypeError,ValueError):
                         getting_fit_params = False
 
-
             # If we are still getting fit parameters, record this as a fit parameter
             if getting_fit_params:
                 self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
@@ -87,13 +86,21 @@ class ModelWrapper:
         updates the fit guess.
         """
 
-        # If we are not setting a fit parameter, just set it like normal
-        if key not in self._mw_fit_parameters.keys():
+
+        # We're setting the guess of the fit parameter
+        if key in self._mw_fit_parameters.keys():
+
+            self._mw_fit_parameters[key].guess = value
+
+        # We're setting another argument
+        elif key in self._mw_other_arguments.keys():
+
+            self._mw_other_arguments[key] = value
+
+        # Otherwise, just set it like normal
+        else:
             super(ModelWrapper, self).__setattr__(key, value)
             return
-
-        # Otherwise, we're setting the guess of the fit parameter
-        self._mw_fit_parameters[key].guess = value
 
 
     def _update_parameter_map(self):

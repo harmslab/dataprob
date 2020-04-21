@@ -60,7 +60,7 @@ def fit_tolerance_fixture():
     """
     Fit tolerance for checking (relative tolerance)
     """
-    return 0.01
+    return 0.1
 
 @pytest.fixture(scope="module")
 def fitter_object(binding_curve_test_data):

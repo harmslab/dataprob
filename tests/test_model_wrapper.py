@@ -55,3 +55,34 @@ def test_fixing():
     # Try to fix a parameter that is not really a parameter
     with pytest.raises(AttributeError):
         mw.extra_stuff.fixed = True
+
+
+def test_setting():
+
+    # Wrap model
+    mw = likelihood.ModelWrapper(model_to_test)
+    assert mw.param_names[0] == "K1"
+    assert mw.param_names[1] == "K2"
+
+    # Fix one parameter
+    mw.K1.fixed = True
+    assert mw.param_names[0] == "K2"
+    assert mw.guesses[0] == 20
+    with pytest.raises(IndexError):
+        mw.param_names[1]
+
+    # Fix second parameter
+    mw.K2.fixed = True
+    with pytest.raises(IndexError):
+        mw.param_names[0]
+
+    # Unfix a parameter
+    mw.K1.fixed = False
+    assert mw.param_names[0] == "K1"
+    assert mw.guesses[0] == 10
+    with pytest.raises(IndexError):
+        mw.param_names[1]
+
+    # Try to fix a parameter that is not really a parameter
+    with pytest.raises(AttributeError):
+        mw.extra_stuff.fixed = True

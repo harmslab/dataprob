@@ -12,6 +12,8 @@ import corner
 
 import re, inspect
 
+import likelihood
+
 class LikelihoodError(Exception):
     pass
 
@@ -54,13 +56,33 @@ class Fitter:
 
         # Load stuff out of the model if it is specified via a ModelWrapper
         if model is not None:
-            if model.__qualname__.startswith("ModelWrapper"):
+
+            # If this is a ModelWrapper, use it to set values for guesses etc.
+            if isinstance(model,likelihood.model_wrapper.ModelWrapper):
+
                 if guesses is None:
-                    guesses = model.__self__.guesses
+                    guesses = model.guesses
                 if bounds is None:
-                    bounds = model.__self__.bounds
+                    bounds = model.bounds
                 if param_names is None:
-                    param_names = model.__self__.param_names
+                    param_names = model.param_names
+
+                model = model.model
+
+            else:
+
+                # If this is the ModelWrapper model attribute, use that to set
+                # values for guesses, etc.
+                try:
+                    if model.__qualname__.startswith("ModelWrapper"):
+                        if guesses is None:
+                            guesses = model.__self__.guesses
+                        if bounds is None:
+                            bounds = model.__self__.bounds
+                        if param_names is None:
+                            param_names = model.__self__.param_names
+                except AttributeError:
+                    pass
 
         # Record model
         if model is None:
@@ -118,7 +140,7 @@ class Fitter:
         ----------
 
         model : callable
-            model to fit.  model should take "guesses" as its only argument.
+            model to fit.  Model should take "guesses" as its only argument.
             If model is a ModelWrapper instance, arguments related to the
             parameters (guess, bounds, param_names) will automatically be
             filled in.
