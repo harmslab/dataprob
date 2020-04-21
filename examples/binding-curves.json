@@ -1,1 +1,1 @@
-{"input_params": [0.5], "guesses": [1], "test_file": "binding-curves_noise-0.050.csv", "ln_like": -584.0463734810997, "fit_params": [0.5067501892079033]}
+{"input_params": [0.5], "guesses": [1], "test_file": "binding-curves_noise-0.050.csv", "ln_like": 115.09190204247034, "fit_params": [0.4781378466780159]}
