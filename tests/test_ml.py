@@ -17,7 +17,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     f = likelihood.MLFitter()
 
-    model = binding_curve_test_data["model"]
+    model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
     input_params = np.array(binding_curve_test_data["input_params"])

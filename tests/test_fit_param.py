@@ -179,6 +179,18 @@ def test_interaction_bounds_guesses():
     assert np.array_equal(p.bounds,np.array(new_bounds))
     assert p.guess == new_bounds[1]
 
+    # --- Upddate bounds such tthat guess remains in the new bounds ---
+    bounds = [-10,10]
+    p = likelihood.FitParameter(name="test",bounds=bounds,guess=5)
+    assert np.array_equal(p.bounds,np.array(bounds))
+    assert p.guess == 5.0
+
+    new_bounds = [0,10]
+    p.bounds = new_bounds
+    assert np.array_equal(p.bounds,np.array(new_bounds))
+    assert p.guess == 5.0
+
+
 
 def test_alias_setter_getter():
 

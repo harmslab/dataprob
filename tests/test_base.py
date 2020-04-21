@@ -35,9 +35,9 @@ def test_model_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         def dummy(): pass
         f.model = dummy
-    f.model = binding_curve_test_data["model"]
+    f.model = binding_curve_test_data["prewrapped_model"]
     assert f.model is not None
-    assert f.model == binding_curve_test_data["model"]
+    assert f.model == binding_curve_test_data["prewrapped_model"]
 
 def test_guesses_setter_getter(binding_curve_test_data):
     """
@@ -179,7 +179,7 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
     with pytest.raises(likelihood.LikelihoodError):
         f.fit()
 
-    f.model = binding_curve_test_data["model"]
+    f.model = binding_curve_test_data["prewrapped_model"]
 
     # This should not work because we have not specified guesses or y_obs
     # yet.
@@ -197,6 +197,11 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
     # Should now work because we've set everything essential (model, gueses,
     # and y_obs)
     f.fit()
+
+
+def test_model_wrapper_interface():
+
+    assert False
 
 # ---------------------------------------------------------------------------- #
 # Test residuals and the like
@@ -216,7 +221,7 @@ def test_unweighted_residuals(binding_curve_test_data):
     with pytest.raises(likelihood.LikelihoodError):
         f.unweighted_residuals(input_params)
 
-    f.model = binding_curve_test_data["model"]
+    f.model = binding_curve_test_data["prewrapped_model"]
 
     # Should fail, haven't loaded y_obs yet
     with pytest.raises(likelihood.LikelihoodError):
@@ -244,7 +249,7 @@ def test_weighted_residuals(binding_curve_test_data):
     with pytest.raises(likelihood.LikelihoodError):
         f.weighted_residuals(input_params)
 
-    f.model = binding_curve_test_data["model"]
+    f.model = binding_curve_test_data["prewrapped_model"]
 
     # Should fail, haven't loaded y_obs or y_stdev yet
     with pytest.raises(likelihood.LikelihoodError):
@@ -277,7 +282,7 @@ def test_ln_like(binding_curve_test_data):
     with pytest.raises(likelihood.LikelihoodError):
         f.ln_like(input_params)
 
-    f.model = binding_curve_test_data["model"]
+    f.model = binding_curve_test_data["prewrapped_model"]
 
     # Should fail, haven't loaded y_obs or y_stdev yet
     with pytest.raises(likelihood.LikelihoodError):

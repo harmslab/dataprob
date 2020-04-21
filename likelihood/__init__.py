@@ -10,5 +10,5 @@ from .base import LikelihoodError
 from .ml import MLFitter
 from .bootstrap import BootstrapFitter
 from .bayesian import BayesianFitter
-from .utils import ModelWrapper
+from .model_wrapper import ModelWrapper
 from .fit_param import FitParameter

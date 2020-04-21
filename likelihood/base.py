@@ -52,6 +52,16 @@ class Fitter:
         putting in default values if none specificed by user.
         """
 
+        # Load stuff out of the model if it is specified via a ModelWrapper
+        if model is not None:
+            if model.__qualname__.startswith("ModelWrapper"):
+                if guesses is None:
+                    guesses = model.__self__.guesses
+                if bounds is None:
+                    bounds = model.__self__.bounds
+                if param_names is None:
+                    param_names = model.__self__.param_names
+
         # Record model
         if model is None:
             if self.model is None:
@@ -109,6 +119,9 @@ class Fitter:
 
         model : callable
             model to fit.  model should take "guesses" as its only argument.
+            If model is a ModelWrapper instance, arguments related to the
+            parameters (guess, bounds, param_names) will automatically be
+            filled in.
         guesses : array of floats
             guesses for parameters to be optimized.
         y_obs : array of floats
@@ -125,11 +138,8 @@ class Fitter:
             scipy.optimize.least_squares
         """
 
-
         self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
-
-        return None
 
 
     def unweighted_residuals(self,param):
