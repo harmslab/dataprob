@@ -81,9 +81,9 @@ def test_expand_to_model_inputs():
     assert np.array_equal(mw.bounds[0],np.array((-np.inf,-np.inf)))
     assert np.array_equal(mw.bounds[1],np.array((np.inf,np.inf)))
 
-    # Check param_names vector
-    assert mw.param_names[0] == "K1"
-    assert mw.param_names[1] == "K2"
+    # Check names vector
+    assert mw.names[0] == "K1"
+    assert mw.names[1] == "K2"
 
 def test_setting_guess():
 
@@ -115,6 +115,11 @@ def test_setting_guess():
     mw.K1.guess = "22"
     assert mw.K1.guess == 22
 
+    # Test setting by fit_parameters dict
+    assert mw.fit_parameters["K1"].guess == 22
+    mw.fit_parameters["K1"].guess = 42
+    assert mw.fit_parameters["K1"].guess == 42
+
 def test_setting_bounds():
 
     mw = likelihood.ModelWrapper(model_to_test)
@@ -134,22 +139,62 @@ def test_setting_bounds():
         mw.K1.bounds = [500,-50]
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
+    # Test setting by fit_parameters dict
+    mw = likelihood.ModelWrapper(model_to_test)
+    assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array((-np.inf,np.inf)))
+    mw.fit_parameters["K1"].bounds = [0,500]
+    assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array([0,500]))
+    assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-def test_setting_param_names():
+def test_setting_names():
 
     mw = likelihood.ModelWrapper(model_to_test)
 
-    assert mw.K1.param_name
+    # Test setting by mw.K
+    assert mw.K1.name == "K1"
+    mw.K1.name = "new_name"
+    assert mw.K1.name == "new_name"
+    assert mw.fit_parameters["K1"].name == "new_name"
 
-def test_setting_two():
+    # Test setting via mw.fit_parameters
+    assert mw.K2.name == "K2"
+    assert mw.fit_parameters["K2"].name == "K2"
+    mw.fit_parameters["K2"].name = "another name with spaces this time"
+    assert mw.K2.name == "another name with spaces this time"
+    assert mw.fit_parameters["K2"].name == "another name with spaces this time"
 
-    # test ability to set param names
-    assert False
+def test_setting_fixed():
 
-    # test ability to set alias
+    # Wrap model
+    mw = likelihood.ModelWrapper(model_to_test)
+    assert mw.names[0] == "K1"
+    assert mw.names[1] == "K2"
+
+    # Fix one parameter
+    mw.K1.fixed = True
+    assert mw.names[0] == "K2"
+    assert mw.guesses[0] == 20
+    with pytest.raises(IndexError):
+        mw.names[1]
+
+    # Fix second parameter
+    mw.K2.fixed = True
+    with pytest.raises(IndexError):
+        mw.names[0]
+
+    # Unfix a parameter
+    mw.K1.fixed = False
+    assert mw.names[0] == "K1"
+    assert mw.guesses[0] == 1
+    with pytest.raises(IndexError):
+        mw.names[1]
+
+    # Try to fix a parameter that is not really a parameter
+    with pytest.raises(AttributeError):
+        mw.extra_stuff.fixed = True
 
 
-def test_getting_setting_by_dicts():
+def test_setting_other_arguments():
 
     mw = likelihood.ModelWrapper(model_to_test)
     assert isinstance(mw.K1,likelihood.FitParameter)
@@ -157,48 +202,13 @@ def test_getting_setting_by_dicts():
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
     assert not isinstance(mw.K3,likelihood.FitParameter)
 
-    assert mw.fit_parameters["K1"].guess == 1
-    mw.fit_parameters["K1"].guess = 42
-    assert mw.fit_parameters["K1"].guess == 42
-
-    assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array((-np.inf,np.inf)))
-    mw.fit_parameters["K1"].bounds = [0,500]
-    assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array([0,500]))
-    assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
     assert mw.other_arguments["extra_stuff"] == "test"
     assert mw.extra_stuff == "test"
     mw.other_arguments["extra_stuff"] = 19
     assert mw.extra_stuff == 19
 
+def test_setting_two():
 
-
-def test_fixing():
-
-    # Wrap model
-    mw = likelihood.ModelWrapper(model_to_test)
-    assert mw.param_names[0] == "K1"
-    assert mw.param_names[1] == "K2"
-
-    # Fix one parameter
-    mw.K1.fixed = True
-    assert mw.param_names[0] == "K2"
-    assert mw.guesses[0] == 20
-    with pytest.raises(IndexError):
-        mw.param_names[1]
-
-    # Fix second parameter
-    mw.K2.fixed = True
-    with pytest.raises(IndexError):
-        mw.param_names[0]
-
-    # Unfix a parameter
-    mw.K1.fixed = False
-    assert mw.param_names[0] == "K1"
-    assert mw.guesses[0] == 1
-    with pytest.raises(IndexError):
-        mw.param_names[1]
-
-    # Try to fix a parameter that is not really a parameter
-    with pytest.raises(AttributeError):
-        mw.extra_stuff.fixed = True
+    # test ability to set param names
+    assert False

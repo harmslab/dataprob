@@ -35,7 +35,7 @@ class MLFitter(Fitter):
         self.fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
@@ -51,7 +51,7 @@ class MLFitter(Fitter):
         bounds : list
             list of two lists containing lower and upper bounds.  If None,
             bounds are set to -np.inf and np.inf
-        param_names : array of str
+        names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
@@ -60,7 +60,7 @@ class MLFitter(Fitter):
             scipy.optimize.least_squares
         """
 
-        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
+        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
 
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)

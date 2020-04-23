@@ -76,33 +76,33 @@ def test_bounds_setter_getter(binding_curve_test_data):
     assert f.bounds is not None
     assert np.array_equal(f.bounds,bnds)
 
-def test_param_names_setter_getter(binding_curve_test_data):
+def test_names_setter_getter(binding_curve_test_data):
     """
-    Test the param_names setter.
+    Test the names setter.
     """
 
     f = likelihood.base.Fitter()
 
-    param_names = ["p{}".format(i)
+    names = ["p{}".format(i)
                    for i in range(len(binding_curve_test_data["guesses"]))]
-    f.param_names = param_names
-    assert f.param_names is not None
-    assert np.array_equal(f.param_names,param_names)
+    f.names = names
+    assert f.names is not None
+    assert np.array_equal(f.names,names)
 
 
 def test_param_mismatch_check(binding_curve_test_data):
     """
     Test the check for mismatches in the number of parameters in guesses,
-    bounds, and param_names.
+    bounds, and names.
     """
 
     f = likelihood.base.Fitter()
 
     f.guesses = binding_curve_test_data["guesses"]
     with pytest.raises(ValueError):
-        f.param_names = ["p{}".format(i)
+        f.names = ["p{}".format(i)
                          for i in range(len(binding_curve_test_data["guesses"])-1)]
-    f.param_names = ["p{}".format(i)
+    f.names = ["p{}".format(i)
                      for i in range(len(binding_curve_test_data["guesses"]))]
 
     with pytest.raises(ValueError):

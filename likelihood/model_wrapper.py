@@ -239,7 +239,7 @@ class ModelWrapper:
         return np.array(bounds)
 
     @property
-    def param_names(self):
+    def names(self):
         """
         Return an array of the names of the parameters (only including the unfixed
         parameters).
@@ -249,11 +249,11 @@ class ModelWrapper:
         # since this was last returned.
         self._update_parameter_map()
 
-        param_names = []
+        names = []
         for p in self._param_to_p_map:
-            param_names.append(self.fit_parameters[p].name)
+            names.append(self.fit_parameters[p].name)
 
-        return param_names[:]
+        return names[:]
 
     @property
     def fit_parameters(self):

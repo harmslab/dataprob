@@ -28,9 +28,6 @@ class FitParameter:
         + .guess: (float) guess value for fit
         + .fixed: (bool) whether to float parameter or not
         + .bounds: [float,float] lower and upper bounds for parameter
-        + .alias: (hashable) name of global parameter.  if not linked to global
-                  parameter, will be None.
-
 
     Fit result attributes:
     ----------------------
@@ -38,8 +35,9 @@ class FitParameter:
     These attributes can only be updated using the load_fit_result method, which
     takes a fitter instance as an argument.
 
-        + .value: (float) value of parameter estimated by the fit.
-                  Before the fit is run, this will be the .guess value.
+        + .value: (float) Current value of parameter.
+                  Before the fit is run, this will be the .guess value. After
+                  the fit is run, this will be the parameter estimate.
         + .stdev: (float) standard deviation on the estimate of the fit parameter.
                   Before the fit is run, this will be None.
         + .ninetyfive: (float,float) top and bottom of the 95% confidence interval.
@@ -56,7 +54,7 @@ class FitParameter:
         + .name: (str) name of fit parameter
     """
 
-    def __init__(self,name,guess=None,fixed=False,bounds=None,alias=None):
+    def __init__(self,name,guess=None,fixed=False,bounds=None):
         """
         Initialize class.  Parameters:
 
@@ -73,8 +71,6 @@ class FitParameter:
         bounds: bounds on fit for parameter (list-like object of 2 floats). If
                 None, bounds will be set to (None,None).  If (None,5), no lower
                 bound, upper bound of 5.
-        alias: alias for parameter name, for linking to global paramter names. (str)
-               If None, no alias is made.
         """
 
         # Setting must be in this order. If no guess is specified, the guess
@@ -86,8 +82,6 @@ class FitParameter:
         # Simple terms
         self.name = name
         self.fixed = fixed
-        self.alias = alias
-
 
     #--------------------------------------------------------------------------
     # parameter name
@@ -273,35 +267,6 @@ class FitParameter:
         self._bounds = bounds
         self._clear_fit_result()
 
-    #--------------------------------------------------------------------------
-    # parameter alias
-
-    @property
-    def alias(self):
-        """
-        Parameter alias.  Either string or None.
-        """
-
-        try:
-            return self._alias
-        except AttributeError:
-            return None
-
-    @alias.setter
-    def alias(self,alias):
-        """
-        Set alias.
-        """
-
-        # Will throw an error if alias is not hashable
-        try:
-            {alias:None}
-        except TypeError:
-            err = f"alias ({alias}) is not hashable.\n"
-            raise ValueError(err)
-
-        self._alias = copy.deepcopy(alias)
-        self._clear_fit_result()
 
     #--------------------------------------------------------------------------
     # Properties that are set by the fitter, but not the user.

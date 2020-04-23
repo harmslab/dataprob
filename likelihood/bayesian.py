@@ -121,7 +121,7 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
         """
         Fit the parameters.
 
@@ -142,7 +142,7 @@ class BayesianFitter(Fitter):
         bounds : list
             list of two lists containing lower and upper bounds.  If None,
             bounds are set to -np.inf and np.inf
-        param_names : array of str
+        names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
@@ -150,7 +150,7 @@ class BayesianFitter(Fitter):
         **kwargs : keyword arguments to pass to emcee.EnsembleSampler
         """
 
-        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
+        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
 
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:

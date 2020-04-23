@@ -48,7 +48,7 @@ class Fitter:
                 raise LikelihoodError(err)
 
 
-    def _preprocess_fit(self,model,guesses,y_obs,bounds=None,param_names=None,y_stdev=None):
+    def _preprocess_fit(self,model,guesses,y_obs,bounds=None,names=None,y_stdev=None):
         """
         Preprocess the user inputs to self.fit(), checking for sanity and
         putting in default values if none specificed by user.
@@ -64,8 +64,8 @@ class Fitter:
                     guesses = model.guesses
                 if bounds is None:
                     bounds = model.bounds
-                if param_names is None:
-                    param_names = model.param_names
+                if names is None:
+                    names = model.names
 
                 model = model.model
 
@@ -79,8 +79,8 @@ class Fitter:
                             guesses = model.__self__.guesses
                         if bounds is None:
                             bounds = model.__self__.bounds
-                        if param_names is None:
-                            param_names = model.__self__.param_names
+                        if names is None:
+                            names = model.__self__.names
                 except AttributeError:
                     pass
 
@@ -117,11 +117,11 @@ class Fitter:
             self.bounds = bounds
 
         # Set param names or use default values
-        if param_names is None:
-            if self.param_names is None:
-                param_names = ["p{}".format(i) for i in range(len(self.guesses))]
-        if param_names is not None:
-            self.param_names = param_names
+        if names is None:
+            if self.names is None:
+                names = ["p{}".format(i) for i in range(len(self.guesses))]
+        if names is not None:
+            self.names = names
 
         # Set y standard deviations or use default values
         if y_stdev is None:
@@ -132,7 +132,7 @@ class Fitter:
 
         self._success = None
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None):
+    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None):
         """
         Fit the parameters.
 
@@ -142,7 +142,7 @@ class Fitter:
         model : callable
             model to fit.  Model should take "guesses" as its only argument.
             If model is a ModelWrapper instance, arguments related to the
-            parameters (guess, bounds, param_names) will automatically be
+            parameters (guess, bounds, names) will automatically be
             filled in.
         guesses : array of floats
             guesses for parameters to be optimized.
@@ -151,7 +151,7 @@ class Fitter:
         bounds : list
             list of two lists containing lower and upper bounds.  If None,
             bounds are set to -np.inf and np.inf
-        param_names : array of str
+        names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
@@ -160,7 +160,7 @@ class Fitter:
             scipy.optimize.least_squares
         """
 
-        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
+        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
 
 
@@ -301,48 +301,48 @@ class Fitter:
         self._bounds = bounds
 
     @property
-    def param_names(self):
+    def names(self):
         """
         Parameter names for fit parameters.
         """
 
         try:
-            return self._param_names
+            return self._names
         except AttributeError:
             return None
 
-    @param_names.setter
-    def param_names(self,param_names):
+    @names.setter
+    def names(self,names):
         """
         Setter for parameter names attribute.
         """
 
         try:
-            param_names = np.array(param_names,dtype=np.str)
+            names = np.array(names,dtype=np.str)
 
             # Will through a type error if the user puts in a single value
             try:
-                len(param_names)
+                len(names)
             except TypeError:
-                param_names = np.array([param_names])
+                names = np.array([names])
 
         except ValueError as err:
-            err = f"{err}\n\nparam_names must be a list or array of strings\n\n"
+            err = f"{err}\n\nnames must be a list or array of strings\n\n"
             raise ValueError(err)
 
-        if len(param_names) != len(set(param_names)):
+        if len(names) != len(set(names)):
             err = "parameter names must all be unique.\n"
             raise ValueError(err)
 
         if self.num_params is not None:
-            if param_names.shape[0] != self.num_params:
-                err = "length of param_names ({}) must match the number of parameters ({})\n".format(param_names.shape[0],
+            if names.shape[0] != self.num_params:
+                err = "length of names ({}) must match the number of parameters ({})\n".format(names.shape[0],
                                                                                                    self.num_params)
                 raise ValueError(err)
         else:
-            self._num_params = param_names.shape[0]
+            self._num_params = names.shape[0]
 
-        self._param_names = param_names
+        self._names = names
 
 
     @property
@@ -541,16 +541,16 @@ class Fitter:
 
         keep_indexes = []
         corner_range = []
-        param_names = []
+        names = []
         est_values = []
         for i in range(s.shape[1]):
 
             # look for patterns to skip
-            if skip_pattern.search(self._param_names[i]):
-                print("not doing corner plot for parameter ",self._param_names[i])
+            if skip_pattern.search(self._names[i]):
+                print("not doing corner plot for parameter ",self._names[i])
                 continue
 
-            param_names.append(self._param_names[i])
+            names.append(self._names[i])
             keep_indexes.append(i)
             corner_range.append(tuple([np.min(s[:,i])-0.5,np.max(s[:,i])+0.5]))
 
@@ -559,7 +559,7 @@ class Fitter:
         to_plot = s[:,np.array(keep_indexes,dtype=np.int)]
         #to_plot = np.swapaxes(to_plot,0,1)
 
-        fig = corner.corner(to_plot,labels=param_names,range=corner_range,
+        fig = corner.corner(to_plot,labels=names,range=corner_range,
                             truths=est_values,*args,**kwargs)
 
         return fig

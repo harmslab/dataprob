@@ -15,7 +15,6 @@ def test_init():
     assert p.guess == 1.0
     assert p.value == p.guess
     assert p.fixed == False
-    assert p.alias is None
 
 
 def test_name_getter_setter():
@@ -192,33 +191,6 @@ def test_interaction_bounds_guesses():
 
 
 
-def test_alias_setter_getter():
-
-    # Default
-    p = likelihood.FitParameter(name="test")
-    assert p.alias is None
-
-    # Set via __init__
-    p = likelihood.FitParameter(name="test",alias="some_alias")
-    assert p.alias is "some_alias"
-
-    # Set directly
-    p = likelihood.FitParameter(name="test")
-    assert p.alias is None
-    p.alias = "alias!"
-    assert p.alias is "alias!"
-    p.alias = 22
-    assert p.alias is 22
-
-    # --- bad value checks ---
-    p = likelihood.FitParameter(name="test")
-
-    with pytest.raises(ValueError):
-        p.alias = [1,3]
-
-    with pytest.raises(ValueError):
-        p.alias = np.array([1,23])
-
 def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure we can load fit result into parameter ---
@@ -226,14 +198,12 @@ def test_load_clear_fit_results(fitter_object):
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
-    assert p.alias is None
     assert not p.is_fit_result
 
     p.load_fit_result(fitter_object,0)
     assert p.value == fitter_object.estimate[0]
     assert p.stdev == fitter_object.stdev[0]
     assert np.array_equal(p.ninetyfive,fitter_object.ninetyfive[0])
-    assert p.alias is None
     assert p.is_fit_result
 
     # --- Make sure setting guess wipes out fit ---
@@ -244,27 +214,6 @@ def test_load_clear_fit_results(fitter_object):
     assert p.ninetyfive is None
     assert not p.is_fit_result
 
-    # --- Make sure setting alias wipes out fit ---
-
-    p = likelihood.FitParameter(name="test")
-    assert p.value == p.guess
-    assert p.stdev is None
-    assert p.ninetyfive is None
-    assert p.alias is None
-    assert not p.is_fit_result
-
-    p.load_fit_result(fitter_object,0)
-    assert p.value == fitter_object.estimate[0]
-    assert p.stdev == fitter_object.stdev[0]
-    assert np.array_equal(p.ninetyfive,fitter_object.ninetyfive[0])
-    assert p.is_fit_result
-
-    p.alias = "alias!"
-    assert p.alias == "alias!"
-    assert p.value == p.guess
-    assert p.stdev is None
-    assert p.ninetyfive is None
-    assert not p.is_fit_result
 
     # --- Make sure setting bounds wipes out fit ---
 
