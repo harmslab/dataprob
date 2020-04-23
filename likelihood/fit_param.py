@@ -20,18 +20,23 @@ class FitParameter:
     Fit control attributes:
     -----------------------
 
+    These attributes can be set on __init__ or directly via instance.xxx = value.
+    If any of these values are set, the fit result (stored in .value) is wiped
+    out to avoid inconsistency between the fit control parameters and the
+    resulting fit.
+
         + .guess: (float) guess value for fit
         + .fixed: (bool) whether to float parameter or not
         + .bounds: [float,float] lower and upper bounds for parameter
         + .alias: (hashable) name of global parameter.  if not linked to global
                   parameter, will be None.
 
-    These attributes can be set on __init__ or directly via instance.xxx = value.
-    If any of these values are set **loaded fit results are wiped out** to avoid
-    inconsistency between the fit control parameters and the resulting fit.
 
     Fit result attributes:
     ----------------------
+
+    These attributes can only be updated using the load_fit_result method, which
+    takes a fitter instance as an argument.
 
         + .value: (float) value of parameter estimated by the fit.
                   Before the fit is run, this will be the .guess value.
@@ -42,16 +47,13 @@ class FitParameter:
         + .is_fit_result: (bool) whether or not the parameter contains the results
                           of a fit.
 
-    These attributes can only be updated using the load_fit_result method, which
-    takes a fitter instance as an argument.
-
     Metadata attributes:
     --------------------
 
-        + .name: (str) name of fit parameter
-
     This attribute can be set on __init__ or directly via instance.name = value.
     The value is used for convenience only and is ignored by other methods.
+
+        + .name: (str) name of fit parameter
     """
 
     def __init__(self,name,guess=None,fixed=False,bounds=None,alias=None):
