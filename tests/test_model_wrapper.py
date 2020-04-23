@@ -6,6 +6,10 @@ import numpy as np
 
 def model_to_test(K1,K2=20,extra_stuff="test",K3=42):
 
+    K1 = np.float(K1)
+    K2 = np.float(K2)
+    K3 = np.float(K3)
+
     return K1*K2*K3
 
 def bad_model_with_reserved_name(guesses=2):
@@ -85,6 +89,7 @@ def test_expand_to_model_inputs():
     assert mw.names[0] == "K1"
     assert mw.names[1] == "K2"
 
+
 def test_setting_guess():
 
     # Default values set correctly
@@ -146,7 +151,7 @@ def test_setting_bounds():
     assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array([0,500]))
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-def test_setting_names():
+def test_setting_name():
 
     mw = likelihood.ModelWrapper(model_to_test)
 
@@ -164,6 +169,9 @@ def test_setting_names():
     assert mw.fit_parameters["K2"].name == "another name with spaces this time"
 
 def test_setting_fixed():
+
+    # This also tests the private function self._update_parameter_map b/c
+    # changing fixed parameters is what changes the guesses and other properties
 
     # Wrap model
     mw = likelihood.ModelWrapper(model_to_test)
@@ -193,6 +201,10 @@ def test_setting_fixed():
     with pytest.raises(AttributeError):
         mw.extra_stuff.fixed = True
 
+    mw = likelihood.ModelWrapper(model_to_test)
+    assert mw.names[0] == "K1"
+    assert mw.names[1] == "K2"
+
 
 def test_setting_other_arguments():
 
@@ -202,13 +214,32 @@ def test_setting_other_arguments():
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
     assert not isinstance(mw.K3,likelihood.FitParameter)
 
-
     assert mw.other_arguments["extra_stuff"] == "test"
     assert mw.extra_stuff == "test"
     mw.other_arguments["extra_stuff"] = 19
     assert mw.extra_stuff == 19
 
-def test_setting_two():
+def test_model_output():
 
-    # test ability to set param names
-    assert False
+    mw = likelihood.ModelWrapper(model_to_test)
+
+    # Test call with default parameters
+    assert mw.model() == 1*20*42
+    assert mw.model((1,20)) == 1*20*42
+    assert mw.model((20,20)) == 20*20*42
+
+    # Test pass through for bad argument
+    with pytest.raises(ValueError):
+        mw.model(("stupid",20))
+
+    # test passing too many arguments
+    with pytest.raises(ValueError):
+        mw.model((20,20,42))
+
+    # test passing too few arguments
+    with pytest.raises(ValueError):
+        mw.model((20,))
+
+    # Test setting other argument that should change output
+    mw.K3 = 14
+    assert mw.model() == 1*20*14

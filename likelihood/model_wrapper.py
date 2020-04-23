@@ -134,6 +134,10 @@ class ModelWrapper:
             super(ModelWrapper, self).__setattr__(key, value)
 
     def __getattr__(self,key):
+        """
+        Define __getattr__ to we get fit parameters and other arguments
+        appropriately.
+        """
 
         # We're getting a fit parameter
         if key in self._mw_fit_parameters.keys():
