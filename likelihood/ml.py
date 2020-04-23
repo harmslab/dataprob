@@ -30,37 +30,21 @@ class MLFitter(Fitter):
         num_samples: number of samples for generating corner plot
         """
 
-        Fitter.__init__(self)
+        super(MLFitter,self).__init__()
 
         self.fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
+    def _fit(self,**kwargs):
         """
-        Fit the parameters.
+        Fit the parameters to the model.
 
         Parameters
         ----------
 
-        model : callable
-            model to fit.  model should take "guesses" as its only argument.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to
+        **kwargs : any keyword arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
-
-        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
 
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)
@@ -101,13 +85,6 @@ class MLFitter(Fitter):
 
         self._success = self._fit_result.success
 
-    @property
-    def fit_info(self):
-        """
-        Return information about the fit.
-        """
-
-        return {}
 
     @property
     def samples(self):

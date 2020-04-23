@@ -37,7 +37,7 @@ class BootstrapFitter(Fitter):
             Give verbose output.
         """
 
-        Fitter.__init__(self)
+        super(BootstrapFitter,self).__init__()
 
         self._num_bootstrap = num_bootstrap
         self._perturb_size = perturb_size
@@ -46,28 +46,14 @@ class BootstrapFitter(Fitter):
 
         self.fit_type = "bootstrap"
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
+    def _fit(self,**kwargs):
         """
         Fit the parameters.
 
         Parameters
         ----------
 
-        model : callable
-            model to fit.  model should take "guesses" as its only argument.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to
+        **kwargs : any keyword arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 

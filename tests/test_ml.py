@@ -22,8 +22,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     df = binding_curve_test_data["df"]
     input_params = np.array(binding_curve_test_data["input_params"])
 
-
-    f.fit(model,guesses,df.Y)
+    f.fit(model=model,guesses=guesses,y_obs=df.Y)
 
     # Make sure fit worked
     assert f.success

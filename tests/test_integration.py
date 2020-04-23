@@ -13,7 +13,6 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     mw = likelihood.ModelWrapper(model_to_wrap)
     assert mw.df is None
-
     mw.df = df
     mw.K.bounds = [0,np.inf]
 
@@ -31,3 +30,5 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
                        input_params,
                        rtol=fit_tolerance_fixture,
                        atol=fit_tolerance_fixture*input_params)
+
+    f.fit_as_df

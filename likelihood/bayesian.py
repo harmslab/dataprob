@@ -42,7 +42,7 @@ class BayesianFitter(Fitter):
             cpus. [NOT YET IMPLEMENTED]
         """
 
-        Fitter.__init__(self)
+        super(BayesianFitter,self).__init__()
 
         self._num_walkers = num_walkers
         self._initial_walker_spread = initial_walker_spread
@@ -121,7 +121,7 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
+    def _fit(self,**kwargs):
         """
         Fit the parameters.
 
@@ -133,24 +133,8 @@ class BayesianFitter(Fitter):
         Parameters
         ----------
 
-        model : callable
-            model to fit.  model should take "guesses" as its only argument.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1
         **kwargs : keyword arguments to pass to emcee.EnsembleSampler
         """
-
-        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
 
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:

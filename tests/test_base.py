@@ -199,9 +199,15 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
     f.fit()
 
 
-def test_model_wrapper_interface():
+def test_model_wrapper_interface(binding_curve_test_data):
 
-    assert False
+    # Set model via attribute, mw instance
+    f = likelihood.base.Fitter()
+    mw = likelihood.ModelWrapper(binding_curve_test_data["wrappable_model"])
+    mw.df = binding_curve_test_data["df"]
+
+    f.model = mw
+
 
 # ---------------------------------------------------------------------------- #
 # Test residuals and the like

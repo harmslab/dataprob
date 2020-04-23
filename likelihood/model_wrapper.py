@@ -193,6 +193,15 @@ class ModelWrapper:
         return self._model_to_fit(**self._mw_kwargs)
 
 
+    def load_fit_result(self,fitter):
+        """
+        Load the result of a fit into all fit parameters.
+        """
+
+        for i in range(len(self._param_to_p_map)):
+            p = self._param_to_p_map[i]
+            self.fit_parameters[p].load_fit_result(fitter,i)
+
     @property
     def model(self):
         """
