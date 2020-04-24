@@ -6,7 +6,6 @@ __author__ = "Michael J. Harms"
 __date__ = "2017-05-09"
 __all__ = []
 
-from .base import LikelihoodError
 from .ml import MLFitter
 from .bootstrap import BootstrapFitter
 from .bayesian import BayesianFitter

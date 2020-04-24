@@ -4,24 +4,20 @@ import likelihood
 
 import numpy as np
 
-def model_to_test(K1,K2=20,extra_stuff="test",K3=42):
 
-    K1 = np.float(K1)
-    K2 = np.float(K2)
-    K3 = np.float(K3)
-
-    return K1*K2*K3
 
 def bad_model_with_reserved_name(guesses=2):
 
     return guesses
 
-def test_init():
+def test_init(binding_curve_test_data):
+
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
 
     # Make sure it correctly recognizes model parameters (takes first two b/c
     # can be coerced into float, not extra_stuff b/c not float, not K3 b/c
     # after non-fittable. )
-    mw = likelihood.ModelWrapper(model_to_test)
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert isinstance(mw.K1,likelihood.FitParameter)
     assert isinstance(mw.K2,likelihood.FitParameter)
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
@@ -32,13 +28,13 @@ def test_init():
 
     # Make sure that we only grab K1 if specified, not the other possible
     # parameters K2 and K3
-    mw = likelihood.ModelWrapper(model_to_test,fittable_params=["K1"])
+    mw = likelihood.ModelWrapper(model_to_test_wrap,fittable_params=["K1"])
     assert isinstance(mw.K1,likelihood.FitParameter)
     assert not isinstance(mw.K2,likelihood.FitParameter)
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
 
     # Make sure we can pass more than one fittable parameters
-    mw = likelihood.ModelWrapper(model_to_test,fittable_params=["K1","K2"])
+    mw = likelihood.ModelWrapper(model_to_test_wrap,fittable_params=["K1","K2"])
     assert isinstance(mw.K1,likelihood.FitParameter)
     assert isinstance(mw.K2,likelihood.FitParameter)
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
@@ -46,7 +42,7 @@ def test_init():
 
     # Make sure we can grab a fittable parameter that would not normally
     # be used.
-    mw = likelihood.ModelWrapper(model_to_test,fittable_params=["K3","K2"])
+    mw = likelihood.ModelWrapper(model_to_test_wrap,fittable_params=["K3","K2"])
     assert not isinstance(mw.K1,likelihood.FitParameter)
     assert isinstance(mw.K2,likelihood.FitParameter)
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
@@ -55,20 +51,22 @@ def test_init():
 
     # Recognizes bad manually passed parameter
     with pytest.raises(ValueError):
-        mw = likelihood.ModelWrapper(model_to_test,fittable_params=["not_real"])
+        mw = likelihood.ModelWrapper(model_to_test_wrap,fittable_params=["not_real"])
 
     # Recognizes another type of bad manually passed parameter
     with pytest.raises(ValueError):
-        mw = likelihood.ModelWrapper(model_to_test,fittable_params=["extra_stuff"])
+        mw = likelihood.ModelWrapper(model_to_test_wrap,fittable_params=["extra_stuff"])
 
     # pass model that uses a reserved name as an argument
     with pytest.raises(ValueError):
         mw = likelihood.ModelWrapper(bad_model_with_reserved_name)
 
 
-def test_expand_to_model_inputs():
+def test_expand_to_model_inputs(binding_curve_test_data):
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
 
     # Make sure we get the right parameter names
     params = list(mw.fit_parameters.keys())
@@ -90,10 +88,12 @@ def test_expand_to_model_inputs():
     assert mw.names[1] == "K2"
 
 
-def test_setting_guess():
+def test_setting_guess(binding_curve_test_data):
+
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
 
     # Default values set correctly
-    mw = likelihood.ModelWrapper(model_to_test)
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert mw.K1.guess == 1
     assert mw.K2.guess == 20
     with pytest.raises(AttributeError):
@@ -125,9 +125,11 @@ def test_setting_guess():
     mw.fit_parameters["K1"].guess = 42
     assert mw.fit_parameters["K1"].guess == 42
 
-def test_setting_bounds():
+def test_setting_bounds(binding_curve_test_data):
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
 
     # Set bounds
     assert np.array_equal(mw.bounds[0],np.array((-np.inf,-np.inf)))
@@ -145,15 +147,17 @@ def test_setting_bounds():
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
     # Test setting by fit_parameters dict
-    mw = likelihood.ModelWrapper(model_to_test)
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array((-np.inf,np.inf)))
     mw.fit_parameters["K1"].bounds = [0,500]
     assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array([0,500]))
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-def test_setting_name():
+def test_setting_name(binding_curve_test_data):
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
 
     # Test setting by mw.K
     assert mw.K1.name == "K1"
@@ -168,13 +172,15 @@ def test_setting_name():
     assert mw.K2.name == "another name with spaces this time"
     assert mw.fit_parameters["K2"].name == "another name with spaces this time"
 
-def test_setting_fixed():
+def test_setting_fixed(binding_curve_test_data):
 
     # This also tests the private function self._update_parameter_map b/c
     # changing fixed parameters is what changes the guesses and other properties
 
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
     # Wrap model
-    mw = likelihood.ModelWrapper(model_to_test)
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert mw.names[0] == "K1"
     assert mw.names[1] == "K2"
 
@@ -201,14 +207,16 @@ def test_setting_fixed():
     with pytest.raises(AttributeError):
         mw.extra_stuff.fixed = True
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert mw.names[0] == "K1"
     assert mw.names[1] == "K2"
 
 
-def test_setting_other_arguments():
+def test_setting_other_arguments(binding_curve_test_data):
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
     assert isinstance(mw.K1,likelihood.FitParameter)
     assert isinstance(mw.K2,likelihood.FitParameter)
     assert not isinstance(mw.extra_stuff,likelihood.FitParameter)
@@ -219,9 +227,11 @@ def test_setting_other_arguments():
     mw.other_arguments["extra_stuff"] = 19
     assert mw.extra_stuff == 19
 
-def test_model_output():
+def test_model_output(binding_curve_test_data):
 
-    mw = likelihood.ModelWrapper(model_to_test)
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+
+    mw = likelihood.ModelWrapper(model_to_test_wrap)
 
     # Test call with default parameters
     assert mw.model() == 1*20*42

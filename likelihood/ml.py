@@ -49,8 +49,8 @@ class MLFitter(Fitter):
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
-                                                  x0=self._guesses,
-                                                  bounds=self._bounds,
+                                                  x0=self.guesses,
+                                                  bounds=self.bounds,
                                                   **kwargs)
         self._estimate = self._fit_result.x
 
@@ -69,9 +69,10 @@ class MLFitter(Fitter):
             c1 = self._estimate - z*self._stdev
             c2 = self._estimate + z*self._stdev
 
-            self._ninetyfive = []
+            self._ninetyfive = [[],[]]
             for i in range(P):
-                self._ninetyfive.append([c1[i],c2[i]])
+                self._ninetyfive[0].append(c1[i])
+                self._ninetyfive[1].append(c2[i])
             self._ninetyfive = np.array(self._ninetyfive)
 
         except np.linalg.LinAlgError:
@@ -81,7 +82,7 @@ class MLFitter(Fitter):
             warnings.warn(warning)
 
             self._stdev = np.nan*np.ones(len(self._estimate),dtype=np.float)
-            self._ninety_five = np.nan*np.ones((len(self._estimate),2),dtype=np.float)
+            self._ninety_five = np.nan*np.ones((2,len(self._estimate)),dtype=np.float)
 
         self._success = self._fit_result.success
 

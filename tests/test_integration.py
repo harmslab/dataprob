@@ -15,13 +15,17 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
     assert mw.df is None
     mw.df = df
     mw.K.bounds = [0,np.inf]
+    assert np.array_equal(mw.bounds,np.array([[0],[np.inf]]))
 
     f = likelihood.MLFitter()
-    f.fit(mw,y_obs=df.Y,y_stdev=df.Y_stdev)
+    f.model = mw
+
     assert f.bounds is not None
     assert f.bounds[0,0] == 0
     assert f.bounds[1,0] == np.inf
 
+
+    f.fit(mw,y_obs=df.Y,y_stdev=df.Y_stdev)
     assert f.success
 
     # Make sure fit gave right answer
@@ -31,4 +35,4 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
                        rtol=fit_tolerance_fixture,
                        atol=fit_tolerance_fixture*input_params)
 
-    f.fit_as_df
+    f.fit_to_df

@@ -114,6 +114,7 @@ class ModelWrapper:
             err += "   ({})".format(",".join(fittable_params))
             raise ValueError(err)
 
+        self._update_parameter_map()
 
     def __setattr__(self, key, value):
         """
@@ -128,6 +129,11 @@ class ModelWrapper:
         # We're setting another argument
         elif key in self._mw_other_arguments.keys():
             self._mw_other_arguments[key] = value
+
+        elif key in ["bounds","guesses","names","fixed"]:
+            err = f"'{key}' can only be set at the individual parameter level\n"
+            err += "for a ModelWrapper instance.\n"
+            raise TypeError(err)
 
         # Otherwise, just set it like normal
         else:
@@ -151,24 +157,22 @@ class ModelWrapper:
         else:
             super(ModelWrapper,self).__getattribute__(key)
 
-
     def _update_parameter_map(self):
         """
         Update the map between the parameter vector that will be passed in to
         the fitter and the parameters in this wrapper. This
         """
 
-        self._param_to_p_map = []
+        self._position_to_param = []
         self._mw_kwargs = {}
         for p in self._mw_fit_parameters.keys():
             if self._mw_fit_parameters[p].fixed:
-                self._mw_kwargs[p] = self.fit_parameters[p].value
+                self._mw_kwargs[p] = self._mw_fit_parameters[p].value
             else:
                 self._mw_kwargs[p] = None
-                self._param_to_p_map.append(p)
+                self._position_to_param.append(p)
 
-        self._mw_kwargs.update(self.other_arguments)
-
+        self._mw_kwargs.update(self._mw_other_arguments)
 
     def _mw_observable(self,params=None):
         """
@@ -178,17 +182,16 @@ class ModelWrapper:
         # If parameters are not passed, stick in the current parameter
         # values
         if params is None:
-            for i in range(len(self._param_to_p_map)):
-                p = self._param_to_p_map[i]
+            for p in self.position_to_param:
                 self._mw_kwargs[p] = self.fit_parameters[p].value
         else:
-            if len(params) != len(self._param_to_p_map):
+            if len(params) != len(self.position_to_param):
                 err = f"Number of fit parameters ({len(params)}) does not match\n"
-                err += f"number of unfixed parameters ({len(self._param_to_p_map)})\n"
+                err += f"number of unfixed parameters ({len(self.position_to_param)})\n"
                 raise ValueError(err)
 
             for i in range(len(params)):
-                self._mw_kwargs[self._param_to_p_map[i]] = params[i]
+                self._mw_kwargs[self.position_to_param[i]] = params[i]
 
         return self._model_to_fit(**self._mw_kwargs)
 
@@ -198,8 +201,7 @@ class ModelWrapper:
         Load the result of a fit into all fit parameters.
         """
 
-        for i in range(len(self._param_to_p_map)):
-            p = self._param_to_p_map[i]
+        for i, p in enumerate(self.position_to_param):
             self.fit_parameters[p].load_fit_result(fitter,i)
 
     @property
@@ -208,8 +210,8 @@ class ModelWrapper:
         Return the observable.
         """
 
-        # Update the parameter map in case the user changed a fit parameter
-        # since this was last returned.
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
         self._update_parameter_map()
 
         # This model, once returned, does not have to re-run update_parameter_map
@@ -223,12 +225,12 @@ class ModelWrapper:
         parameters).
         """
 
-        # Update the parameter map in case the user changed a fit parameter
-        # since this was last returned.
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
         self._update_parameter_map()
 
         guesses = []
-        for p in self._param_to_p_map:
+        for p in self.position_to_param:
             guesses.append(self.fit_parameters[p].guess)
 
         return np.array(guesses)
@@ -240,12 +242,12 @@ class ModelWrapper:
         parameters).
         """
 
-        # Update the parameter map in case the user changed a fit parameter
-        # since this was last returned.
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
         self._update_parameter_map()
 
         bounds = [[],[]]
-        for p in self._param_to_p_map:
+        for p in self.position_to_param:
             bounds[0].append(self.fit_parameters[p].bounds[0])
             bounds[1].append(self.fit_parameters[p].bounds[1])
 
@@ -258,12 +260,12 @@ class ModelWrapper:
         parameters).
         """
 
-        # Update the parameter map in case the user changed a fit parameter
-        # since this was last returned.
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
         self._update_parameter_map()
 
         names = []
-        for p in self._param_to_p_map:
+        for p in self.position_to_param:
             names.append(self.fit_parameters[p].name)
 
         return names[:]
@@ -283,3 +285,12 @@ class ModelWrapper:
         """
 
         return self._mw_other_arguments
+
+    @property
+    def position_to_param(self):
+        """
+        List mapping the position of each parameters in the output arrays to
+        their original model argument names.
+        """
+
+        return self._position_to_param

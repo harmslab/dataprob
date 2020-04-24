@@ -15,9 +15,6 @@ import re, inspect
 
 import likelihood
 
-class LikelihoodError(Exception):
-    pass
-
 class Fitter:
     """
     Base class for fits/analyses using a likelihood function.
@@ -47,7 +44,7 @@ class Fitter:
                     raise KeyError
             except KeyError:
                 err = f"'{a}' must be set before {call_string}\n"
-                raise LikelihoodError(err)
+                raise RuntimeError(err)
 
 
     def _preprocess_fit(self,model,guesses,y_obs,bounds=None,names=None,y_stdev=None):
@@ -62,7 +59,7 @@ class Fitter:
         else:
             if self.model is None:
                 err = "model must be specified before fit\n"
-                raise LikelihoodError(err)
+                raise RuntimeError(err)
 
         # Record guesses, grab from ModelWrapper model, or fail.
         if guesses is not None:
@@ -73,7 +70,7 @@ class Fitter:
                     self.guesses = self.model.__self__.guesses
                 else:
                     err = "parameter guesses must be specified before fit\n"
-                    raise LikelihoodError(err)
+                    raise RuntimeError(err)
 
         # Record bounds, grab from ModelWrapper model, or make infinite
         if bounds is not None:
@@ -102,7 +99,7 @@ class Fitter:
         else:
             if self.y_obs is None:
                 err = "y_obs must be specified before fit\n"
-                raise LikelihoodError(err)
+                raise RuntimeError(err)
 
         # Record y_stdev, check for preloaded, or use default
         if y_stdev is not None:
@@ -160,7 +157,10 @@ class Fitter:
             self.model.__self__.load_fit_result(self)
 
     @property
-    def fit_as_df(self):
+    def fit_to_df(self):
+        """
+        Return the fit results as a dataframe.
+        """
 
         if not self.success:
             return None
@@ -201,8 +201,8 @@ class Fitter:
                 out_dict["param"].append(self.names[i])
                 out_dict["estimate"].append(self.estimate[i])
                 out_dict["stdev"].append(self.stdev[i])
-                out_dict["low_95"].append(self.ninetyfive[i,0])
-                out_dict["high_95"].append(self.ninetyfive[i,1])
+                out_dict["low_95"].append(self.ninetyfive[0,i])
+                out_dict["high_95"].append(self.ninetyfive[1,i])
                 out_dict["guess"].append(self.guesses[i])
                 out_dict["lower_bound"].append(self.bounds[0,i])
                 out_dict["upper_bound"].append(self.bounds[1,i])
@@ -263,20 +263,13 @@ class Fitter:
         Setter for "model" attribute.
         """
 
+        if model is None:
+            return
+
         # If this is a ModelWrapper instance, grab the model method rather than
         # the model instance
         if isinstance(model,likelihood.model_wrapper.ModelWrapper):
             model = model.model
-
-        # If the model is a method of a ModelWrapper instance, record this so
-        # the Fitter object knows it can get guesses, bounds, and names from
-        # the ModelWrapper if necessary.
-        self._model_is_model_wrapper = False
-        try:
-            if model.__qualname__.startswith("ModelWrapper"):
-                self._model_is_model_wrapper = True
-        except AttributeError:
-            pass
 
         has_err = False
         try:
@@ -293,12 +286,25 @@ class Fitter:
 
         self._model = model
 
+        # If the model is a method of a ModelWrapper instance, record this so
+        # the Fitter object knows it can get guesses, bounds, and names from
+        # the ModelWrapper if necessary.
+        self._model_is_model_wrapper = False
+        try:
+            if model.__qualname__.startswith("ModelWrapper"):
+                self._model_is_model_wrapper = True
+
+        except AttributeError:
+            pass
 
     @property
     def guesses(self):
         """
         Guesses for fit parameters.
         """
+
+        if self._model_is_model_wrapper:
+            return self.model.__self__.guesses
 
         try:
             return self._guesses
@@ -327,11 +333,19 @@ class Fitter:
 
         self._guesses = guesses
 
+        # Update the underlying guesses in each FitParameter instance
+        if self._model_is_model_wrapper:
+            for i, p in enumerate(self.model.__self__.position_to_param):
+                self.model.__self__.fit_parameters[p].guess = guesses[i]
+
     @property
     def bounds(self):
         """
         Bounds for fit parameters.
         """
+
+        if self._model_is_model_wrapper:
+            return self.model.__self__.bounds
 
         try:
             return self._bounds
@@ -346,6 +360,8 @@ class Fitter:
 
         try:
             bounds = np.array(bounds,dtype=np.float)
+            if len(bounds.shape) != 2 or bounds.shape[0] != 2:
+                raise ValueError("incorrect dimensions!\n")
         except (ValueError,TypeError) as err:
             err = f"{err}\n\nguesses must be a 2 x num_params list or array of floats:\n\n"
             err += "   [[lower_1,lower_2,...lower_n],[upper_1,upper_2,...upper_n]]\n\n"
@@ -354,18 +370,27 @@ class Fitter:
         if self.num_params is not None:
             if bounds.shape[1] != self.num_params:
                 err = "length of bounds ({}) must match the number of parameters ({})\n".format(bounds.shape[1],
-                                                                                               self.num_params)
+                                                                                                self.num_params)
                 raise ValueError(err)
         else:
             self._num_params = bounds.shape[1]
 
         self._bounds = bounds
 
+        # Update the underlying guesses in each FitParameter instance
+        if self._model_is_model_wrapper:
+            for i, p in enumerate(self.model.__self__.position_to_param):
+                self.model.__self__.fit_parameters[p].bounds = bounds[:,i]
+
+
     @property
     def names(self):
         """
         Parameter names for fit parameters.
         """
+
+        if self._model_is_model_wrapper:
+            return self.model.__self__.names
 
         try:
             return self._names
@@ -381,7 +406,7 @@ class Fitter:
         try:
             names = np.array(names,dtype=np.str)
 
-            # Will through a type error if the user puts in a single value
+            # Will throw a type error if the user puts in a single value
             try:
                 len(names)
             except TypeError:
@@ -405,6 +430,10 @@ class Fitter:
 
         self._names = names
 
+        # Update the underlying guesses in each FitParameter instance
+        if self._model_is_model_wrapper:
+            for i, p in enumerate(self.model.__self__.position_to_param):
+                self.model.__self__.fit_parameters[p].name = names[i]
 
     @property
     def y_obs(self):
@@ -477,6 +506,9 @@ class Fitter:
         """
         Number of fit parameters.
         """
+
+        if self._model_is_model_wrapper:
+            return len(self.model.__self__.guesses)
 
         try:
             return self._num_params
@@ -606,11 +638,11 @@ class Fitter:
         for i in range(s.shape[1]):
 
             # look for patterns to skip
-            if skip_pattern.search(self._names[i]):
-                print("not doing corner plot for parameter ",self._names[i])
+            if skip_pattern.search(self.names[i]):
+                print("not doing corner plot for parameter ",self.names[i])
                 continue
 
-            names.append(self._names[i])
+            names.append(self.names[i])
             keep_indexes.append(i)
             corner_range.append(tuple([np.min(s[:,i])-0.5,np.max(s[:,i])+0.5]))
 

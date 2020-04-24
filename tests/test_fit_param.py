@@ -203,7 +203,8 @@ def test_load_clear_fit_results(fitter_object):
     p.load_fit_result(fitter_object,0)
     assert p.value == fitter_object.estimate[0]
     assert p.stdev == fitter_object.stdev[0]
-    assert np.array_equal(p.ninetyfive,fitter_object.ninetyfive[0])
+    assert np.array_equal(p.ninetyfive[0],fitter_object.ninetyfive[0,0])
+    assert np.array_equal(p.ninetyfive[1],fitter_object.ninetyfive[1,0])
     assert p.is_fit_result
 
     # --- Make sure setting guess wipes out fit ---
@@ -227,7 +228,8 @@ def test_load_clear_fit_results(fitter_object):
     p.load_fit_result(fitter_object,0)
     assert p.value == fitter_object.estimate[0]
     assert p.stdev == fitter_object.stdev[0]
-    assert np.array_equal(p.ninetyfive,fitter_object.ninetyfive[0])
+    assert np.array_equal(p.ninetyfive[0],fitter_object.ninetyfive[0,0])
+    assert np.array_equal(p.ninetyfive[1],fitter_object.ninetyfive[1,0])
     assert p.is_fit_result
 
     p.bounds = [-100,100]
@@ -250,7 +252,8 @@ def test_load_clear_fit_results(fitter_object):
     p.load_fit_result(fitter_object,0)
     assert p.value == fitter_object.estimate[0]
     assert p.stdev == fitter_object.stdev[0]
-    assert np.array_equal(p.ninetyfive,fitter_object.ninetyfive[0])
+    assert np.array_equal(p.ninetyfive[0],fitter_object.ninetyfive[0,0])
+    assert np.array_equal(p.ninetyfive[1],fitter_object.ninetyfive[1,0])
     assert p.is_fit_result
 
     p.fixed = True
