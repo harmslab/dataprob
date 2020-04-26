@@ -69,7 +69,7 @@ class Fitter:
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
-            is assigned an error of 1.
+            is assigned an error of 1.  
         **kwargs : any remaining keywaord arguments are passed as **kwargs to
             core engine (optimize.least_squares or emcee.EnsembleSampler)
         """

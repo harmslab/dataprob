@@ -34,7 +34,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         else:
             f.bounds = [[0],[10]]
 
-        f.fit(model=model,guesses=guesses,y_obs=df.Y)
+        f.fit(model=model,guesses=guesses,y_obs=df.Y,y_stdev=df.Y_stdev)
 
         # Assert that we succesfully passed in bounds
         assert np.allclose(f.bounds,np.array([[0],[10]]))

@@ -13,6 +13,7 @@ import numpy as np
 import scipy.optimize as optimize
 
 import multiprocessing
+from multiprocessing import Pool
 
 class BayesianFitter(Fitter):
     """
@@ -154,14 +155,17 @@ class BayesianFitter(Fitter):
                for i in range(self._num_walkers)]
 
         # Sample using walkers
-        self._fit_result = emcee.EnsembleSampler(self._num_walkers, ndim, self.ln_prob,
-                                                 threads=self._num_threads,**kwargs)
-        self._fit_result.run_mcmc(pos, self._num_steps)
+        self._fit_result = emcee.EnsembleSampler(self._num_walkers,
+                                                 ndim,
+                                                 self.ln_prob,
+                                                 **kwargs)
+
+        self._fit_result.run_mcmc(pos, self._num_steps,progress=True)
 
         # Create list of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
-        self._samples = self._fit_result.chain[:,to_discard:,:].reshape((-1,ndim))
-        self._lnprob = self._fit_result.lnprobability[:,:].reshape(-1)
+        self._samples = self._fit_result.get_chain()[:,to_discard:,:].reshape((-1,ndim))
+        self._lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
 
         # Get mean and standard deviation
         self._estimate = np.mean(self._samples,axis=0)

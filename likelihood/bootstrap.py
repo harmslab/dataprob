@@ -57,10 +57,8 @@ class BootstrapFitter(Fitter):
             scipy.optimize.least_squares
         """
 
-        self._preprocess_fit(model,guesses,y_obs,bounds,names,y_stdev)
-
         # Create array to store bootstrap replicates
-        self._samples = np.zeros((self._num_bootstrap,len(parameters)),
+        self._samples = np.zeros((self._num_bootstrap,len(self.guesses)),
                                  dtype=float)
 
         original_y_obs = np.copy(self._y_obs)
@@ -73,11 +71,11 @@ class BootstrapFitter(Fitter):
                 sys.stdout.flush()
 
             # Add random error to each sample
-            self._y_obs = original_y_obs + np.random.normal(0.0,y_stdev)
+            self.y_obs = original_y_obs + np.random.normal(0.0,self.y_stdev)
 
             # Do the fit
             fit = scipy.optimize.least_squares(self.unweighted_residuals,
-                                               x0=parameters,
+                                               x0=self.guesses,
                                                bounds=self.bounds,
                                                **kwargs)
 
