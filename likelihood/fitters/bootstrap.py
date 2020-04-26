@@ -37,7 +37,7 @@ class BootstrapFitter(Fitter):
             Give verbose output.
         """
 
-        Fitter.__init__(self)
+        super(BootstrapFitter,self).__init__()
 
         self._num_bootstrap = num_bootstrap
         self._perturb_size = perturb_size
@@ -46,36 +46,19 @@ class BootstrapFitter(Fitter):
 
         self.fit_type = "bootstrap"
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def _fit(self,**kwargs):
         """
         Fit the parameters.
 
         Parameters
         ----------
 
-        model : callable
-            model to fit.  model should take "guesses" as its only argument.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        param_names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to
+        **kwargs : any keyword arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
-        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
-
         # Create array to store bootstrap replicates
-        self._samples = np.zeros((self._num_bootstrap,len(parameters)),
-                                 dtype=float)
+        samples = np.zeros((self._num_bootstrap,len(self.guesses)),dtype=float)
 
         original_y_obs = np.copy(self._y_obs)
 
@@ -87,20 +70,31 @@ class BootstrapFitter(Fitter):
                 sys.stdout.flush()
 
             # Add random error to each sample
-            self._y_obs = original_y_obs + np.random.normal(0.0,y_stdev)
+            self.y_obs = original_y_obs + np.random.normal(0.0,self.y_stdev)
 
             # Do the fit
             fit = scipy.optimize.least_squares(self.unweighted_residuals,
-                                               x0=parameters,
-                                               bounds=bounds,
+                                               x0=self.guesses,
+                                               bounds=self.bounds,
                                                **kwargs)
 
             # record the fit results
-            self._samples[i,:] = fit.x
+            samples[i,:] = fit.x
 
         self._y_obs = np.copy(original_y_obs)
 
+        if self.samples is None:
+            self._samples = samples
+
+        # If samples have already been done, append to them.
+        else:
+            self._samples = np.concatenate((self._samples,samples))
+
         self._fit_result = self._samples
+
+        self._update_estimates()
+
+    def _update_estimates(self):
 
         # mean of bootstrap samples
         self._estimate = np.mean(self._samples,axis=0)
@@ -109,11 +103,12 @@ class BootstrapFitter(Fitter):
         self._stdev = np.std(self._samples,axis=0)
 
         # 95% from bootstrap samples
-        self._ninetyfive = []
+        self._ninetyfive = [[],[]]
         for i in range(self._samples.shape[1]):
             lower = np.percentile(self._samples[:,i], 2.5)
             upper = np.percentile(self._samples[:,i],97.5)
-            self._ninetyfive.append([lower,upper])
+            self._ninetyfive[0].append(lower)
+            self._ninetyfive[1].append(upper)
         self._ninetyfive = np.array(self._ninetyfive)
 
         self._success = True

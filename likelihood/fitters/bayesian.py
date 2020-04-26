@@ -13,6 +13,7 @@ import numpy as np
 import scipy.optimize as optimize
 
 import multiprocessing
+from multiprocessing import Pool
 
 class BayesianFitter(Fitter):
     """
@@ -42,7 +43,7 @@ class BayesianFitter(Fitter):
             cpus. [NOT YET IMPLEMENTED]
         """
 
-        Fitter.__init__(self)
+        super(BayesianFitter,self).__init__()
 
         self._num_walkers = num_walkers
         self._initial_walker_spread = initial_walker_spread
@@ -59,7 +60,7 @@ class BayesianFitter(Fitter):
             raise ValueError(err)
 
         if self._num_threads != 1:
-            err = "multithreading has not yet been (fully) implemented.\n"
+            err = "multithreading has not yet been implemented (yet!).\n"
             raise NotImplementedError(err)
 
         self._success = None
@@ -84,7 +85,7 @@ class BayesianFitter(Fitter):
         """
 
         # If a paramter falls outside of the bounds, make the prior -infinity
-        if np.sum(param < self._bounds[0,:]) > 0 or np.sum(param > self._bounds[1,:]) > 0:
+        if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
             return -np.inf
 
         # otherwise, uniform
@@ -121,7 +122,7 @@ class BayesianFitter(Fitter):
         # log posterior is log prior plus log likelihood
         return ln_prior + ln_like
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,param_names=None,y_stdev=None,**kwargs):
+    def _fit(self,**kwargs):
         """
         Fit the parameters.
 
@@ -133,51 +134,54 @@ class BayesianFitter(Fitter):
         Parameters
         ----------
 
-        model : callable
-            model to fit.  model should take "guesses" as its only argument.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        param_names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1
         **kwargs : keyword arguments to pass to emcee.EnsembleSampler
         """
-
-        self._preprocess_fit(model,guesses,y_obs,bounds,param_names,y_stdev)
 
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
             fn = lambda *args: -self.weighted_residuals(*args)
-            ml_fit = optimize.least_squares(fn,x0=self._guesses,bounds=self._bounds)
+            ml_fit = optimize.least_squares(fn,x0=self.guesses,bounds=self.bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
-            self._initial_guess = np.copy(self._guesses)
+            self._initial_guess = np.copy(self.guesses)
 
         # Create walker positions
 
         # Size of perturbation in parameter depends on the scale of the parameter
         perturb_size = self._initial_guess*self._initial_walker_spread
 
-        ndim = len(self._guesses)
+        ndim = len(self.guesses)
         pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
                for i in range(self._num_walkers)]
 
         # Sample using walkers
-        self._fit_result = emcee.EnsembleSampler(self._num_walkers, ndim, self.ln_prob,
-                                                 threads=self._num_threads,**kwargs)
-        self._fit_result.run_mcmc(pos, self._num_steps)
+        self._fit_result = emcee.EnsembleSampler(self._num_walkers,
+                                                 ndim,
+                                                 self.ln_prob,
+                                                 **kwargs)
+
+        self._fit_result.run_mcmc(pos, self._num_steps,progress=True)
 
         # Create list of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
-        self._samples = self._fit_result.chain[:,to_discard:,:].reshape((-1,ndim))
-        self._lnprob = self._fit_result.lnprobability[:,:].reshape(-1)
+        new_samples = self._fit_result.get_chain()[:,to_discard:,:].reshape((-1,ndim))
+
+
+        if self.samples is None:
+            self._samples = new_samples
+
+        # If samples have already been done, append to them.
+        else:
+            self._samples = np.concatenate((self._samples,new_samples))
+
+        self._lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
+
+        self._update_estimates()
+
+    def _update_estimates(self):
+        """
+        Update samples based on the samples array.
+        """
 
         # Get mean and standard deviation
         self._estimate = np.mean(self._samples,axis=0)
@@ -187,9 +191,11 @@ class BayesianFitter(Fitter):
         self._ninetyfive = []
         lower = int(round(0.025*self._samples.shape[0],0))
         upper = int(round(0.975*self._samples.shape[0],0))
+        self._ninetyfive = [[],[]]
         for i in range(self._samples.shape[1]):
             nf = np.sort(self._samples[:,i])
-            self._ninetyfive.append([nf[lower],nf[upper]])
+            self._ninetyfive[0].append(nf[lower])
+            self._ninetyfive[1].append(nf[upper])
 
         self._ninetyfive = np.array(self._ninetyfive)
 

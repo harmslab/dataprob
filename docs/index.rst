@@ -11,6 +11,9 @@ Welcome to likelihood's documentation!
    :caption: Contents:
 
 
+If you set ModelWrapper.K1.name == "test", it changes the name of the parameter
+in the underlying FitParameter and output, but *not* in the ModelWrapper. 
+
 
 Indices and tables
 ==================
