@@ -84,7 +84,7 @@ class BayesianFitter(Fitter):
         """
 
         # If a paramter falls outside of the bounds, make the prior -infinity
-        if np.sum(param < self._bounds[0,:]) > 0 or np.sum(param > self._bounds[1,:]) > 0:
+        if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
             return -np.inf
 
         # otherwise, uniform
@@ -139,17 +139,17 @@ class BayesianFitter(Fitter):
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
             fn = lambda *args: -self.weighted_residuals(*args)
-            ml_fit = optimize.least_squares(fn,x0=self._guesses,bounds=self._bounds)
+            ml_fit = optimize.least_squares(fn,x0=self.guesses,bounds=self.bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
-            self._initial_guess = np.copy(self._guesses)
+            self._initial_guess = np.copy(self.guesses)
 
         # Create walker positions
 
         # Size of perturbation in parameter depends on the scale of the parameter
         perturb_size = self._initial_guess*self._initial_walker_spread
 
-        ndim = len(self._guesses)
+        ndim = len(self.guesses)
         pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
                for i in range(self._num_walkers)]
 
@@ -171,9 +171,11 @@ class BayesianFitter(Fitter):
         self._ninetyfive = []
         lower = int(round(0.025*self._samples.shape[0],0))
         upper = int(round(0.975*self._samples.shape[0],0))
+        self._ninetyfive = [[],[]]
         for i in range(self._samples.shape[1]):
             nf = np.sort(self._samples[:,i])
-            self._ninetyfive.append([nf[lower],nf[upper]])
+            self._ninetyfive[0].append(nf[lower])
+            self._ninetyfive[1].append(nf[upper])
 
         self._ninetyfive = np.array(self._ninetyfive)
 

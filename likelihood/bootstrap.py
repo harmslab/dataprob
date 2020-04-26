@@ -78,7 +78,7 @@ class BootstrapFitter(Fitter):
             # Do the fit
             fit = scipy.optimize.least_squares(self.unweighted_residuals,
                                                x0=parameters,
-                                               bounds=bounds,
+                                               bounds=self.bounds,
                                                **kwargs)
 
             # record the fit results
@@ -95,11 +95,12 @@ class BootstrapFitter(Fitter):
         self._stdev = np.std(self._samples,axis=0)
 
         # 95% from bootstrap samples
-        self._ninetyfive = []
+        self._ninetyfive = [[],[]]
         for i in range(self._samples.shape[1]):
             lower = np.percentile(self._samples[:,i], 2.5)
             upper = np.percentile(self._samples[:,i],97.5)
-            self._ninetyfive.append([lower,upper])
+            self._ninetyfive[0].append(lower)
+            self._ninetyfive[1].append(upper)
         self._ninetyfive = np.array(self._ninetyfive)
 
         self._success = True
