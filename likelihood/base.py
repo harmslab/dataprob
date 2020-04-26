@@ -11,7 +11,7 @@ import scipy.optimize as optimize
 import corner
 import pandas as pd
 
-import re, inspect
+import re, inspect, pickle, os, warnings
 
 import likelihood
 
@@ -27,7 +27,15 @@ class Fitter:
 
         self._num_obs = None
         self._num_params = None
+
+        # Keep track of whether or not the model is a ModelWrapper instance
+        # (which can be used for more powerful fit/parameter options)
         self._model_is_model_wrapper = False
+
+        # This is set to True after a fit is run but is reset to False by
+        # the setter functions like guesses, etc. that would influence the
+        # fit results.
+        self._fit_has_been_run = False
 
         self.fit_type = ""
 
@@ -69,7 +77,7 @@ class Fitter:
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
-            is assigned an error of 1.  
+            is assigned an error of 1.
         **kwargs : any remaining keywaord arguments are passed as **kwargs to
             core engine (optimize.least_squares or emcee.EnsembleSampler)
         """
@@ -145,12 +153,22 @@ class Fitter:
         if self._model_is_model_wrapper:
             self._model.load_fit_result(self)
 
+        self._fit_has_been_run = True
+
     def _fit(self,**kwargs):
         """
         Should be redefined in subclass.
         """
 
         pass
+
+    def _update_estimates(self):
+        """
+        Should be redefined in subclass.
+        """
+
+        pass
+
 
     @property
     def fit_to_df(self):
@@ -276,6 +294,7 @@ class Fitter:
                 has_err = True
             if len(inspect.signature(model).parameters) < 1:
                 has_err = True
+
         except TypeError:
             has_err = True
 
@@ -283,19 +302,34 @@ class Fitter:
             err = "model must be a function that takes at least one argument\n"
             raise ValueError(err)
 
-        self._model = model
-
         # If the model is a method of a ModelWrapper instance, record this so
         # the Fitter object knows it can get guesses, bounds, and names from
         # the ModelWrapper if necessary.
         self._model_is_model_wrapper = False
         try:
             if model.__qualname__.startswith("ModelWrapper"):
-                self._model = model.__self__
+
+                # If this is a model wrapper, we can check for consistency
+                # between the number of model parameters in the model vs.
+                # what has been pre-set in the model.
+                if self.num_params is not None:
+                    if len(model.__self__.guesses) != self.num_params:
+                        err = f"number of model parameters ({len(model.__self__.guesses)}) does\n"
+                        err += f"not match the number of parameters in the Fitter ({self.num_params})\n"
+                        raise ValueError(err)
+
                 self._model_is_model_wrapper = True
+
+                # We're going to store the ModelWrapper instance, not the
+                # method.
+                model = model.__self__
 
         except AttributeError:
             pass
+
+        # Record the model
+        self._model = model
+        self._fit_has_been_run = False
 
     @property
     def guesses(self):
@@ -327,7 +361,7 @@ class Fitter:
         if self.num_params is not None:
             if guesses.shape[0] != self.num_params:
                 err = "length of guesses ({}) must match the number of parameters ({})\n".format(guesses.shape[0],
-                                                                                               self.num_params)
+                                                                                                 self.num_params)
                 raise ValueError(err)
         else:
             self._num_params = guesses.shape[0]
@@ -338,6 +372,8 @@ class Fitter:
         if self._model_is_model_wrapper:
             for i, p in enumerate(self._model.position_to_param):
                 self._model.fit_parameters[p].guess = guesses[i]
+
+        self._fit_has_been_run = False
 
     @property
     def bounds(self):
@@ -383,6 +419,8 @@ class Fitter:
         if self._model_is_model_wrapper:
             for i, p in enumerate(self._model.position_to_param):
                 self._model.fit_parameters[p].bounds = bounds[:,i]
+
+        self._fit_has_been_run = False
 
 
     @property
@@ -470,6 +508,8 @@ class Fitter:
 
         self._y_obs = y_obs
 
+        self._fit_has_been_run = False
+
 
     @property
     def y_stdev(self):
@@ -502,6 +542,8 @@ class Fitter:
             self._num_obs = y_stdev.shape[0]
 
         self._y_stdev = y_stdev
+
+        self._fit_has_been_run = False
 
 
     @property
@@ -658,3 +700,87 @@ class Fitter:
                             truths=est_values,*args,**kwargs)
 
         return fig
+
+    def write_samples(self,output_file):
+        """
+        Write the samples from the fit out to a pickle file.
+
+        output_file: output pickle file to write to.
+        """
+
+        # See if the file exists already.
+        if os.path.isfile(output_file):
+            err = f"{output_file} exists.\n"
+            raise FileExistsError(err)
+
+        # If there are samples, write them out.
+        if self.samples is not None:
+            pickle.dump(self.samples,open(output_file,'wb'))
+
+    def append_samples(self,sample_file=None,sample_array=None):
+        """
+        Append samples to the fit.  The new samples must be a float array
+        with the shape: num_samples, num_parameters. This can come from a
+        pickle file (sample_file) or array.  Only one of these can be specified.
+
+        sample_file: Pickle file of the numpy array.
+        sample_array: Array of samples.
+        """
+
+        # Nothing to do; no new samples specified
+        if sample_file is None and sample_array is None:
+            return
+
+        # Cannot specify both sample file and sample array
+        if sample_file is not None and sample_array is not None:
+            err = "Either a file with samples or a sample array can be specified,"
+            err += " but not both."
+            raise ValueError(err)
+
+        # Read sample file
+        if sample_file is not None:
+
+            try:
+                sample_array = pickle.load(open(sample_file,"rb"))
+            except FileNotFound:
+                err = f"'{sample_file}'  does not exist.\n"
+                raise FileNotFound(err)
+            except UnpicklingError:
+                err = f"'{sample_file}' does not appear to be a pickle file.\n"
+                raise pickle.UnpicklingError(err)
+
+        # Check sanity of sample_array; update num_params if not specified
+        has_err = False
+        if isinstance(sample_array,np.ndarray) and sample_array.dtype == np.floating:
+            if len(sample_array.shape) == 2:
+                if self.num_params is not None:
+                    if sample_array.shape[1] != self.num_params:
+                        has_err = True
+                else:
+                    self._num_params = sample_array.shape[1]
+            else:
+                has_err = True
+        else:
+            has_err = True
+
+        if has_err:
+            err = "sample_array should be a float numpy array of shape\n"
+            err += "(num_samples,num_param)\n"
+            raise ValueError(err)
+
+        if self.samples is None:
+            err = "You can only append samples to  a fit that has already been done\.n"
+            raise ValueError(err)
+
+        warn = "\n\nThis function only checks to see if the input samples array\n"
+        warn += "has the same number of parameters as the current number of\n"
+        warn += "parameters. It does not check the identity of those parameters.\n"
+        warn += "It will happily combine samples from one model with samples\n"
+        warn += "from a different model.  It's up to you to make sure that does\n"
+        warn += "not happen.  Happy Sampling. \U0001F600\n\n"
+        warnings.warn(warn,UserWarning)
+
+        # Concatenate the new samples to the existing samples
+        self._samples = np.concatenate((self.samples,sample_array))
+
+        self._update_estimates()

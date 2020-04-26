@@ -58,8 +58,7 @@ class BootstrapFitter(Fitter):
         """
 
         # Create array to store bootstrap replicates
-        self._samples = np.zeros((self._num_bootstrap,len(self.guesses)),
-                                 dtype=float)
+        samples = np.zeros((self._num_bootstrap,len(self.guesses)),dtype=float)
 
         original_y_obs = np.copy(self._y_obs)
 
@@ -80,11 +79,22 @@ class BootstrapFitter(Fitter):
                                                **kwargs)
 
             # record the fit results
-            self._samples[i,:] = fit.x
+            samples[i,:] = fit.x
 
         self._y_obs = np.copy(original_y_obs)
 
+        if self.samples is None:
+            self._samples = samples
+
+        # If samples have already been done, append to them.
+        else:
+            self._samples = np.concatenate((self._samples,samples))
+
         self._fit_result = self._samples
+
+        self._update_estimates()
+
+    def _update_estimates(self):
 
         # mean of bootstrap samples
         self._estimate = np.mean(self._samples,axis=0)

@@ -162,7 +162,7 @@ def test_interaction_bounds_guesses():
     assert p.guess == -5.0
 
     new_bounds = [0,10]
-    with pytest.warns(RuntimeWarning):
+    with pytest.warns(UserWarning):
         p.bounds = new_bounds
     assert np.array_equal(p.bounds,np.array(new_bounds))
     assert p.guess == new_bounds[0]
@@ -173,7 +173,7 @@ def test_interaction_bounds_guesses():
     assert p.guess == 5.0
 
     new_bounds = [-10,0]
-    with pytest.warns(RuntimeWarning):
+    with pytest.warns(UserWarning):
         p.bounds = new_bounds
     assert np.array_equal(p.bounds,np.array(new_bounds))
     assert p.guess == new_bounds[1]

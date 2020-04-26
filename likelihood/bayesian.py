@@ -60,7 +60,7 @@ class BayesianFitter(Fitter):
             raise ValueError(err)
 
         if self._num_threads != 1:
-            err = "multithreading has not yet been (fully) implemented.\n"
+            err = "multithreading has not yet been implemented (yet!).\n"
             raise NotImplementedError(err)
 
         self._success = None
@@ -164,8 +164,24 @@ class BayesianFitter(Fitter):
 
         # Create list of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
-        self._samples = self._fit_result.get_chain()[:,to_discard:,:].reshape((-1,ndim))
+        new_samples = self._fit_result.get_chain()[:,to_discard:,:].reshape((-1,ndim))
+
+
+        if self.samples is None:
+            self._samples = new_samples
+
+        # If samples have already been done, append to them.
+        else:
+            self._samples = np.concatenate((self._samples,new_samples))
+
         self._lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
+
+        self._update_estimates()
+
+    def _update_estimates(self):
+        """
+        Update samples based on the samples array.
+        """
 
         # Get mean and standard deviation
         self._estimate = np.mean(self._samples,axis=0)

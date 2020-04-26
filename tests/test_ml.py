@@ -5,6 +5,7 @@ import likelihood
 import numpy as np
 import pandas as pd
 
+import pickle, os
 
 def test_init():
 

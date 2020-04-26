@@ -262,7 +262,7 @@ class FitParameter:
             if old_guess is not None:
                 w = f"The previous guess ({old_guess}) is outside the new bounds ({bounds})\n"
                 w += f"Guess has been updated to {self.guess}\n"
-                warnings.warn(w,RuntimeWarning)
+                warnings.warn(w,UserWarning)
 
         self._bounds = bounds
         self._clear_fit_result()

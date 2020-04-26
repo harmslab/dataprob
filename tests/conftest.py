@@ -92,7 +92,7 @@ def fitter_object(binding_curve_test_data):
 
     return f
 
-## Code for skipping slow tests. 
+## Code for skipping slow tests.
 
 def pytest_addoption(parser):
     parser.addoption(

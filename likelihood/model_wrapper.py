@@ -193,8 +193,11 @@ class ModelWrapper:
             for i in range(len(params)):
                 self._mw_kwargs[self.position_to_param[i]] = params[i]
 
-        return self._model_to_fit(**self._mw_kwargs)
-
+        try:
+            return self._model_to_fit(**self._mw_kwargs)
+        except Exception as e:
+            err = "\n\nThe wrapped model threw an error (see trace).\n\n"
+            raise type(e)(err) from e
 
     def load_fit_result(self,fitter):
         """

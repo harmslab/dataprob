@@ -52,6 +52,13 @@ class MLFitter(Fitter):
                                                   x0=self.guesses,
                                                   bounds=self.bounds,
                                                   **kwargs)
+
+        self._success = self._fit_result.success
+
+        self._update_estimates()
+
+    def _update_estimates(self):
+
         self._estimate = self._fit_result.x
 
         # Extract standard error on the fit parameter from the covariance
@@ -84,8 +91,6 @@ class MLFitter(Fitter):
             self._stdev = np.nan*np.ones(len(self._estimate),dtype=np.float)
             self._ninety_five = np.nan*np.ones((2,len(self._estimate)),dtype=np.float)
 
-        self._success = self._fit_result.success
-
 
     @property
     def samples(self):
@@ -108,7 +113,11 @@ class MLFitter(Fitter):
         except AttributeError:
 
             try:
-                J = self._fit_result.jac
+                # Return None if no fit has been run.
+                try:
+                    J = self._fit_result.jac
+                except AttributeError:
+                    return None
 
                 cov = np.linalg.inv(2*np.dot(J.T,J))
                 chol_cov = np.linalg.cholesky(cov).T
