@@ -15,7 +15,7 @@ def test_init():
     Test model initialization.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     assert f.fit_type == ""
 
 # ---------------------------------------------------------------------------- #
@@ -27,7 +27,7 @@ def test_model_setter_getter(binding_curve_test_data):
     Test the model setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     with pytest.raises(ValueError):
         f.model = "a"
@@ -48,7 +48,7 @@ def test_model_setter_getter(binding_curve_test_data):
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = likelihood.ModelWrapper(model_to_test_wrap)
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     f.model = mw
     assert f.model == mw._mw_observable
     assert np.array_equal(f.guesses,np.array([1,20]))
@@ -60,7 +60,7 @@ def test_model_setter_getter(binding_curve_test_data):
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = likelihood.ModelWrapper(model_to_test_wrap)
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     f.model = mw.model
     assert f.model == mw._mw_observable
     assert np.array_equal(f.guesses,np.array([1,20]))
@@ -72,7 +72,7 @@ def test_guesses_setter_getter(binding_curve_test_data):
     Test the guesses setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     with pytest.raises(ValueError):
         f.guesses = "a"
@@ -87,7 +87,7 @@ def test_guesses_setter_getter(binding_curve_test_data):
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = likelihood.ModelWrapper(model_to_test_wrap)
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     f.model = mw.model
     assert f.model == mw._mw_observable
     assert np.array_equal(f.guesses,np.array([1,20]))
@@ -108,7 +108,7 @@ def test_bounds_setter_getter(binding_curve_test_data):
     Test the bounds setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     with pytest.raises(ValueError):
         f.bounds = "a"
@@ -133,7 +133,7 @@ def test_names_setter_getter(binding_curve_test_data):
     Test the names setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     names = ["p{}".format(i)
                    for i in range(len(binding_curve_test_data["guesses"]))]
@@ -148,7 +148,7 @@ def test_param_mismatch_check(binding_curve_test_data):
     bounds, and names.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     f.guesses = binding_curve_test_data["guesses"]
     with pytest.raises(ValueError):
@@ -174,7 +174,7 @@ def test_y_obs_setter_getter(binding_curve_test_data):
     Test the y_obs setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     with pytest.raises(ValueError):
         f.y_obs = "a"
@@ -190,7 +190,7 @@ def test_y_stdev_setter_getter(binding_curve_test_data):
     Test the y_stdev setter.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     with pytest.raises(ValueError):
         f.y_stdev = "a"
@@ -207,14 +207,14 @@ def test_obs_mismatch_check(binding_curve_test_data):
     and y_stdev.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     f.y_obs = binding_curve_test_data["df"].Y
     with pytest.raises(ValueError):
         f.y_stdev = binding_curve_test_data["df"].Y_stdev[:-1]
     f.y_stdev = binding_curve_test_data["df"].Y_stdev
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     f.y_stdev = binding_curve_test_data["df"].Y_stdev
     with pytest.raises(ValueError):
@@ -224,7 +224,7 @@ def test_obs_mismatch_check(binding_curve_test_data):
 
 def test_fit_completeness_sanity_checking(binding_curve_test_data):
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     # This should not work because we have not specified a model, guesses,
     # or y_obs yet
@@ -262,7 +262,7 @@ def test_unweighted_residuals(binding_curve_test_data):
     test data.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     input_params = binding_curve_test_data["input_params"]
 
@@ -290,7 +290,7 @@ def test_weighted_residuals(binding_curve_test_data):
     test data.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     input_params = binding_curve_test_data["input_params"]
 
@@ -323,7 +323,7 @@ def test_ln_like(binding_curve_test_data):
     test data.
     """
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     input_params = binding_curve_test_data["input_params"]
 
@@ -351,7 +351,7 @@ def test_ln_like(binding_curve_test_data):
 
 def test_num_params():
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     assert f.num_params is None
 
     f.guesses = np.array([1,2])
@@ -360,13 +360,13 @@ def test_num_params():
     with pytest.raises(ValueError):
         f.guesses = np.array([7,8,9,10])
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     f.guesses = np.array([])
     assert f.num_params == 0
 
 def test_num_obs():
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     assert f.num_obs is None
 
     f.y_obs = np.arange(10)
@@ -375,14 +375,14 @@ def test_num_obs():
     with pytest.raises(ValueError):
         f.y_obs = np.arange(2)
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     f.y_obs = np.array([])
     assert f.num_obs == 0
 
 
 def test_base_properties():
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
 
     assert f.estimate is None
     assert f.stdev is None
@@ -395,5 +395,5 @@ def test_base_properties():
 
 def test_base_functions():
 
-    f = likelihood.base.Fitter()
+    f = likelihood.fitters.base.Fitter()
     assert f.corner_plot() is None
