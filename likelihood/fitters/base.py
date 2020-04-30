@@ -203,8 +203,14 @@ class Fitter:
                         out_dict[col].append(None)
                 else:
                     out_dict["stdev"].append(m.fit_parameters[p].stdev)
-                    out_dict["low_95"].append(m.fit_parameters[p].ninetyfive[0])
-                    out_dict["high_95"].append(m.fit_parameters[p].ninetyfive[1])
+
+                    if m.fit_parameters[p].ninetyfive is not None:
+                        out_dict["low_95"].append(m.fit_parameters[p].ninetyfive[0])
+                        out_dict["high_95"].append(m.fit_parameters[p].ninetyfive[1])
+                    else:
+                        out_dict["low_95"].append(np.nan)
+                        out_dict["high_95"].append(np.nan)
+
                     out_dict["guess"].append(m.fit_parameters[p].guess)
                     out_dict["lower_bound"].append(m.fit_parameters[p].bounds[0])
                     out_dict["upper_bound"].append(m.fit_parameters[p].bounds[1])
@@ -215,8 +221,14 @@ class Fitter:
                 out_dict["param"].append(self.names[i])
                 out_dict["estimate"].append(self.estimate[i])
                 out_dict["stdev"].append(self.stdev[i])
-                out_dict["low_95"].append(self.ninetyfive[0,i])
-                out_dict["high_95"].append(self.ninetyfive[1,i])
+
+                if self.ninetyfive is not None:
+                    out_dict["low_95"].append(self.ninetyfive[0,i])
+                    out_dict["high_95"].append(self.ninetyfive[1,i])
+                else:
+                    out_dict["low_95"].append(np.nan)
+                    out_dict["high_95"].append(np.nan)
+
                 out_dict["guess"].append(self.guesses[i])
                 out_dict["lower_bound"].append(self.bounds[0,i])
                 out_dict["upper_bound"].append(self.bounds[1,i])
@@ -672,7 +684,7 @@ class Fitter:
 
         # Make sure that fit actually returned samples. (Will fail, for example
         # if Jacobian misbehaves in ML fit)
-        if s is None:
+        if len(s) == 0:
             err = "\n\nFit did not produce samples for generation of a corner plot.\nCheck warnings.\n"
             raise RuntimeError(err)
 

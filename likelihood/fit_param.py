@@ -327,8 +327,11 @@ class FitParameter:
         if fitter.success:
             self._value = fitter.estimate[param_number]
             self._stdev = fitter.stdev[param_number]
-            self._ninetyfive = np.array([fitter.ninetyfive[0,param_number],
-                                         fitter.ninetyfive[1,param_number]])
+            if fitter.ninetyfive is not None:
+                self._ninetyfive = np.array([fitter.ninetyfive[0,param_number],
+                                             fitter.ninetyfive[1,param_number]])
+            else:
+                self._ninetyfive = np.array([np.nan,np.nan])
             self._is_fit_result = True
 
     def _clear_fit_result(self):
