@@ -754,10 +754,10 @@ class Fitter:
 
             try:
                 sample_array = pickle.load(open(sample_file,"rb"))
-            except FileNotFound:
+            except FileNotFoundError:
                 err = f"'{sample_file}'  does not exist.\n"
-                raise FileNotFound(err)
-            except UnpicklingError:
+                raise FileNotFoundError(err)
+            except pickle.UnpicklingError:
                 err = f"'{sample_file}' does not appear to be a pickle file.\n"
                 raise pickle.UnpicklingError(err)
 

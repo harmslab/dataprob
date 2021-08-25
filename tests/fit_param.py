@@ -81,7 +81,7 @@ class FitParameter:
                 value = np.float(value)
             except ValueError:
                 err = f"parameter value '{value}' cannot be interpretable as a float\n"
-                raise ValueError(error)
+                raise ValueError(err)
 
             self._value = value
 
