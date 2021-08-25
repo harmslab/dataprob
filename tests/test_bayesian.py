@@ -77,3 +77,4 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert np.array_equal(df["guess"],f.guesses)
         assert np.array_equal(df["lower_bound"],f.bounds[0,:])
         assert np.array_equal(df["upper_bound"],f.bounds[1,:])
+        assert np.array_equal(f.samples.shape,(900,3))
