@@ -135,7 +135,7 @@ class Fitter:
             self.y_stdev = y_stdev
         else:
             if self.y_stdev is None:
-                self.y_stdev = np.ones(len(self.y_obs),dtype=np.float)
+                self.y_stdev = np.ones(len(self.y_obs),dtype=float)
 
         # No fit has been run
         self._success = None
@@ -365,7 +365,7 @@ class Fitter:
         """
 
         try:
-            guesses = np.array(guesses,dtype=np.float)
+            guesses = np.array(guesses,dtype=float)
         except (ValueError,TypeError) as err:
             err = f"{err}\n\nguesses must be a list or array of floats\n\n"
             raise ValueError(err)
@@ -409,7 +409,7 @@ class Fitter:
         """
 
         try:
-            bounds = np.array(bounds,dtype=np.float)
+            bounds = np.array(bounds,dtype=float)
             if len(bounds.shape) != 2 or bounds.shape[0] != 2:
                 raise ValueError("incorrect dimensions!\n")
         except (ValueError,TypeError) as err:
@@ -457,7 +457,7 @@ class Fitter:
         """
 
         try:
-            names = np.array(names,dtype=np.str)
+            names = np.array(names,dtype=str)
 
             # Will throw a type error if the user puts in a single value
             try:
@@ -506,7 +506,7 @@ class Fitter:
         """
 
         try:
-            y_obs = np.array(y_obs,dtype=np.float)
+            y_obs = np.array(y_obs,dtype=float)
         except (ValueError,TypeError) as err:
             err = f"{err}\n\ny_obs must be a list or array of floats\n\n"
             raise ValueError(err)
@@ -541,7 +541,7 @@ class Fitter:
         """
 
         try:
-            y_stdev = np.array(y_stdev,dtype=np.float)
+            y_stdev = np.array(y_stdev,dtype=float)
         except (ValueError,TypeError) as err:
             err = f"{err}\n\ny_stdev must be a list or array of floats\n\n"
             raise ValueError(err)
@@ -705,7 +705,7 @@ class Fitter:
 
             est_values.append(self.estimate[i])
 
-        to_plot = s[:,np.array(keep_indexes,dtype=np.int)]
+        to_plot = s[:,np.array(keep_indexes,dtype=int)]
         #to_plot = np.swapaxes(to_plot,0,1)
 
         fig = corner.corner(to_plot,labels=names,range=corner_range,
@@ -763,7 +763,7 @@ class Fitter:
 
         # Check sanity of sample_array; update num_params if not specified
         has_err = False
-        if isinstance(sample_array,np.ndarray) and sample_array.dtype == np.floating:
+        if isinstance(sample_array,np.ndarray) and isinstance(np.zeros(1,dtype=sample_array.dtype)[0],np.floating):
             if len(sample_array.shape) == 2:
                 if self.num_params is not None:
                     if sample_array.shape[1] != self.num_params:
@@ -781,7 +781,7 @@ class Fitter:
             raise ValueError(err)
 
         if self.samples is None:
-            err = "You can only append samples to  a fit that has already been done\.n"
+            err = "You can only append samples to  a fit that has already been done.\n"
             raise ValueError(err)
 
         warn = "\n\nThis function only checks to see if the input samples array\n"

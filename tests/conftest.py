@@ -55,9 +55,9 @@ def binding_curve_test_data():
 
     def model_to_test_wrap(K1,K2=20,extra_stuff="test",K3=42):
 
-        K1 = np.float(K1)
-        K2 = np.float(K2)
-        K3 = np.float(K3)
+        K1 = float(K1)
+        K2 = float(K2)
+        K3 = float(K3)
 
         return K1*K2*K3
 

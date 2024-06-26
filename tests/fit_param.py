@@ -78,7 +78,7 @@ class FitParameter:
             self._value = self.guess
         else:
             try:
-                value = np.float(value)
+                value = float(value)
             except ValueError:
                 err = f"parameter value '{value}' cannot be interpretable as a float\n"
                 raise ValueError(err)

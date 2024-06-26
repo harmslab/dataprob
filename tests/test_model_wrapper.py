@@ -5,7 +5,6 @@ import likelihood
 import numpy as np
 
 
-
 def bad_model_with_reserved_name(guesses=2):
 
     return guesses
@@ -60,6 +59,8 @@ def test_init(binding_curve_test_data):
     # pass model that uses a reserved name as an argument
     with pytest.raises(ValueError):
         mw = likelihood.ModelWrapper(bad_model_with_reserved_name)
+
+    # pass non-fit parameters
 
 
 def test_expand_to_model_inputs(binding_curve_test_data):

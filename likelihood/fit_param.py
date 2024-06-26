@@ -128,7 +128,7 @@ class FitParameter:
         if guess is not None:
 
             try:
-                guess = np.float(guess)
+                guess = float(guess)
             except (ValueError,TypeError):
                 err = f"parameter guess '{guess}' cannot be interpretable as a float\n"
                 raise ValueError(err)
@@ -231,7 +231,7 @@ class FitParameter:
                 if len(bounds) != 2:
                     raise TypeError
 
-                bounds = np.array(bounds,dtype=np.float)
+                bounds = np.array(bounds,dtype=float)
 
             except TypeError:
                 err = "Bounds must be list-like object of length 2\n"

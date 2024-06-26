@@ -59,11 +59,11 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
 
     # array of wrong dimensions
     with pytest.raises(ValueError):
-        f.append_samples(sample_array=np.eye(3,dtype=np.float))
+        f.append_samples(sample_array=np.eye(3,dtype=float))
 
     # array of right dimensons, wrong type
     with pytest.raises(ValueError):
-        f.append_samples(sample_array=np.eye(1,dtype=np.int))
+        f.append_samples(sample_array=np.eye(1,dtype=int))
 
     # Can't specify array and input file
     with pytest.raises(ValueError):

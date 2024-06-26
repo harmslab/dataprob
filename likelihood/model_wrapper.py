@@ -61,7 +61,7 @@ class ModelWrapper:
             # See if this parameter can concievably be a fit parameter: either
             # no default or default can be coerced into a float
             try:
-                np.float(self._mw_signature.parameters[p].default)
+                float(self._mw_signature.parameters[p].default)
                 argument_gettable.append(p)
             except (TypeError,ValueError):
                 if self._mw_signature.parameters[p].default == inspect._empty:
@@ -99,7 +99,7 @@ class ModelWrapper:
                 if self._mw_signature.parameters[p].default == inspect._empty:
                     guess = None
                 else:
-                    guess = np.float(self._mw_signature.parameters[p].default)
+                    guess = float(self._mw_signature.parameters[p].default)
 
                 # Convert to a fit parameter
                 self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
