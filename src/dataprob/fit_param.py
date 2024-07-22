@@ -171,8 +171,8 @@ class FitParameter:
                 else:
                     err = f"Could not set guess automatically: lower bound \n"
                     err += f"({self.bounds[0]}) somehow above upper bound ({self.bound[1]}).\n"
-                    err += "this is probably a bug in the likelihood code. You\n"
-                    err += "can file a bug report at https://github.com/harmslab/likelihood\n"
+                    err += "this is probably a bug in the dataprob code. You\n"
+                    err += "can file a bug report at https://github.com/harmslab/dataprob\n"
                     raise RuntimeError(err)
 
         # Make sure the guess is within bounds

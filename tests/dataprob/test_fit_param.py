@@ -1,15 +1,15 @@
 import pytest
 
-import likelihood
+import dataprob
 
 import numpy as np
 
 def test_init():
 
     with pytest.raises(TypeError):
-        p = likelihood.FitParameter()
+        p = dataprob.FitParameter()
 
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
 
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
     assert p.guess == 1.0
@@ -20,7 +20,7 @@ def test_init():
 def test_name_getter_setter():
 
     # Default (must be set via __init__)
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert p.name == "test"
 
     # Set directly
@@ -35,21 +35,21 @@ def test_name_getter_setter():
 def test_guess_getter_setter():
 
     # Default
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
     assert p.guess == 1.0
 
     # Set via __init__
-    p = likelihood.FitParameter(name="test",guess=12)
+    p = dataprob.FitParameter(name="test",guess=12)
     assert p.guess == 12
 
     # Set directly
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     p.guess = 22
     assert p.guess == 22
 
     # --- bad value checks ---
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
 
     with pytest.raises(ValueError):
         p.guess = "test"
@@ -63,24 +63,24 @@ def test_guess_getter_setter():
     # --- bound check ---
 
     with pytest.raises(ValueError):
-        p = likelihood.FitParameter(name="test")
+        p = dataprob.FitParameter(name="test")
         p.bounds = [-10,10]
         p.guess = -20
 
     with pytest.raises(ValueError):
-        p = likelihood.FitParameter(name="test")
+        p = dataprob.FitParameter(name="test")
         p.bounds = [-10,10]
         p.guess = 20
 
 def test_bounds_getter_setter():
 
     # Default
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
 
     # Set via __init__
     bounds = [1,2]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
 
     # Set directly
@@ -116,48 +116,48 @@ def test_interaction_bounds_guesses():
 
     # Two positive bounds
     bounds = [10,20]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,np.exp(np.mean(np.log(bounds))))
 
     # Two negative bounds
     bounds = [-20,-10]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,-np.exp(np.mean(np.log(np.abs(bounds)))))
 
     # One negative, one positive
     bounds = [-10,10]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,np.sum(bounds)/2)
 
     # negative infinity, positive real
     bounds = [-np.inf,10]
-    internal_bounds = [-likelihood.fit_param._INFINITY_PROXY,bounds[1]]
+    internal_bounds = [-dataprob.fit_param._INFINITY_PROXY,bounds[1]]
     expected = np.sum(internal_bounds)/2
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,expected)
 
     # negative real, positive infinity
     bounds = [-10,np.inf]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
-    internal_bounds = [bounds[0],likelihood.fit_param._INFINITY_PROXY]
+    p = dataprob.FitParameter(name="test",bounds=bounds)
+    internal_bounds = [bounds[0],dataprob.fit_param._INFINITY_PROXY]
     expected = np.sum(internal_bounds)/2
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,expected)
 
     # negative infinity, positive infinity
     bounds = [-np.inf,np.inf]
-    p = likelihood.FitParameter(name="test",bounds=bounds)
+    p = dataprob.FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 1.0
 
     # --- Update bounds such that guess is outside the new bounds ---
 
     bounds = [-10,10]
-    p = likelihood.FitParameter(name="test",bounds=bounds,guess=-5)
+    p = dataprob.FitParameter(name="test",bounds=bounds,guess=-5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == -5.0
 
@@ -168,7 +168,7 @@ def test_interaction_bounds_guesses():
     assert p.guess == new_bounds[0]
 
     bounds = [-10,10]
-    p = likelihood.FitParameter(name="test",bounds=bounds,guess=5)
+    p = dataprob.FitParameter(name="test",bounds=bounds,guess=5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 5.0
 
@@ -180,7 +180,7 @@ def test_interaction_bounds_guesses():
 
     # --- Upddate bounds such tthat guess remains in the new bounds ---
     bounds = [-10,10]
-    p = likelihood.FitParameter(name="test",bounds=bounds,guess=5)
+    p = dataprob.FitParameter(name="test",bounds=bounds,guess=5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 5.0
 
@@ -194,7 +194,7 @@ def test_interaction_bounds_guesses():
 def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure we can load fit result into parameter ---
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -218,7 +218,7 @@ def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure setting bounds wipes out fit ---
 
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -242,7 +242,7 @@ def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure setting fixed wipes out fit ---
 
-    p = likelihood.FitParameter(name="test")
+    p = dataprob.FitParameter(name="test")
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None

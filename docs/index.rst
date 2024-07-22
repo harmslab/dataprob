@@ -1,10 +1,10 @@
-.. likelihood documentation master file, created by
+.. dataprob documentation master file, created by
    sphinx-quickstart on Fri Apr 17 15:49:02 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to likelihood's documentation!
-======================================
+Welcome to dataprob's documentation!
+====================================
 
 .. toctree::
    :maxdepth: 2

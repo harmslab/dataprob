@@ -1,6 +1,6 @@
 import pytest
 
-import likelihood
+import dataprob
 
 import pandas as pd
 import numpy as np
@@ -78,7 +78,7 @@ def fitter_object(binding_curve_test_data):
     Do a successful fit that can be passed into other functions
     """
 
-    f = likelihood.MLFitter()
+    f = dataprob.MLFitter()
 
     model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]

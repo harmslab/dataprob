@@ -13,11 +13,11 @@ import pandas as pd
 
 import re, inspect, pickle, os, warnings
 
-import likelihood
+import dataprob
 
 class Fitter:
     """
-    Base class for fits/analyses using a likelihood function.
+    Base class for fits/analyses using a dataprob function.
     """
 
     def __init__(self):
@@ -297,7 +297,7 @@ class Fitter:
 
         # If this is a ModelWrapper instance, grab the model method rather than
         # the model instance for the check below.
-        if isinstance(model,likelihood.model_wrapper.ModelWrapper):
+        if isinstance(model,dataprob.model_wrapper.ModelWrapper):
             model = model.model
 
         has_err = False

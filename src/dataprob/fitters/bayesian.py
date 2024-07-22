@@ -1,19 +1,18 @@
 __description__ = \
 """
-Fitter subclass for performing bayesian (MCMC) fits.
+Fitter subclass for performing bayesian (MCMC) parameter estimation.
 """
 __author__ = "Michael J. Harms"
 __date__ = "2017-05-10"
 
 from .base import Fitter
 
-import emcee, corner
+import emcee
 
 import numpy as np
 import scipy.optimize as optimize
 
 import multiprocessing
-from multiprocessing import Pool
 
 class BayesianFitter(Fitter):
     """

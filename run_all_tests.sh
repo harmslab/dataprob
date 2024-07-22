@@ -17,7 +17,7 @@ echo "Running flake8, aggressive"
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics > reports/flake.txt
 
 echo "Checking for test file completeness"
-./tests/completeness_crawler.py likelihood tests  > reports/completeness-crawler.txt
+./tests/dataprob/completeness_crawler.py ./src/dataprob/ tests  > reports/completeness-crawler.txt
 grep MISSING reports/completeness-crawler.txt
 
 echo "Running coverage.py"

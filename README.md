@@ -1,6 +1,7 @@
-# likelihood
+# dataprob
 
-Library for fitting models using a likelihood framework.  Can do maximum
+Library for calculating the probability of data (the likeliehood) to extract
+parameter estimates for models describing experimental data. Can do maximum
 likelihood, bootstrap, and Bayesian sampling using a consistent API.  
 
 Docs in progress.  See `examples/example-fit.ipynb` for basic demonstration
