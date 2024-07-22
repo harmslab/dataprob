@@ -8,7 +8,7 @@ import pandas as pd
 def test_init():
 
     f = dataprob.MLFitter()
-    assert f.fit_type == "maximum dataprob"
+    assert f.fit_type == "maximum likelihood"
 
 def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     """

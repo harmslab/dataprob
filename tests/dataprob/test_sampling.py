@@ -9,7 +9,7 @@ import os
 def test_init():
 
     f = dataprob.MLFitter()
-    assert f.fit_type == "maximum dataprob"
+    assert f.fit_type == "maximum likelihood"
 
 def test_write_append_samples(binding_curve_test_data,tmp_path):
     """
