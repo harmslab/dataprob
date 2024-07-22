@@ -1,7 +1,7 @@
 
 import pytest
 
-import likelihood
+import dataprob
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ import pandas as pd
 
 def test_init():
 
-    f = likelihood.BayesianFitter()
+    f = dataprob.BayesianFitter()
     assert f.fit_type == "bayesian"
 
 @pytest.mark.slow
@@ -23,14 +23,14 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     for model_key in ["prewrapped_model","wrappable_model"]:
 
-        f = likelihood.BayesianFitter()
+        f = dataprob.BayesianFitter()
         model = binding_curve_test_data[model_key]
         guesses = binding_curve_test_data["guesses"]
         df = binding_curve_test_data["df"]
         input_params = np.array(binding_curve_test_data["input_params"])
 
         if model_key == "wrappable_model":
-            model = likelihood.ModelWrapper(model)
+            model = dataprob.ModelWrapper(model)
             model.df = df
             model.K.bounds = [0,10]
         else:
@@ -77,4 +77,4 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert np.array_equal(df["guess"],f.guesses)
         assert np.array_equal(df["lower_bound"],f.bounds[0,:])
         assert np.array_equal(df["upper_bound"],f.bounds[1,:])
-        assert np.array_equal(f.samples.shape,(900,3))
+        assert np.array_equal(f.samples.shape,(9000,1))

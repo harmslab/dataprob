@@ -88,8 +88,8 @@ class MLFitter(Fitter):
             warning += "Consider using the Bayesian sampler.\n"
             warnings.warn(warning)
 
-            self._stdev = np.nan*np.ones(len(self._estimate),dtype=np.float)
-            self._ninety_five = np.nan*np.ones((2,len(self._estimate)),dtype=np.float)
+            self._stdev = np.nan*np.ones(len(self._estimate),dtype=float)
+            self._ninety_five = np.nan*np.ones((2,len(self._estimate)),dtype=float)
 
 
     @property
@@ -98,7 +98,7 @@ class MLFitter(Fitter):
         Use the Jacobian spit out by least_squares to generate a whole bunch of
         fake samples.
 
-        Approximate the covariance matrix as $(2*J^{T} \dot J)^{-1}$, then perform
+        Approximate the covariance matrix as $(2*J^{T} \\dot J)^{-1}$, then perform
         cholesky factorization on the covariance matrix.  This can then be
         multiplied by random normal samples to create distributions that come
         from this covariance matrix.

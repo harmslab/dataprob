@@ -1,18 +1,15 @@
-
 import pytest
 
-import likelihood
+import dataprob
 
 import numpy as np
 import pandas as pd
 
-
 def test_init():
 
-    f = likelihood.BootstrapFitter()
-    assert f.fit_type == "bootstrap"
+    f = dataprob.MLFitter()
+    assert f.fit_type == "maximum likelihood"
 
-@pytest.mark.slow
 def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     """
     Test the ability to fit the test data in binding_curve_test_data.
@@ -23,14 +20,14 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     for model_key in ["prewrapped_model","wrappable_model"]:
 
-        f = likelihood.BootstrapFitter()
+        f = dataprob.MLFitter()
         model = binding_curve_test_data[model_key]
         guesses = binding_curve_test_data["guesses"]
         df = binding_curve_test_data["df"]
         input_params = np.array(binding_curve_test_data["input_params"])
 
         if model_key == "wrappable_model":
-            model = likelihood.ModelWrapper(model)
+            model = dataprob.ModelWrapper(model)
             model.df = df
             model.K.bounds = [0,10]
         else:

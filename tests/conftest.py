@@ -1,6 +1,6 @@
 import pytest
 
-import likelihood
+import dataprob
 
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ def binding_curve_test_data():
 
     # Find directory with test files
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    example_dir = os.path.abspath(os.path.join(base_dir,"..","examples"))
+    example_dir = os.path.abspath(os.path.join(base_dir,"examples"))
 
     # Load json describing test informations
     json_file = os.path.join(example_dir,"binding-curves.json")
@@ -55,9 +55,9 @@ def binding_curve_test_data():
 
     def model_to_test_wrap(K1,K2=20,extra_stuff="test",K3=42):
 
-        K1 = np.float(K1)
-        K2 = np.float(K2)
-        K3 = np.float(K3)
+        K1 = float(K1)
+        K2 = float(K2)
+        K3 = float(K3)
 
         return K1*K2*K3
 
@@ -78,7 +78,7 @@ def fitter_object(binding_curve_test_data):
     Do a successful fit that can be passed into other functions
     """
 
-    f = likelihood.MLFitter()
+    f = dataprob.MLFitter()
 
     model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]

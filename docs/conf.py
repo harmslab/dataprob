@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'likelihood'
+project = 'dataprob'
 copyright = '2020, Michael J. Harms'
 author = 'Michael J. Harms'
 

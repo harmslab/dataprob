@@ -1,17 +1,14 @@
 import pytest
 
-import likelihood
+import dataprob
 
 import numpy as np
-import pandas as pd
-
-import pickle
 
 import os
 
 def test_init():
 
-    f = likelihood.MLFitter()
+    f = dataprob.MLFitter()
     assert f.fit_type == "maximum likelihood"
 
 def test_write_append_samples(binding_curve_test_data,tmp_path):
@@ -22,7 +19,7 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
     out_pickle1 = os.path.join(tmp_path,"test1.pickle")
     out_pickle2 = os.path.join(tmp_path,"test2.pickle")
 
-    f = likelihood.MLFitter()
+    f = dataprob.MLFitter()
     model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
@@ -59,11 +56,11 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
 
     # array of wrong dimensions
     with pytest.raises(ValueError):
-        f.append_samples(sample_array=np.eye(3,dtype=np.float))
+        f.append_samples(sample_array=np.eye(3,dtype=float))
 
     # array of right dimensons, wrong type
     with pytest.raises(ValueError):
-        f.append_samples(sample_array=np.eye(1,dtype=np.int))
+        f.append_samples(sample_array=np.eye(1,dtype=int))
 
     # Can't specify array and input file
     with pytest.raises(ValueError):
@@ -94,6 +91,6 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
     assert np.array_equal(f.samples.shape,[6*current_size,1])
 
     # Create a new fitter and load samples into an empty fitter (won't work)
-    f = likelihood.MLFitter()
+    f = dataprob.MLFitter()
     with pytest.raises(ValueError):
         f.append_samples(sample_file=out_pickle1)
