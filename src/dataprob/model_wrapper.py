@@ -1,3 +1,6 @@
+"""
+Class for wrapping models for use in likelihood calculations. 
+"""
 
 from .fit_param import FitParameter
 
@@ -25,8 +28,13 @@ class ModelWrapper:
 
     def __init__(self,model_to_fit,fittable_params=None):
         """
-        model_to_fit: a function or method to fit.
-        fittable_params: list of arguments to fit.
+
+        Parameters
+        ----------
+        model_to_fit : callable
+            a function or method to fit.
+        fittable_params : list-like, optional
+            list of arguments to fit.
         """
 
         # Define these here so __setattr__ and __getattr__ are looking at
@@ -42,6 +50,11 @@ class ModelWrapper:
         Load a model into the wrapper, making the arguments into attributes.
         Fittable arguments are made into FitParameter instances.  Non-fittable
         arguments are set as generic attributes.
+
+        Parameters
+        ----------
+        fittable_params : list-like or None
+            list of parameters to fit 
         """
 
         # model arguments
@@ -210,7 +223,7 @@ class ModelWrapper:
     @property
     def model(self):
         """
-        Return the observable.
+        The observable.
         """
 
         # Update mapping between parameters and model arguments in case

@@ -1,9 +1,6 @@
-__description__ = \
 """
-Fitter subclass for performing bootstrap fits.
+Fitter subclass for performing bootstrap analyses.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-11"
 
 from .base import Fitter
 
@@ -24,7 +21,6 @@ class BootstrapFitter(Fitter):
 
         Parameters
         ----------
-
         num_bootstrap : int
             Number of bootstrap samples to do
         perturb_size : float
@@ -52,8 +48,8 @@ class BootstrapFitter(Fitter):
 
         Parameters
         ----------
-
-        **kwargs : any keyword arguments are passed as **kwargs to
+        kwargs : dict
+            any keyword arguments are passed as **kwargs to 
             scipy.optimize.least_squares
         """
 
@@ -95,6 +91,9 @@ class BootstrapFitter(Fitter):
         self._update_estimates()
 
     def _update_estimates(self):
+        """
+        Recalculate the parameter estimates from the new samples.
+        """
 
         # mean of bootstrap samples
         self._estimate = np.mean(self._samples,axis=0)

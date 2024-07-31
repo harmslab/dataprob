@@ -245,9 +245,10 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
     f.y_obs = binding_curve_test_data["df"].Y
 
     # Should now work because we've set everything essential (model, gueses,
-    # and y_obs).  It won't do anything b/c this is the base class, but it
-    # will still run.
-    f.fit()
+    # and y_obs).  But it will throw NotImplementedError because it's the base 
+    # class.
+    with pytest.raises(NotImplementedError):
+        f.fit()
 
 
 # ---------------------------------------------------------------------------- #

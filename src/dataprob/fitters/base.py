@@ -1,13 +1,8 @@
-__description__ = \
 """
 Fitter base class allowing different classes of fits.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-10"
 
 import numpy as np
-import scipy.stats
-import scipy.optimize as optimize
 import corner
 import pandas as pd
 
@@ -43,7 +38,12 @@ class Fitter:
         """
         Do a sanity check before doing model calculations.
 
-        call_string: string to dump into output on error.
+        Parameters
+        ----------
+        call_string : str
+            string to dump into output on error.
+        attributes_to_check : list
+            list of attributes to check
         """
 
         for a in attributes_to_check:
@@ -78,7 +78,7 @@ class Fitter:
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
             is assigned an error of 1.
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to
+        **kwargs : any remaining keyword arguments are passed as **kwargs to
             core engine (optimize.least_squares or emcee.EnsembleSampler)
         """
 
@@ -160,14 +160,14 @@ class Fitter:
         Should be redefined in subclass.
         """
 
-        pass
+        raise NotImplementedError("should be implemented in subclass\n")
 
     def _update_estimates(self):
         """
         Should be redefined in subclass.
         """
 
-        pass
+        raise NotImplementedError("should be implemented in subclass\n")
 
 
     @property
@@ -239,6 +239,16 @@ class Fitter:
     def unweighted_residuals(self,param):
         """
         Calculate residuals.
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values
         """
 
         self._sanity_check("fit can be done",["model","y_obs"])
@@ -250,6 +260,17 @@ class Fitter:
     def weighted_residuals(self,param):
         """
         Calculate weighted residuals.
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values weighted by
+            standard deviation
         """
 
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
@@ -260,6 +281,16 @@ class Fitter:
     def ln_like(self,param):
         """
         Log likelihood of function given parameters.
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        ln_like : numpy.ndarray
+            log likelihood (probability of data given the model)
         """
 
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
@@ -717,7 +748,10 @@ class Fitter:
         """
         Write the samples from the fit out to a pickle file.
 
-        output_file: output pickle file to write to.
+        Parameters
+        ----------
+        output_file : str
+            output pickle file to write to
         """
 
         # See if the file exists already.
@@ -735,8 +769,12 @@ class Fitter:
         with the shape: num_samples, num_parameters. This can come from a
         pickle file (sample_file) or array.  Only one of these can be specified.
 
-        sample_file: Pickle file of the numpy array.
-        sample_array: Array of samples.
+        Parameters
+        ----------
+        sample_file : str
+            Pickle file of the numpy array
+        sample_array : numpy.ndarray
+            array of samples
         """
 
         # Nothing to do; no new samples specified

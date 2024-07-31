@@ -1,9 +1,6 @@
-__description__ = \
 """
 Fitter subclass for performing bayesian (MCMC) parameter estimation.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-10"
 
 from .base import Fitter
 
@@ -17,14 +14,18 @@ import multiprocessing
 class BayesianFitter(Fitter):
     """
     """
-    def __init__(self,num_walkers=100,initial_walker_spread=1e-4,ml_guess=True,
-                 num_steps=100,burn_in=0.1,num_threads=1):
+    def __init__(self,
+                 num_walkers=100,
+                 initial_walker_spread=1e-4,
+                 ml_guess=True,
+                 num_steps=100,
+                 burn_in=0.1,
+                 num_threads=1):
         """
         Initialize the bayesian fitter
 
         Parameters
         ----------
-
         num_walkers : int > 0
             how many markov chains to have in the analysis
         initial_walker_spread : float
@@ -42,7 +43,7 @@ class BayesianFitter(Fitter):
             cpus. [NOT YET IMPLEMENTED]
         """
 
-        super(BayesianFitter,self).__init__()
+        super().__init__()
 
         self._num_walkers = num_walkers
         self._initial_walker_spread = initial_walker_spread
@@ -73,14 +74,13 @@ class BayesianFitter(Fitter):
 
         Parameters
         ----------
-
-        param : array of floats
-            parameters to fit
+        param : numpy.ndarray
+            float array of parameters to fit
 
         Returns
         -------
-
-        float value for log of priors.
+        prior : float
+            log of priors.
         """
 
         # If a paramter falls outside of the bounds, make the prior -infinity
@@ -96,14 +96,13 @@ class BayesianFitter(Fitter):
 
         Parameters
         ----------
-
         param : array of floats
             parameters to fit
 
         Returns
         -------
-
-        float value for log posterior proability
+        ln_prob : float
+            log posterior proability
         """
 
         # Calcualte prior.  If not finite, this solution has an -infinity log
@@ -127,13 +126,8 @@ class BayesianFitter(Fitter):
 
         Parameters
         ----------
-
-        Fit the parameters.
-
-        Parameters
-        ----------
-
-        **kwargs : keyword arguments to pass to emcee.EnsembleSampler
+        kwargs : dict
+            keyword arguments to pass to emcee.EnsembleSampler
         """
 
         # Make initial guess (ML or just whatever the parameters sent in were)

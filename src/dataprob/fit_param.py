@@ -1,11 +1,7 @@
-__description__ = \
 """
-Main class for holding fit parameters, including guesses, values, ranges, etc.
+Class for holding fit parameters, including guesses, values, ranges, etc.
 """
-__date__ = "2016-09-02"
-__author__ = "Michael J. Harms"
 
-import copy
 import numpy as np
 
 import warnings
@@ -56,21 +52,24 @@ class FitParameter:
 
     def __init__(self,name,guess=None,fixed=False,bounds=None):
         """
-        Initialize class.  Parameters:
+        Initialize class.  
 
-        name: name of parameter (string)
-        guess: parameter guess (float).
-               If None:
-                    + If bounds are given:
-                        - If lower and upper bounds have the same sign, the guess
-                          will be placed at the geometric mean of the two bounds.
-                        - Otherwise, the guess is placed at the arithmetic mean
-                          of the two bounds.
-                    + If bounds are not given, guess will be set to 1.0.
-        fixed: whether or not the parameter is fixed (bool)
-        bounds: bounds on fit for parameter (list-like object of 2 floats). If
-                None, bounds will be set to (None,None).  If (None,5), no lower
-                bound, upper bound of 5.
+        Parameters
+        ----------
+        name : str
+            name of parameter
+        guess : float, optional. 
+            parameter guess. If None and bounds are given: 1) If lower and upper
+            bounds have the same sign, the guess will be placed at the geometric
+            mean of the two bounds. 2) Otherwise, the guess is placed at the
+            arithmetic mean of the two bounds. If None and no bounds are given,
+            the guess will be set to 1.0.
+        fixed : bool
+            whether or not the parameter is fixed
+        bounds : list-like
+            bounds on fit for parameter (list-like object of 2 floats). If None,
+            bounds will be set to (None,None).  If (None,5), no lower bound,
+            upper bound of 5.
         """
 
         # Setting must be in this order. If no guess is specified, the guess
@@ -316,12 +315,15 @@ class FitParameter:
 
     def load_fit_result(self,fitter,param_number):
         """
-        Update standard deviation, ninetyfive, parameter value, from a successful
-        fit.
+        Update the standard deviation, ninetyfive, parameter value, from a
+        successful fit.
 
-        fitter: Fitter instance.
-        param_number: number corresponding to this parameter in the fit parameter
-                      vector.
+        Parameters
+        ----------
+        fitter : dataprob.Fitter
+            fit with results
+        param_number : int
+            number corresponding to this parameter in the fit parameter vector.
         """
 
         if fitter.success:
@@ -336,7 +338,7 @@ class FitParameter:
 
     def _clear_fit_result(self):
         """
-        Cleared the fit result.  Called when attributes controlling the fit
+        Clear the fit result.  Called when attributes controlling the fit
         are modified to avoid inconsistency.
         """
 
