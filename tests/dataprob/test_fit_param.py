@@ -37,8 +37,6 @@ def test__guess_setter_from_bounds():
     expected_guess = -0.5
     assert np.isclose(guess,expected_guess)
     
-
-
 def test_init():
 
     with pytest.raises(TypeError):
@@ -411,9 +409,9 @@ def test_load_clear_fit_results(fitter_object):
     assert not p.is_fit_result
 
 
+def test_interaction_bounds_guesses():
 
-
-def xtest_interaction_bounds_guesses():
+    from dataprob.fit_param import _INFINITY_PROXY
 
     # --- default guess depends on bounds; try different bounds scenarios ---
 
@@ -437,7 +435,7 @@ def xtest_interaction_bounds_guesses():
 
     # negative infinity, positive real
     bounds = [-np.inf,10]
-    internal_bounds = [-dataprob.fit_param._INFINITY_PROXY,bounds[1]]
+    internal_bounds = [-_INFINITY_PROXY,bounds[1]]
     expected = np.sum(internal_bounds)/2
     p = FitParameter(name="test",bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
@@ -446,7 +444,7 @@ def xtest_interaction_bounds_guesses():
     # negative real, positive infinity
     bounds = [-10,np.inf]
     p = FitParameter(name="test",bounds=bounds)
-    internal_bounds = [bounds[0],dataprob.fit_param._INFINITY_PROXY]
+    internal_bounds = [bounds[0],_INFINITY_PROXY]
     expected = np.sum(internal_bounds)/2
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,expected)
@@ -481,7 +479,7 @@ def xtest_interaction_bounds_guesses():
     assert np.array_equal(p.bounds,np.array(new_bounds))
     assert p.guess == new_bounds[1]
 
-    # --- Upddate bounds such tthat guess remains in the new bounds ---
+    # --- Upddate bounds such that guess remains in the new bounds ---
     bounds = [-10,10]
     p = FitParameter(name="test",bounds=bounds,guess=5)
     assert np.array_equal(p.bounds,np.array(bounds))

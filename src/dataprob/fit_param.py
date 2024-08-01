@@ -201,8 +201,6 @@ class FitParameter:
         guess = check_float(value=guess,
                             variable_name="guess")
 
-
-
         # Make sure the guess is within bounds
         if guess > self.bounds[1] or guess < self.bounds[0]:
             err = f"guess ({guess}) outside bounds ({self.bounds[0],self.bounds[1]})\n"
