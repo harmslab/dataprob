@@ -92,7 +92,7 @@ class BootstrapFitter(Fitter):
 
     def _update_estimates(self):
         """
-        Recalculate the parameter estimates from the new samples.
+        Recalculate the parameter estimates from any new samples.
         """
 
         # mean of bootstrap samples

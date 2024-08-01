@@ -54,7 +54,15 @@ class Fitter:
                 err = f"'{a}' must be set before {call_string}\n"
                 raise RuntimeError(err)
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
+    def fit(self,
+            model=None,
+            guesses=None,
+            y_obs=None,
+            bounds=None,
+            priors=None,
+            names=None,
+            y_stdev=None,
+            **kwargs):
         """
         Fit the parameters.
 
@@ -70,9 +78,13 @@ class Fitter:
             guesses for parameters to be optimized.
         y_obs : array of floats
             observations in an concatenated array
-        bounds : list
+        bounds : list, optional
             list of two lists containing lower and upper bounds.  If None,
             bounds are set to -np.inf and np.inf
+        priors : list, optional
+            list of two lists containing the mean and standard deviation of 
+            gaussian priors. None entries use uniform priors. If whole argument
+            is None, use uniform priors for all parameters. 
         names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
@@ -111,6 +123,17 @@ class Fitter:
                 else:
                     tmp = np.ones(len(self.guesses))
                     self.bounds = [-np.inf*tmp,np.inf*tmp]
+
+        # Record priors, grab from ModelWrapper model, or make infinite
+        if priors is not None:
+            self.priors = priors
+        else:
+            if self.priors is None:
+                if self._model_is_model_wrapper:
+                    self.priors = self.model.priors
+                else:
+                    tmp = np.ones(len(self.guesses))
+                    self.priors = None
 
         # Record names, grab from ModelWrapper model, or use default
         if names is not None:
@@ -185,6 +208,8 @@ class Fitter:
                     "low_95":[],
                     "high_95":[],
                     "guess":[],
+                    "prior_mean":[],
+                    "prior_std":[],
                     "lower_bound":[],
                     "upper_bound":[]}
 
@@ -214,10 +239,13 @@ class Fitter:
                     out_dict["guess"].append(m.fit_parameters[p].guess)
                     out_dict["lower_bound"].append(m.fit_parameters[p].bounds[0])
                     out_dict["upper_bound"].append(m.fit_parameters[p].bounds[1])
+                    out_dict["prior_mean"].append(m.fit_parameters[p].prior[0])
+                    out_dict["prior_std"].append(m.fit_parameters[p].prior[1])
 
         else:
 
             for i in range(len(self.names)):
+
                 out_dict["param"].append(self.names[i])
                 out_dict["estimate"].append(self.estimate[i])
                 out_dict["stdev"].append(self.stdev[i])
@@ -232,6 +260,8 @@ class Fitter:
                 out_dict["guess"].append(self.guesses[i])
                 out_dict["lower_bound"].append(self.bounds[0,i])
                 out_dict["upper_bound"].append(self.bounds[1,i])
+                out_dict["prior_mean"].append(self.priors[i,0])
+                out_dict["prior_std"].append(self.priors[i,1])
 
         return pd.DataFrame(out_dict)
 
@@ -465,6 +495,52 @@ class Fitter:
 
         self._fit_has_been_run = False
 
+    @property
+    def priors(self):
+        """
+        priors for fit parameters.
+        """
+
+        # Grab the priors from the model wrapper in case they changed
+        if self._model_is_model_wrapper:
+            self._priors = self._model.priors
+
+        try:
+            return self._priors
+        except AttributeError:
+            return None
+
+    @priors.setter
+    def priors(self,priors):
+        """
+        Setter for priors attribute.
+        """
+
+        try:
+            priors = np.array(priors,dtype=float)
+            if len(priors.shape) != 2 or priors.shape[0] != 2:
+                raise ValueError("incorrect dimensions!\n")
+        except (ValueError,TypeError) as err:
+            err = f"{err}\n\nguesses must be a 2 x num_params list or array of floats:\n\n"
+            err += "   [[lower_1,lower_2,...lower_n],[upper_1,upper_2,...upper_n]]\n\n"
+            raise ValueError(err)
+
+        if self.num_params is not None:
+            if priors.shape[1] != self.num_params:
+                err = "length of priors ({}) must match the number of parameters ({})\n".format(priors.shape[1],
+                                                                                                self.num_params)
+                raise ValueError(err)
+        else:
+            self._num_params = priors.shape[1]
+
+        self._priors = priors
+
+        # Update the underlying guesses in each FitParameter instance
+        if self._model_is_model_wrapper:
+            for i, p in enumerate(self._model.position_to_param):
+                self._model.fit_parameters[p].priors = priors[:,i]
+
+        self._fit_has_been_run = False
 
     @property
     def names(self):
@@ -496,9 +572,9 @@ class Fitter:
             except TypeError:
                 names = np.array([names])
 
-        except ValueError as err:
+        except ValueError as e:
             err = f"{err}\n\nnames must be a list or array of strings\n\n"
-            raise ValueError(err)
+            raise ValueError(err) from e
 
         if len(names) != len(set(names)):
             err = "parameter names must all be unique.\n"
@@ -538,9 +614,9 @@ class Fitter:
 
         try:
             y_obs = np.array(y_obs,dtype=float)
-        except (ValueError,TypeError) as err:
+        except Exception as e:
             err = f"{err}\n\ny_obs must be a list or array of floats\n\n"
-            raise ValueError(err)
+            raise ValueError(err) from e
 
         if self._num_obs is not None:
             if y_obs.shape[0] != self._num_obs:
@@ -573,9 +649,9 @@ class Fitter:
 
         try:
             y_stdev = np.array(y_stdev,dtype=float)
-        except (ValueError,TypeError) as err:
+        except Exception as e:
             err = f"{err}\n\ny_stdev must be a list or array of floats\n\n"
-            raise ValueError(err)
+            raise ValueError(err) from e
 
         if self._num_obs is not None:
             if y_stdev.shape[0] != self._num_obs:

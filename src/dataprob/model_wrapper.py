@@ -71,7 +71,7 @@ class ModelWrapper:
                 err += "Please change the argument name in your function.\n"
                 raise ValueError(err)
 
-            # See if this parameter can concievably be a fit parameter: either
+            # See if this parameter can conceivably be a fit parameter: either
             # no default or default can be coerced into a float
             try:
                 float(self._mw_signature.parameters[p].default)
@@ -268,6 +268,24 @@ class ModelWrapper:
             bounds[1].append(self.fit_parameters[p].bounds[1])
 
         return np.array(bounds)
+
+    @property
+    def priors(self):
+        """
+        Return an array of the priors for the model (only including the unfixed
+        parameters).
+        """
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        priors = [[],[]]
+        for p in self.position_to_param:
+            priors[0].append(self.fit_parameters[p].priors[0])
+            priors[1].append(self.fit_parameters[p].priors[1])
+
+        return np.array(priors)
 
     @property
     def names(self):

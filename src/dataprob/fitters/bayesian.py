@@ -8,8 +8,154 @@ import emcee
 
 import numpy as np
 import scipy.optimize as optimize
+from scipy import stats
 
+import warnings
 import multiprocessing
+
+def _find_normalization(scale,rv,**kwargs):
+    """
+    This method finds an offset to add to the output of rv.logpdf that 
+    makes the total area under the pdf curve 1.0. 
+
+    First, calculate the unnormalized pdf at the center of the distribution
+    (loc):
+
+        un_norm_prob = rv.pdf(loc)
+
+    Second, calculate the minimum difference between floats we can represent
+    using our data type. This sets the bin width for a discrete approximation
+    of the continuous distribution.
+
+        res = np.finfo(un_norm_prob.dtype).resolution
+
+    Third, calculate the difference in the cdf between loc + num_to_sample*res
+    and loc - num_to_sample*res. This is the normalized probability of the slice
+    centered on loc. 
+
+        norm_prob = cdf(loc + num_to_sample*res) - cdf(loc - num_to_sample*res). 
+
+    The ratio of norm_prob and un_norm_prob is a scalar that converts from raw
+    pdf calculations to normalized probabilities. 
+
+        norm_prob_x = rv.pdf(x)*norm_prob/un_norm_prob
+
+    Since we care about log versions of this, it becomes:
+
+        log_norm_prob_x = rv.logpdf(x) + log(norm_prob) - log(un_norm_prob)
+
+    We can define a pre-calculated offset;
+
+        offset = log(norm_prob) - log(un_norm_prob) 
+
+    So, finally:
+
+        log_norm_prob_x = rv.logpdf(x) + offset
+
+    This is most numerically stable at loc = 0, so figure out the
+    normalization using all other shape parameters but loc = 0. 
+    """
+
+    # Create frozen distribution located at 0.0
+    centered_rv = rv(loc=0,scale=scale,**kwargs)
+
+    # Get smallest float step (resolution) for this datatype on this
+    # platform.
+    res = np.finfo(centered_rv.cdf(0).dtype).resolution
+
+    num_to_sample = int(np.round(1/res/1e9,0))
+
+    # Calculate prob of -1000res -> 1000res using cdf
+    cdf = centered_rv.cdf(num_to_sample*res) - centered_rv.cdf(-num_to_sample*res)
+
+    # Calculate pdf over this interval with a step size of res
+    pdf = np.sum(centered_rv.pdf(np.linspace(-num_to_sample*res,
+                                             num_to_sample*res,
+                                             2*num_to_sample + 1)))
+    
+    # This normalizes logpdf. It's the log version of:
+    # norm_prob_x = rv.pdf(x)*cdf/pdf. 
+    offset = np.log(cdf) - np.log(pdf)
+    
+    return offset
+
+def _process_bounds(bounds,frozen_rv):
+
+    # bounds specified, no offset to area
+    if bounds is None:
+        return 0.0
+
+    # Parse bounds list
+    try: 
+        left = float(bounds[0])
+        right = float(bounds[1])
+    except Exception as e:
+        err = "bounds must be an iterable with an upper and lower value\n"
+        raise ValueError(err) from e
+
+    # Check sanity of bounds
+    if left > right:
+        err = f"left bound '{bounds[0]}' must be smaller than right bound '{bounds[1]}'\n"
+        raise ValueError(err)
+
+    # left and right the same, infinite prior for the shared value
+    if left == right:
+        w = f"left and right bounds {bounds} are identical\n"
+        warnings.warn(w)
+        return 0.0
+    
+    # Calculate the amount the bounds trim off the top and the bottom of the 
+    # distribution. 
+    left_trim = frozen_rv.cdf(left) 
+    right_trim = frozen_rv.sf(right)
+
+    # Figure out how much we need to scale the area up given we lost some
+    # of the tails. 
+    remaining = 1 - (left_trim + right_trim)
+
+    # If remaining ends up zero, the left and right edges of the bounds
+    # are identical within numerical error
+    if remaining == 0:
+        w = f"left and right bounds {bounds} are numerically identical\n"
+        warnings.warn(w)
+        return 0.0
+
+    # Return amount to scale the area by
+    return np.log(1/remaining)
+
+def _find_uniform_value(bounds):
+
+    finfo = np.finfo(np.ones(1,dtype=float)[0].dtype)
+    
+    # The probability of being one of the non-infinite points with step size
+    # of resolution
+    if bounds is None:
+        return np.log(finfo.resolution) - (np.log(2) + np.log(finfo.max))
+
+    # Parse bounds list
+    try: 
+        left = float(bounds[0])
+        right = float(bounds[1])
+    except Exception as e:
+        err = "bounds must be an iterable with an upper and lower value\n"
+        raise ValueError(err) from e
+
+    # Check sanity of bounds
+    if left > right:
+        err = f"left bound '{bounds[0]}' must be smaller than right bound '{bounds[1]}'\n"
+        raise ValueError(err)
+
+    # left and right the same, infinite prior for the shared value
+    if left == right:
+        w = f"left and right bounds {bounds} are identical\n"
+        warnings.warn(w)
+        return 0
+    
+    # Probability of being one number with step size of resolution between the
+    # edges specified by bounds
+    return np.log(finfo.resolution) - np.log((bounds[1] - bounds[0]))
+
+
 
 class BayesianFitter(Fitter):
     """
@@ -22,7 +168,7 @@ class BayesianFitter(Fitter):
                  burn_in=0.1,
                  num_threads=1):
         """
-        Initialize the bayesian fitter
+        Initialize the bayesian sampler.
 
         Parameters
         ----------
@@ -69,8 +215,7 @@ class BayesianFitter(Fitter):
 
     def ln_prior(self,param):
         """
-        Log prior of fit parameters.  Priors are uniform between bounds and
-        set to -np.inf outside of bounds.
+        Log prior of fit parameters.  
 
         Parameters
         ----------
@@ -83,12 +228,19 @@ class BayesianFitter(Fitter):
             log of priors.
         """
 
-        # If a paramter falls outside of the bounds, make the prior -infinity
+        # If any parameter falls outside of the bounds, make the prior -infinity
         if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
             return -np.inf
 
-        # otherwise, uniform
-        return 0.0
+        # Get priors for parameters we're treating with uniform priors
+        uniform = np.sum(self._uniform_prior)
+
+        # Get priors for parameters we're treating with gaussian priors
+        z = (param - self._prior_means)/self._prior_stds
+        gauss = np.sum(self._prior_frozen_rv.logpdf(z) + self._prior_gaussian_offsets)
+
+        # Return total priors
+        return uniform + gauss
 
     def ln_prob(self,param):
         """
@@ -105,20 +257,61 @@ class BayesianFitter(Fitter):
             log posterior proability
         """
 
-        # Calcualte prior.  If not finite, this solution has an -infinity log
-        # likelihood
+        # Calculate prior.  
         ln_prior = self.ln_prior(param)
-        if not np.isfinite(ln_prior):
-            return -np.inf
 
-        # Calcualte likelihood.  If not finite, this solution has an -infinity
-        # log likelihood
+        # Calculate likelihood.  
         ln_like = self.ln_like(param)
-        if not np.isfinite(ln_like):
-            return -np.inf
 
         # log posterior is log prior plus log likelihood
-        return ln_prior + ln_like
+        ln_prob = ln_prior + ln_like
+
+        # If result is not finite, this solution has an -infinity log
+        # probability
+        if not np.isfinite(ln_prob):
+            return -np.inf
+
+        return ln_prob
+
+    def _setup_priors(self):
+        """
+        Set up the priors for the calculation.
+        """
+
+        # Create prior distribution to use for all gaussian prior calcs
+        self._prior_frozen_rv = stats.norm(loc=0,scale=1)
+
+        # Figure out the offset that normalizes the area of the pdf curve to 1.0
+        # given the float precision etc. of the system
+        base_offset = _find_normalization(scale=1,rv=stats.norm)
+
+        uniform_priors = []
+        gauss_prior_means = []
+        gauss_prior_stds = []
+        gauss_prior_offsets = []
+        for i, s in enumerate(self._priors):
+
+            bounds = self.bounds[i,:]
+
+            if np.isnan(s[0]) or np.isnan(s[1]):
+                uniform_priors.append(_find_uniform_value(bounds))
+
+            else:
+                gauss_prior_means.append(s[0])
+                gauss_prior_stds.append(s[1])
+
+                z_bounds = (bounds - s[0])/s[1]
+                bounds_offset = _process_bounds(bounds=z_bounds,
+                                                frozen_rv=self._prior_frozen_rv)
+                gauss_prior_offsets.append(base_offset + bounds_offset)
+
+    
+        self._uniform_priors = np.array(uniform_priors,dtype=float)
+
+        self._prior_means = np.array(gauss_prior_means,dtype=float)
+        self._prior_stds = np.array(gauss_prior_stds,type=float)
+        self._gauss_prior_offsets = np.array(gauss_prior_offsets)
+        
 
     def _fit(self,**kwargs):
         """
@@ -129,6 +322,9 @@ class BayesianFitter(Fitter):
         kwargs : dict
             keyword arguments to pass to emcee.EnsembleSampler
         """
+
+        # Set up the priors
+        self._setup_priors()
 
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
@@ -158,7 +354,6 @@ class BayesianFitter(Fitter):
         # Create list of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
         new_samples = self._fit_result.get_chain()[to_discard:,:,:].reshape((-1,ndim))
-
 
         if self.samples is None:
             self._samples = new_samples
