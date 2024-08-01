@@ -62,7 +62,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert corner_fig is not None
 
         # Make sure data frame that comes out is correct
-        df = f.fit_to_df
+        df = f.fit_df
 
         assert isinstance(df,pd.DataFrame)
         assert np.allclose(df["estimate"].iloc[:],

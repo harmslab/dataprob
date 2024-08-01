@@ -300,10 +300,12 @@ class FitParameter:
 
                 w = f"The previous guess ({self.guess}) is outside the new\n"
                 w += f"bounds ({bounds}). The guess has been updated to\n"
-                w += f"'{self.guess}'.\n"
+                w += f"'{new_guess}'.\n"
                 warnings.warn(w,UserWarning)
 
                 self.guess = new_guess
+
+        print(bounds)
 
         self._bounds = bounds
         self._clear_fit_result()

@@ -3,10 +3,14 @@ Fitter base class allowing different classes of fits.
 """
 
 import numpy as np
-import corner
 import pandas as pd
+import corner
 
-import re, inspect, pickle, os, warnings
+
+import re
+import inspect
+import pickle
+import os
 
 import dataprob
 
@@ -191,8 +195,8 @@ class Fitter:
         """
 
         raise NotImplementedError("should be implemented in subclass\n")
-
-
+    
+    
     def unweighted_residuals(self,param):
         """
         Calculate residuals.
@@ -346,18 +350,29 @@ class Fitter:
         Setter for guess attribute.
         """
 
+        err_msg = \
+        """
+
+        guesses should be an array of floats the same length as the number of
+        parameters.        
+        
+        """
+
         try:
             guesses = np.array(guesses,dtype=float)
         except Exception as e:
-            err = f"guesses must be a list or array of floats\n"
-            raise ValueError(err) from e
+            raise ValueError(err_msg) from e
 
-        if self.num_params is not None:
-            if guesses.shape[0] != self.num_params:
-                err = f"length of guesses ({guesses.shape[0]}) must match the number of parameters ({self.num_params})\n"
-                raise ValueError(err)
-        else:
+        # make sure the cast array has a length. (It won't if guesses was 
+        # sent in as a single value)
+        if len(guesses.shape) == 0:
+            raise ValueError(err_msg)
+
+        if self.num_params is None:
             self._num_params = guesses.shape[0]
+
+        if guesses.shape[0] != self.num_params:
+            raise ValueError(err_msg)        
 
         self._guesses = guesses
 
@@ -715,7 +730,7 @@ class Fitter:
         return self._fit_type
 
     @property
-    def fit_to_df(self):
+    def fit_df(self):
         """
         Return the fit results as a dataframe.
         """
@@ -781,8 +796,8 @@ class Fitter:
                 out_dict["guess"].append(self.guesses[i])
                 out_dict["lower_bound"].append(self.bounds[0,i])
                 out_dict["upper_bound"].append(self.bounds[1,i])
-                out_dict["prior_mean"].append(self.priors[i,0])
-                out_dict["prior_std"].append(self.priors[i,1])
+                out_dict["prior_mean"].append(self.priors[0,i])
+                out_dict["prior_std"].append(self.priors[1,i])
 
         return pd.DataFrame(out_dict)
 

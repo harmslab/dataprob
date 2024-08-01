@@ -2,7 +2,7 @@
 Class for wrapping models for use in likelihood calculations. 
 """
 
-from .fit_param import FitParameter
+from dataprob.fit_param import FitParameter
 
 import numpy as np
 
@@ -282,8 +282,8 @@ class ModelWrapper:
 
         priors = [[],[]]
         for p in self.position_to_param:
-            priors[0].append(self.fit_parameters[p].priors[0])
-            priors[1].append(self.fit_parameters[p].priors[1])
+            priors[0].append(self.fit_parameters[p].prior[0])
+            priors[1].append(self.fit_parameters[p].prior[1])
 
         return np.array(priors)
 

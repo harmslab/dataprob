@@ -22,7 +22,7 @@ grep MISSING reports/completeness-crawler.txt
 
 echo "Running coverage.py"
 coverage erase
-coverage run --branch -m pytest tests/dataprob --runslow --junit-xml=reports/junit/junit.xml
+coverage run --source ~/miniconda3/lib/python3.12/site-packages/dataprob --branch -m pytest tests/dataprob --runslow --junit-xml=reports/junit/junit.xml
 
 echo "Generating reports"
 coverage html

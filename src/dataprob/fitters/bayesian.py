@@ -2,7 +2,10 @@
 Fitter subclass for performing bayesian (MCMC) parameter estimation.
 """
 
-from .base import Fitter
+from dataprob.fitters.base import Fitter
+from dataprob.check import check_int
+from dataprob.check import check_float
+from dataprob.check import check_bool
 
 import emcee
 
@@ -10,13 +13,30 @@ import numpy as np
 import scipy.optimize as optimize
 from scipy import stats
 
-import warnings
 import multiprocessing
+import warnings
 
 def _find_normalization(scale,rv,**kwargs):
     """
     This method finds an offset to add to the output of rv.logpdf that 
     makes the total area under the pdf curve 1.0. 
+
+    Parameters
+    ----------
+    scale : float
+        scale argument to scipy.stats.rv
+    rv : rv_continuous
+        object for calculating logpdf
+    kwargs : dict
+        kwargs are passed to rv_continuous to initialize
+
+    Returns
+    -------
+    offset : float
+        offset to add to rv.logpdf(x) to normalize pdf to 1.0 
+
+    Notes
+    -----
 
     First, calculate the unnormalized pdf at the center of the distribution
     (loc):
@@ -79,26 +99,33 @@ def _find_normalization(scale,rv,**kwargs):
     
     return offset
 
-def _process_bounds(bounds,frozen_rv):
+def _reconcile_bounds_and_priors(bounds,frozen_rv):
+    """
+    Figure out how much bounds trim off priors and return amount to add to the 
+    prior offset area to set to pdf area to 1.
+
+    Parameters
+    ----------
+    bounds : list-like or None
+        bounds applied to parameter
+    
+    Returns
+    -------
+    offset : float
+        offset to add to np.logpdf(x) that accounts for the fact that bounds 
+        may have trimmed some of the probability density and normalizes the 
+        area of the pdf to 1.0. 
+    """
 
     # bounds specified, no offset to area
     if bounds is None:
         return 0.0
 
-    # Parse bounds list
-    try: 
-        left = float(bounds[0])
-        right = float(bounds[1])
-    except Exception as e:
-        err = "bounds must be an iterable with an upper and lower value\n"
-        raise ValueError(err) from e
-
-    # Check sanity of bounds
-    if left > right:
-        err = f"left bound '{bounds[0]}' must be smaller than right bound '{bounds[1]}'\n"
-        raise ValueError(err)
-
-    # left and right the same, infinite prior for the shared value
+    # Parse bounds list.
+    left = float(bounds[0])
+    right = float(bounds[1])
+    
+    # left and right the same. prob of this value is 1 (np.log(1) = 0)
     if left == right:
         w = f"left and right bounds {bounds} are identical\n"
         warnings.warn(w)
@@ -114,7 +141,7 @@ def _process_bounds(bounds,frozen_rv):
     remaining = 1 - (left_trim + right_trim)
 
     # If remaining ends up zero, the left and right edges of the bounds
-    # are identical within numerical error
+    # are identical within numerical error. prob of this value is 1 (np.log(1) = 0)
     if remaining == 0:
         w = f"left and right bounds {bounds} are numerically identical\n"
         warnings.warn(w)
@@ -124,41 +151,103 @@ def _process_bounds(bounds,frozen_rv):
     return np.log(1/remaining)
 
 def _find_uniform_value(bounds):
+    """
+    Find the log probability for a specific value between bounds to use in a 
+    uniform prior. 
 
-    finfo = np.finfo(np.ones(1,dtype=float)[0].dtype)
+    Parameters
+    ----------
+    bounds : list-like, optional
+        list like float of two values. function assumes these are non-nanf 
+        floats where bounds[1] >= bounds[0]. If bounds is None, assume 
+        infinite bounds. 
     
-    # The probability of being one of the non-infinite points with step size
-    # of resolution
+    The idea here is to find the maximum finite width the parameter can occupy
+    (bound[1] - bound[0]) and then to divide that by the number of steps based 
+    on our numerical resolution. If our resolution was 0.1 and we were between 
+    0 and 1, there would be 11 values, so the uniform prior would be ln(1/11).
+    The log prior ends up being: np.log(resolution/width)
+
+    For finite bounds, this is:
+    
+        np.log(resolution) - np.log(upper - lower)
+
+    For infinite bounds, this is:
+        
+        np.log(resolution) - (np.log(scalar) + log(max_positive_finite_float)).
+
+    max_positive_finite_float is the largest number we can represent. scalar
+    ranges (0,2]. It would be 2 for the bounds (-infinity,infinity), because 
+    this covers a span 2*max_positive_finite_float. To avoid overflow, we 
+    represent as logs (ln(2*max) --> ln(2) + ln(max)). Scalar values lower than
+    2 represent smaller chunks of the finite number line. A value of 1 would 
+    be half the number line (-infinity,0), (0,infinity). The value approaches
+    zero for the bounds (-infinity, -infinity + resolution) and 
+    (infinity - resolution,infinity). 
+    """
+
+    # float architecture information
+    finfo = np.finfo(np.ones(1,dtype=float)[0].dtype)
+    log_resolution = np.log(finfo.resolution)
+    log_max_value = np.log(finfo.max)
+    max_value = finfo.max
+
+    # width is 2*max_value --> log(2) + log_max_value
     if bounds is None:
-        return np.log(finfo.resolution) - (np.log(2) + np.log(finfo.max))
+        return log_resolution - (np.log(2) + log_max_value)
 
     # Parse bounds list
-    try: 
-        left = float(bounds[0])
-        right = float(bounds[1])
-    except Exception as e:
-        err = "bounds must be an iterable with an upper and lower value\n"
-        raise ValueError(err) from e
+    left = float(bounds[0])
+    right = float(bounds[1])
 
-    # Check sanity of bounds
-    if left > right:
-        err = f"left bound '{bounds[0]}' must be smaller than right bound '{bounds[1]}'\n"
-        raise ValueError(err)
-
-    # left and right the same, infinite prior for the shared value
+    # left and right the same, probability is 1.0 (log(P) = 0) for this value
     if left == right:
         w = f"left and right bounds {bounds} are identical\n"
         warnings.warn(w)
-        return 0
+        return 0.0
     
-    # Probability of being one number with step size of resolution between the
-    # edges specified by bounds
-    return np.log(finfo.resolution) - np.log((bounds[1] - bounds[0]))
+    # width is 2*max_value --> log(2) + log_max_value
+    if np.isinf(left) and np.isinf(right):
+        return log_resolution - (np.log(2) + log_max_value)
 
+    # Figure out scalars (see docstring)
+    if np.isinf(left):
+
+        # exactly half the number line; scalar = 1
+        if right == 0:
+            return log_resolution - log_max_value
+        
+        # scalar is less than 1 if left and right are both to the left of zero,
+        # more than 1 if right is above zero
+        if right < 0:
+            scalar = 1 - np.abs(right/max_value)
+        else:
+            scalar = 1 + np.abs(right/max_value)
+        
+        return log_resolution - (np.log(scalar) + log_max_value)
+    
+    if np.isinf(right):
+        
+        # exactly half the number line; scalar = 1
+        if left == 0:
+            return log_resolution - log_max_value
+        
+        # scalar is less than 1 if left and right are both to the right of zero,
+        # more than 1 if left is below zero
+        if left > 0:
+            scalar = 1 - np.abs(left/max_value)
+        else:
+            scalar = 1 + np.abs(left/max_value)
+        
+        return log_resolution - (np.log(scalar) + log_max_value)
+
+    # simple case with finite bounds. resolution/bound_width
+    return np.log(finfo.resolution) - np.log((right - left))
 
 
 class BayesianFitter(Fitter):
     """
+    Use Bayesian MCMC to sample parameter space. 
     """
     def __init__(self,
                  num_walkers=100,
@@ -184,34 +273,92 @@ class BayesianFitter(Fitter):
             number of steps to run the markov chains
         burn_in : float between 0 and 1
             fraction of samples to discard from the start of the run
-        num_threads : int or `"max"`
-            number of threads to use.  if `"max"`, use the total number of
-            cpus. [NOT YET IMPLEMENTED]
+        num_threads : int
+            number of threads to use.  if `0`, use the total number of cpus. 
+            [NOT YET IMPLEMENTED]
         """
 
         super().__init__()
 
-        self._num_walkers = num_walkers
-        self._initial_walker_spread = initial_walker_spread
-        self._ml_guess = ml_guess
-        self._num_steps = num_steps
-        self._burn_in = burn_in
+        # Set keywords, validating as we go
+        self._num_walkers = check_int(value=num_walkers,
+                                      variable_name="num_walkers",
+                                      minimum_allowed=1)
+        self._initial_walker_spread = check_float(value=initial_walker_spread,
+                                                  variable_name="initial_walker_spread",
+                                                  minimum_allowed=0,
+                                                  minimum_inclusive=False)               
+        self._ml_guess = check_bool(value=ml_guess,
+                                    variable_name="ml_guess")
+        self._num_steps = check_int(value=num_steps,
+                                    variable_name="num_steps",
+                                    minimum_allowed=1)
+        self._burn_in = check_float(value=burn_in,
+                                    variable_name="burn_in",
+                                    minimum_allowed=0,
+                                    maximum_allowed=1,
+                                    minimum_inclusive=False,
+                                    maximum_inclusive=False)
 
-        self._num_threads = num_threads
-        if self._num_threads == "max":
-            self._num_threads = multiprocessing.cpu_count()
+        # Deal with number of threads
+        num_threads = check_int(value=num_threads,
+                                variable_name="num_threads",
+                                minimum_allowed=0)                
+        if num_threads == 0:
+            num_threads = multiprocessing.cpu_count()
 
-        if not type(self._num_threads) == int and self._num_threads > 0:
-            err = "num_threads must be 'max' or a positive integer\n"
-            raise ValueError(err)
-
-        if self._num_threads != 1:
+        if num_threads != 1:
             err = "multithreading has not yet been implemented (yet!).\n"
             raise NotImplementedError(err)
+        
+        self._num_threads = num_threads
 
+        # Finalize initialization
         self._success = None
+        self._fit_type = "bayesian"
 
-        self.fit_type = "bayesian"
+    def _setup_priors(self):
+        """
+        Set up the priors for the calculation.
+        """
+
+        # Create prior distribution to use for all gaussian prior calcs
+        self._prior_frozen_rv = stats.norm(loc=0,scale=1)
+
+        # Figure out the offset that normalizes the area of the pdf curve to 1.0
+        # given the float precision etc. of the system
+        base_offset = _find_normalization(scale=1,rv=stats.norm)
+
+        uniform_priors = []
+        gauss_prior_means = []
+        gauss_prior_stds = []
+        gauss_prior_offsets = []
+        gauss_prior_mask = []
+        for i in range(self.num_params):
+
+            priors = self.priors[:,i]
+            bounds = self.bounds[:,i]
+
+            if np.isnan(priors[0]) or np.isnan(priors[1]):
+                uniform_priors.append(_find_uniform_value(bounds))
+                gauss_prior_mask.append(False)
+
+            else:
+                gauss_prior_means.append(priors[0])
+                gauss_prior_stds.append(priors[1])
+
+                z_bounds = (bounds - priors[0])/priors[1]
+                bounds_offset = _reconcile_bounds_and_priors(bounds=z_bounds,
+                                                             frozen_rv=self._prior_frozen_rv)
+                gauss_prior_offsets.append(base_offset + bounds_offset)
+                gauss_prior_mask.append(True)
+    
+        self._uniform_priors = np.sum(uniform_priors)
+
+        self._gauss_prior_means = np.array(gauss_prior_means,dtype=float)
+        self._gauss_prior_stds = np.array(gauss_prior_stds,dtype=float)
+        self._gauss_prior_offsets = np.array(gauss_prior_offsets,dtype=float)
+        self._gauss_prior_mask = np.array(gauss_prior_mask,dtype=bool)
 
     def ln_prior(self,param):
         """
@@ -232,15 +379,12 @@ class BayesianFitter(Fitter):
         if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
             return -np.inf
 
-        # Get priors for parameters we're treating with uniform priors
-        uniform = np.sum(self._uniform_prior)
-
         # Get priors for parameters we're treating with gaussian priors
-        z = (param - self._prior_means)/self._prior_stds
-        gauss = np.sum(self._prior_frozen_rv.logpdf(z) + self._prior_gaussian_offsets)
+        z = (param[self._gauss_prior_mask] - self._gauss_prior_means)/self._gauss_prior_stds
+        gauss = np.sum(self._prior_frozen_rv.logpdf(z) + self._gauss_prior_offsets)
 
         # Return total priors
-        return uniform + gauss
+        return self._uniform_priors + gauss
 
     def ln_prob(self,param):
         """
@@ -273,45 +417,6 @@ class BayesianFitter(Fitter):
 
         return ln_prob
 
-    def _setup_priors(self):
-        """
-        Set up the priors for the calculation.
-        """
-
-        # Create prior distribution to use for all gaussian prior calcs
-        self._prior_frozen_rv = stats.norm(loc=0,scale=1)
-
-        # Figure out the offset that normalizes the area of the pdf curve to 1.0
-        # given the float precision etc. of the system
-        base_offset = _find_normalization(scale=1,rv=stats.norm)
-
-        uniform_priors = []
-        gauss_prior_means = []
-        gauss_prior_stds = []
-        gauss_prior_offsets = []
-        for i, s in enumerate(self._priors):
-
-            bounds = self.bounds[i,:]
-
-            if np.isnan(s[0]) or np.isnan(s[1]):
-                uniform_priors.append(_find_uniform_value(bounds))
-
-            else:
-                gauss_prior_means.append(s[0])
-                gauss_prior_stds.append(s[1])
-
-                z_bounds = (bounds - s[0])/s[1]
-                bounds_offset = _process_bounds(bounds=z_bounds,
-                                                frozen_rv=self._prior_frozen_rv)
-                gauss_prior_offsets.append(base_offset + bounds_offset)
-
-    
-        self._uniform_priors = np.array(uniform_priors,dtype=float)
-
-        self._prior_means = np.array(gauss_prior_means,dtype=float)
-        self._prior_stds = np.array(gauss_prior_stds,type=float)
-        self._gauss_prior_offsets = np.array(gauss_prior_offsets)
-        
 
     def _fit(self,**kwargs):
         """

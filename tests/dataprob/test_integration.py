@@ -35,4 +35,4 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
                        rtol=fit_tolerance_fixture,
                        atol=fit_tolerance_fixture*input_params)
 
-    f.fit_to_df
+    f.fit_df

@@ -78,21 +78,36 @@ def fitter_object(binding_curve_test_data):
     Do a successful fit that can be passed into other functions
     """
 
-    f = dataprob.MLFitter()
+    wrapped_fit = dataprob.MLFitter()
 
     model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
-    #input_params = np.array(binding_curve_test_data["input_params"])
 
-    f.fit(model=model,
-          guesses=guesses,
-          y_obs=df.Y)
+    wrapped_fit.fit(model=model,
+                    guesses=guesses,
+                    y_obs=df.Y)
 
-    if not f.success:
-        raise RuntimeError("test fit did not converge!")
+    if not wrapped_fit.success:
+        raise RuntimeError("wrapped test fit did not converge!")
 
-    return f
+    unwrapped_fit = dataprob.MLFitter()
+    
+    model = binding_curve_test_data["model_to_test_wrap"]
+    guesses = binding_curve_test_data["guesses"]
+    df = binding_curve_test_data["df"]
+
+    unwrapped_fit.fit(model=model,
+                      guesses=guesses,
+                      y_obs=df.Y)
+    
+    if not unwrapped_fit.success:
+        raise RuntimeError("unwrapped test fit did not converge!")
+
+    out_dict = {"wrapped_fit":wrapped_fit,
+                "unwrapped_fit":unwrapped_fit}
+
+    return out_dict
 
 ## Code for skipping slow tests.
 

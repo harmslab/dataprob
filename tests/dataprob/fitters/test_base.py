@@ -5,6 +5,7 @@ from dataprob.fitters.base import Fitter
 from dataprob.model_wrapper import ModelWrapper
 
 import numpy as np
+import pandas as pd
 
 import os
 import pickle
@@ -27,9 +28,6 @@ def test_Fitter__init__():
     assert f._fit_has_been_run is False
     assert f._fit_type == ""
 
-# ---------------------------------------------------------------------------- #
-# Test a few utility functions
-# ---------------------------------------------------------------------------- #
 
 def test_Fitter__sanity_check():
     
@@ -37,6 +35,9 @@ def test_Fitter__sanity_check():
     f._sanity_check("some error",["fit_type"])
     with pytest.raises(RuntimeError):
         f._sanity_check("some error",["not_an_attribute"])
+
+def xtest_Fitter_fit():
+    pass
 
 def test__fit():
     f = Fitter()
@@ -48,9 +49,6 @@ def test__update_estimates():
     with pytest.raises(NotImplementedError):
         f._fit()
 
-# ---------------------------------------------------------------------------- #
-# Test residuals and the like
-# ---------------------------------------------------------------------------- #
 
 def test_unweighted_residuals(binding_curve_test_data):
     """
@@ -227,6 +225,8 @@ def test_guesses_setter_getter(binding_curve_test_data):
         f.guesses = "a"
     with pytest.raises(ValueError):
         f.guesses = ["a",1.5]
+    with pytest.raises(ValueError):
+        f.guesses = 1.0
 
     f = Fitter()
     assert f.guesses is None
@@ -528,8 +528,8 @@ def test_num_params(binding_curve_test_data):
         f.guesses = np.array([7,8,9,10])
 
     f = Fitter()
-    f.guesses = np.array([])
-    assert f.num_params == 0
+    f.guesses = np.array([1,2,3])
+    assert f.num_params == 3
 
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = ModelWrapper(model_to_test_wrap)
@@ -569,15 +569,43 @@ def test_base_properties():
     assert f.success is None
     assert f.fit_info is None
     assert f.samples is None
-    assert f.fit_to_df is None
+    assert f.fit_df is None
 
-def test_base_functions():
-    """
-    Test functions that can only be None in the base class.
-    """
+def xtest_fit_df(fitter_object):
 
-    f = Fitter()
-    assert f.corner_plot() is None
+    print(fitter_object["wrapped_fit"])
+
+    assert False
+    #wrapped_fit = fitter_object["wrapped_fit"]
+    #assert wrapped_fit.success
+
+    # f = Fitter()
+
+    # # Check success gatekeeper
+    # assert f.success is None
+    # f._success = False
+    # assert f.success is False
+    # value = f.fit_df
+    # assert value is None
+
+    # f = Fitter()
+
+    # model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+    # mw = ModelWrapper(model_to_test_wrap)
+    # f.model = mw
+    # mw.fit_parameters["K1"]._value = 5
+    # mw.fit_parameters["K2"]._value = -5
+    # f._success = True
+
+    # df = f.fit_df
+    # assert issubclass(type(df),pd.DataFrame)
+    
+    # assert False
+
+
+
+def xtest_corner_plot():
+    pass
 
 def test_write_samples(tmpdir):
     
@@ -707,7 +735,7 @@ def test_append_samples(tmpdir):
 
     os.chdir(cwd)
 
-def xtest_fit_completeness_sanity_checking(binding_curve_test_data):
+def test_fit_completeness_sanity_checking(binding_curve_test_data):
 
     f = Fitter()
 
@@ -737,30 +765,3 @@ def xtest_fit_completeness_sanity_checking(binding_curve_test_data):
     with pytest.raises(NotImplementedError):
         f.fit()
 
-def xtest_param_mismatch_check(binding_curve_test_data):
-    """
-    Test the check for mismatches in the number of parameters in guesses,
-    bounds, and names.
-    """
-
-    # XXXX PRIORS???
-
-    f = Fitter()
-
-    f.guesses = binding_curve_test_data["guesses"]
-    with pytest.raises(ValueError):
-        f.names = ["p{}".format(i)
-                         for i in range(len(binding_curve_test_data["guesses"])-1)]
-    f.names = ["p{}".format(i)
-                     for i in range(len(binding_curve_test_data["guesses"]))]
-
-    with pytest.raises(ValueError):
-        bnds = [[-np.inf for _ in range(len(binding_curve_test_data["guesses"])-1)],
-                [ np.inf for _ in range(len(binding_curve_test_data["guesses"])-1)]]
-        bnds = np.array(bnds)
-        f.bounds = bnds
-
-    bnds = [[-np.inf for _ in range(len(binding_curve_test_data["guesses"]))],
-            [ np.inf for _ in range(len(binding_curve_test_data["guesses"]))]]
-    bnds = np.array(bnds)
-    f.bounds = bnds

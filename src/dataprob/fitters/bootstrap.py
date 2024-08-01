@@ -40,7 +40,7 @@ class BootstrapFitter(Fitter):
         self._exp_err = exp_err
         self._verbose = verbose
 
-        self.fit_type = "bootstrap"
+        self._fit_type = "bootstrap"
 
     def _fit(self,**kwargs):
         """

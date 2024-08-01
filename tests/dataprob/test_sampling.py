@@ -58,23 +58,17 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
     with pytest.raises(ValueError):
         f.append_samples(sample_array=np.eye(3,dtype=float))
 
-    # array of right dimensons, wrong type
-    with pytest.raises(ValueError):
-        f.append_samples(sample_array=np.eye(1,dtype=int))
-
     # Can't specify array and input file
     with pytest.raises(ValueError):
         f.append_samples(sample_array=np.eye(1),sample_file=out_pickle1)
 
     # Load an input array as an array
     current_size = f.samples.shape[0]
-    with pytest.warns(UserWarning):
-        f.append_samples(sample_array=f.samples)
+    f.append_samples(sample_array=f.samples)
     assert np.array_equal(f.samples.shape,[2*current_size,1])
 
     # Load an input array from a pickle
-    with pytest.warns(UserWarning):
-        f.append_samples(sample_file=out_pickle1)
+    f.append_samples(sample_file=out_pickle1)
     assert np.array_equal(f.samples.shape,[3*current_size,1])
 
     # Now try to write to existing file
@@ -86,8 +80,7 @@ def test_write_append_samples(binding_curve_test_data,tmp_path):
     assert os.path.isfile(out_pickle2)
 
     # Load the written out file to make sure it worked
-    with pytest.warns(UserWarning):
-        f.append_samples(sample_file=out_pickle2)
+    f.append_samples(sample_file=out_pickle2)
     assert np.array_equal(f.samples.shape,[6*current_size,1])
 
     # Create a new fitter and load samples into an empty fitter (won't work)

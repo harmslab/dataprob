@@ -32,7 +32,7 @@ class MLFitter(Fitter):
 
         super(MLFitter,self).__init__()
 
-        self.fit_type = "maximum likelihood"
+        self._fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
     def _fit(self,**kwargs):
