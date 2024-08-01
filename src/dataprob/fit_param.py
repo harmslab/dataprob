@@ -6,8 +6,60 @@ import numpy as np
 
 import warnings
 
+from dataprob.check import check_bool
+from dataprob.check import check_float
+
 _INFINITY_PROXY = 1e9
-_CLOSE_TO_ZERO = 1e6
+
+def _guess_setter_from_bounds(bounds):
+    """
+    Find reasonable guesses from bounds.
+
+    Parameters
+    ----------
+    bounds : numpy.ndarray
+        array with two entries corresponding to lower and upper bounds. because
+        this is private, it assumes bounds[0] < bounds[1]. 
+
+    Returns
+    -------
+    guess : float
+        parameter guess consistent with these bounds
+    """
+
+    # Copy bounds because we will edit
+    bounds = np.array(bounds,dtype=float).copy()
+
+    # Approximate infinities as a moderately large, finite number
+    if np.isinf(bounds[0]):
+        bounds[0] = -_INFINITY_PROXY
+    
+    if np.isinf(bounds[1]):
+        bounds[1] = _INFINITY_PROXY
+    
+    # Lower bound is 0, return upper_bound/2
+    if bounds[0] == 0:
+        guess = bounds[1]/2
+        return guess
+    
+    # Upper bound is 0, return lower_bound/2
+    if bounds[1] == 0:
+        guess = bounds[0]/2
+        return guess
+
+    lower_sign = bounds[0]/np.abs(bounds[0])
+    upper_sign = bounds[1]/np.abs(bounds[1])
+
+    # If the bounds have the same sign, use geometric mean. Otherwise, 
+    # use arithmetic mean
+    if upper_sign == lower_sign:
+        log_sum = np.sum(np.log(np.abs(bounds)))
+        guess = upper_sign * np.exp(log_sum/2)
+    else:
+        guess = np.mean(bounds)
+
+    return guess
+
 
 class FitParameter:
     """
@@ -62,22 +114,24 @@ class FitParameter:
         guess : float, optional. 
             parameter guess. If None, the guess will be determined in the 
             following way.  1) If prior is given, the guess will be set to the
-            mean of the prior. 2) If lower and upper bounds have the same sign,
-            the guess will be placed at the geometric mean of the two bounds. 
-            3) If lower and upper bounds have different signs, the guess is
-            placed at the arithmetic mean of the two bounds. 4) If no prior or
-            bounds are given, the guess will be set to 0.0.
+            mean of the prior. 2) If no prior is given and lower and upper
+            bounds have the same sign, the guess will be placed at the geometric
+            mean of the two bounds. 3) If no prior is given and lower and upper
+            bounds have different signs, the guess is placed at the arithmetic
+            mean of the two bounds. 4) If no prior or bounds are given, the
+            guess will be set to 0.0.
         fixed : bool
             whether or not the parameter is fixed
-        bounds : list-like
-            bounds on fit for parameter (list-like object of 2 floats). If None,
-            bounds will be set to (None,None).  If (None,5), no lower bound,
-            upper bound of 5.
-        prior : list-like
-            prior on parameter (list-like object of 2 floats). Two values 
-            represent the (mean,stdev) for a Gaussian prior on that parameter. 
-            If None, prior will be set to None. (A Bayesian inference will then
-            use a uniform prior.)
+        bounds : iterable
+            bounds (inclusive) on fit for parameter (list-like, 2 floats). If
+            not given, bounds will be set to (-np.inf,np.inf).  Nones are
+            interpreted as infinities: (None,5) would give bounds of (-np.inf,5)
+        prior : iterable
+            prior on parameter (list-like, 2 floats). The two values represent
+            the (mean,stdev) for a Gaussian prior on that parameter. The second
+            value must be positive. Infinities are not allowed. If None,
+            the prior will be set to (np.nan,np.nan), causing a Bayesian
+            inference to use a uniform prior. 
         """
 
         # Setting must be in this order. If no guess is specified, the guess
@@ -131,72 +185,23 @@ class FitParameter:
         Set the guess.  If None, the guess is assigned using the following. 1)
         If prior is specified, the mean of the prior is used as the guess. 2) 
         If bounds are specified and both have the same sign, the guess becomes
-        the to geometric mean of the bounds. 3) If the bounds are specified and
-        have different signs, use the arithmetic mean of the bounds. (For #2 and
-        #3, if one of the bounds is infinte, set that bound to {_INFINITY_PROXY} 
+        the to arithmetic mean of the bounds. 3) If the bounds are specified and
+        have different signs, use the geometric mean of the bounds. (For #2 and
+        #3, if one of the bounds is infinite, set that bound to {_INFINITY_PROXY} 
         for the purpose of the mean calculation. 4) If no prior or bound is 
         specified, the guess is set to 0.0. 
         """
 
-        # Guess sent in
-        if guess is not None:
-
-            try:
-                guess = float(guess)
-            except Exception as e:
-                err = f"parameter guess '{guess}' cannot be interpretable as a float\n"
-                raise ValueError(err) from e
-
-        # no guess sent in
-        else:
-
-            # Set with the prior
-            if self.prior is not None:
-                guess = self.prior[0]
-
-            # No bound, set to 0.0
-            else:
-                if self.bounds[0] == -np.inf and self.bounds[1] == np.inf:
-                    guess = 0.0
-
-        # If we've gotten all the way here, we have some work to do to figure
-        # out guess from the bounds. 
         if guess is None:
-        
-            # If we have non-infinite bounds, take the geometric midpoint of
-            # the bounds as the guess
-            if self.bounds[0] > -np.inf:
-                lower_bound = self.bounds[0]
-                lower_sign = np.abs(lower_bound)/lower_bound
+            if not np.isnan(self.prior[0]):
+                guess = self.prior[0]
             else:
-                lower_bound = -_INFINITY_PROXY
-                lower_sign = -1
+                guess = _guess_setter_from_bounds(self.bounds)
 
-            if self.bounds[1] < np.inf:
-                upper_bound = self.bounds[1]
-                upper_sign = np.abs(upper_bound)/upper_bound
-            else:
-                upper_bound = _INFINITY_PROXY
-                upper_sign = 1
+        guess = check_float(value=guess,
+                            variable_name="guess")
 
-            # If the bounds have the same sign, use geometric mean
-            if upper_sign == lower_sign:
-                l = np.log(np.abs(lower_bound))
-                u = np.log(np.abs(upper_bound))
-                guess = upper_sign * np.exp((u + l)/2)
 
-            # If they have opposite signs, use the arithmetic mean
-            elif upper_sign > lower_sign:
-                guess = (upper_bound + lower_bound)/2
-
-            # This should *never* be true. This would imply the upper
-            # bound is negative and the lower bound is positive.
-            else:
-                err = f"Could not set guess automatically: lower bound \n"
-                err += f"({self.bounds[0]}) somehow above upper bound ({self.bound[1]}).\n"
-                err += "this is probably a bug in the dataprob code. You\n"
-                err += "can file a bug report at https://github.com/harmslab/dataprob\n"
-                raise RuntimeError(err)
 
         # Make sure the guess is within bounds
         if guess > self.bounds[1] or guess < self.bounds[0]:
@@ -223,7 +228,8 @@ class FitParameter:
         Fix or unfix the parameter.
         """
 
-        self._fixed = bool(bool_value)
+        self._fixed = check_bool(value=bool_value,
+                                 variable_name="fixed")
         self._clear_fit_result()
 
     #--------------------------------------------------------------------------
@@ -246,45 +252,60 @@ class FitParameter:
         Set fit bounds.
         """
 
-        if bounds is not None:
+        err_msg = \
+        """
 
-            try:
-                if len(bounds) != 2:
-                    raise TypeError
+        Bounds should be list-like, with two floats. The first entry is the 
+        lower bound; the second is the upper bounds. When doing the fit, bounds
+        are inclusive. 
+        
+        + The upper bound must be larger than the lower bound. 
+        + If bounds == None, the bounds are set to [-np.inf,np.inf]. 
+        + np.inf values are allowed, but np.nan is not. 
 
-                bounds = np.array(bounds,dtype=float)
+        """
 
-            except Exception as e:
-                err = "Bounds must be list-like object of length 2\n"
-                raise ValueError(err) from e
-
-        else:
+        if bounds is None:
             bounds = np.array((-np.inf,np.inf))
 
-        # Set bounds very close to zero to zero.
-        equiv_to_zero = np.finfo(bounds.dtype).tiny*_CLOSE_TO_ZERO
+        try:
+            bounds = np.array(bounds,dtype=float)
+        except Exception as e:
+            raise ValueError(err_msg) from e
+        
+        if len(bounds.shape) == 0 or bounds.shape[0] != 2:
+            raise ValueError(err_msg)
+        
+        num_nan = np.sum(np.isnan(bounds))
+        if num_nan > 0:
+            raise ValueError(err_msg)
+            
+        # Set any bounds very close to zero to zero.
+        equiv_to_zero = np.finfo(bounds.dtype).resolution
         bounds[np.abs(bounds) < equiv_to_zero] = 0.0
 
         # Make sure upper bound is above the lower bound
         if bounds[1] <= bounds[0]:
-            err = f"upper bound ({bounds[1]}) must be greater than lower bound ({bounds[0]})"
-            raise ValueError(err)
+            raise ValueError(err_msg)
 
+        # Shift existing guess if necessary
         if self.guess is not None:
-            
+        
             if self.guess < bounds[0]:
-                old_guess = self.guess
-                self.guess = bounds[0]
+                new_guess = bounds[0]
             elif self.guess > bounds[1]:
-                old_guess = self.guess
-                self.guess = bounds[1]
+                new_guess = bounds[1]
             else:
-                old_guess = None
+                new_guess = None
 
-            if old_guess is not None:
-                w = f"The previous guess ({old_guess}) is outside the new bounds ({bounds})\n"
-                w += f"Guess has been updated to {self.guess}\n"
+            if new_guess is not None:
+
+                w = f"The previous guess ({self.guess}) is outside the new\n"
+                w += f"bounds ({bounds}). The guess has been updated to\n"
+                w += f"'{self.guess}'.\n"
                 warnings.warn(w,UserWarning)
+
+                self.guess = new_guess
 
         self._bounds = bounds
         self._clear_fit_result()
@@ -299,7 +320,7 @@ class FitParameter:
         """
 
         try:
-            return self._prior_mean
+            return self._prior
         except AttributeError:
             return None
         
@@ -309,28 +330,41 @@ class FitParameter:
         Set the prior.
         """
 
-        if prior is not None:
+        err_msg = \
+        """
 
-            try:
-                if len(prior) != 2:
-                    raise TypeError
-
-                prior = np.array(prior,dtype=float)
-
-            except Exception as e:
-                err = "prior must be list-like object of length 2 representing\n"
-                err += "the (mean,std) of the distribution\n"
-                raise ValueError(err) from e
-
-            if prior[1] <= 0:
-                err = f"Second prior entry '{prior[1]}'  is invalid. This\n"
-                err += "entry is the standard deviation of the prior and must\n"
-                err += "be > 0.\n"
-                raise ValueError(err)
+        prior should be list-like, with two floats. The first entry is the 
+        mean of a gaussian prior; the second is the standard deviation.
         
-        else:
-            prior = [None,None]
+        + If prior == None, the prior is set to [np.nan,np.nan], which will 
+          cause a Bayesian inference to use uniform priors
+        + The standard deviation must be positive.
+        + np.nan values are allowed, but np.inf is not. 
 
+        """
+
+        if prior is None:
+            prior = np.nan*np.ones(2,dtype=float)
+
+        # Can be coerced to float array
+        try:
+            prior = np.array(prior,dtype=float)
+        except Exception as e:
+            raise ValueError(err_msg) from e
+        
+        # two elements
+        if len(prior.shape) == 0 or prior.shape[0] != 2:
+            raise ValueError(err_msg)
+
+        # no infinities allowed
+        num_inf = np.sum(np.isinf(prior))
+        if num_inf > 0:
+            raise ValueError(err_msg)
+
+        # stdev must be >= 0
+        if prior[1] <= 0:
+            raise ValueError(err_msg)
+        
         self._prior = prior
         self._clear_fit_result()
 

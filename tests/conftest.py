@@ -83,9 +83,11 @@ def fitter_object(binding_curve_test_data):
     model = binding_curve_test_data["prewrapped_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
-    input_params = np.array(binding_curve_test_data["input_params"])
+    #input_params = np.array(binding_curve_test_data["input_params"])
 
-    f.fit(model,guesses,df.Y)
+    f.fit(model=model,
+          guesses=guesses,
+          y_obs=df.Y)
 
     if not f.success:
         raise RuntimeError("test fit did not converge!")
@@ -95,9 +97,10 @@ def fitter_object(binding_curve_test_data):
 ## Code for skipping slow tests.
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--runslow", action="store_true", default=False, help="run slow tests"
-    )
+    parser.addoption("--runslow",
+                     action="store_true",
+                     default=False,
+                     help="run slow tests")
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "slow: mark test as slow to run")
