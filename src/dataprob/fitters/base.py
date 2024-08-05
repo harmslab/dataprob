@@ -13,6 +13,7 @@ import pickle
 import os
 
 import dataprob
+from dataprob.check import check_array
 
 class Fitter:
     """
@@ -197,9 +198,27 @@ class Fitter:
         raise NotImplementedError("should be implemented in subclass\n")
     
     
+    def _unweighted_residuals(self,param):
+        """
+        Private function calculating residuals with no error checking. 
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values
+        """
+
+        y_calc = self.model(param)
+        return self._y_obs - y_calc
+
     def unweighted_residuals(self,param):
         """
-        Calculate residuals.
+        Calculate residuals: (y_obs - y_calc)
 
         Parameters
         ----------
@@ -214,13 +233,39 @@ class Fitter:
 
         self._sanity_check("fit can be done",["model","y_obs"])
 
-        y_calc = self.model(param)
-        return self._y_obs - y_calc
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
 
+        return self._unweighted_residuals(param)
+
+    def _weighted_residuals(self,param):
+        """
+        Private function calculating weighted residuals without error checking
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values weighted by
+            standard deviation
+        """
+
+        y_calc = self.model(param)
+        return (self.y_obs - y_calc)/self.y_stdev
 
     def weighted_residuals(self,param):
         """
-        Calculate weighted residuals.
+        Calculate weighted residuals: (y_obs - y_calc)/y_stdev
 
         Parameters
         ----------
@@ -236,12 +281,20 @@ class Fitter:
 
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
 
-        y_calc = self.model(param)
-        return (self.y_obs - y_calc)/self.y_stdev
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
 
-    def ln_like(self,param):
+        return self._weighted_residuals(param)
+
+    def _ln_like(self,param):
         """
-        Log likelihood of function given parameters.
+        Private log likelihood, no error checking.
 
         Parameters
         ----------
@@ -251,20 +304,49 @@ class Fitter:
         Returns
         -------
         ln_like : numpy.ndarray
-            log likelihood (probability of data given the model)
+            log likelihood 
         """
-
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
 
         y_calc = self.model(param)
         sigma2 = self._y_stdev**2
         return -0.5*(np.sum((self._y_obs - y_calc)**2/sigma2 + np.log(sigma2)))
-        
 
+    def ln_like(self,param):
+        """
+        Log likelihood: P(obs|model(param))
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        ln_like : numpy.ndarray
+            log likelihood
+        """
+
+        self._sanity_check("fit can be done",["model","y_obs","y_stdev",])
+
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
+
+        return self._ln_like(param)
+
+    
     @property
     def model(self):
         """
-        Model used for fit.
+        Model to use for calculating y_calc. The model should either be an 
+        instance of dataprob.ModelWrapper OR a function that takes param (a 1D
+        numpy array) as its only argument and returns y_calc (a 1D numpy array)
+        as its only returned value. 
         """
 
         try:
@@ -277,9 +359,6 @@ class Fitter:
 
     @model.setter
     def model(self,model):
-        """
-        Setter for "model" attribute.
-        """
 
         # If this is a ModelWrapper instance, grab the model method rather than
         # the model instance for the check below.
@@ -346,34 +425,20 @@ class Fitter:
 
     @guesses.setter
     def guesses(self,guesses):
-        """
-        Setter for guess attribute.
-        """
 
-        err_msg = \
-        """
-
-        guesses should be an array of floats the same length as the number of
-        parameters.        
+        guesses = check_array(value=guesses,
+                              variable_name="guesses",
+                              expected_shape=(None,),
+                              expected_shape_names="(num_param,)")
         
-        """
-
-        try:
-            guesses = np.array(guesses,dtype=float)
-        except Exception as e:
-            raise ValueError(err_msg) from e
-
-        # make sure the cast array has a length. (It won't if guesses was 
-        # sent in as a single value)
-        if len(guesses.shape) == 0:
-            raise ValueError(err_msg)
-
         if self.num_params is None:
             self._num_params = guesses.shape[0]
 
         if guesses.shape[0] != self.num_params:
-            raise ValueError(err_msg)        
-
+            err = "guesses should be a numpy array the same length as the\n"
+            err += "number of guesses\n"
+            raise ValueError(err)
+        
         self._guesses = guesses
 
         # Update the underlying guesses in each FitParameter instance
@@ -387,6 +452,15 @@ class Fitter:
     def bounds(self):
         """
         Bounds for fit parameters.
+
+        bounds must be a (2 x num_parameters) numpy array of floats with the
+        form:
+
+        [[lower_0, lower_1, ..., lower_n],
+         [upper_0, upper_1, ..., upper_n]]
+
+        np.inf values are allowed, indicating no bounds on that parameter.
+        np.nan are not allowed. 
         """
 
         # Grab the bounds from the model wrapper in case they changed
@@ -400,37 +474,19 @@ class Fitter:
 
     @bounds.setter
     def bounds(self,bounds):
-        """
-        Setter for bounds attribute.
-        """
 
-        err_msg = \
-        """
+        bounds = check_array(value=bounds,
+                              variable_name="bounds",
+                              expected_shape=(2,None),
+                              expected_shape_names="(2,num_param)")
         
-        bounds must be a (2 x num_parameters) numpy array of floats with the
-        form:
-
-        [[lower_0, lower_1, ..., lower_n],
-         [upper_0, upper_1, ..., upper_n]]
-
-        """
-
-        try:
-            bounds = np.array(bounds,dtype=float)
-        except Exception as e:
-            raise ValueError(err_msg) from e
-        
-        if len(bounds.shape) != 2:
-            raise ValueError(err_msg)
-        
-        if bounds.shape[0] != 2:
-            raise ValueError(err_msg)
-
-        if self.num_params is not None:
-            if bounds.shape[1] != self.num_params:      
-                raise ValueError(err_msg)
-        else:
+        if self.num_params is None:
             self._num_params = bounds.shape[1]
+
+        if bounds.shape[1] != self.num_params:
+            doc = inspect.getdoc(Fitter.bounds)
+            err = f"incorrectly specified bounds. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._bounds = bounds
 
@@ -444,7 +500,16 @@ class Fitter:
     @property
     def priors(self):
         """
-        priors for fit parameters.
+        Gaussian priors to use for each parameter.
+
+        priors must be a (2 x num_parameters) numpy array of floats with the
+        form:
+
+        [[mean_0,   mean_1, ...,  mean_n],
+         [stdev_0, stdev_1, ..., stdev_n]]
+
+        np.inf values are not allowed. np.nan entries indicate that uniform
+        priors should be used for that parameter.        
         """
 
         # Grab the priors from the model wrapper in case they changed
@@ -458,44 +523,24 @@ class Fitter:
 
     @priors.setter
     def priors(self,priors):
-        """
-        Setter for priors attribute.
-        """
 
-        err_msg = \
-        """
+        priors = check_array(value=priors,
+                             variable_name="priors",
+                             expected_shape=(2,None),
+                             expected_shape_names="(2,num_param)")
         
-        priors must be a (2 x num_parameters) numpy array of floats with the
-        form:
-
-        [[mean_0,   mean_1, ...,  mean_n],
-         [stdev_0, stdev_1, ..., stdev_n]]
-
-        np.inf values are not allowed. np.nan entries indicate that uniform
-        priors should be used for that parameter.
-        
-        """
-
-        try:
-            priors = np.array(priors,dtype=float)
-        except Exception as e:
-            raise ValueError(err_msg) from e
-        
-        if len(priors.shape) != 2:
-            raise ValueError(err_msg)
-        
-        if priors.shape[0] != 2:
-            raise ValueError(err_msg)
-        
-        num_infinities = np.sum(np.isinf(priors))
-        if num_infinities > 0:
-            raise ValueError(err_msg)
-
-        if self.num_params is not None:
-            if priors.shape[1] != self.num_params:      
-                raise ValueError(err_msg)
-        else:
+        if self.num_params is None:
             self._num_params = priors.shape[1]
+
+        if priors.shape[1] != self.num_params:
+            doc = inspect.getdoc(Fitter.priors)
+            err = f"incorrectly specified priors. \n\n{doc}\n\n"
+            raise ValueError(err)
+
+        if np.sum(np.isinf(priors)) > 0:
+            doc = inspect.getdoc(Fitter.priors)
+            err = f"priors cannot be infinite. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._priors = priors
 
@@ -510,6 +555,9 @@ class Fitter:
     def names(self):
         """
         Parameter names for fit parameters.
+
+        Should be an array of unique strings the same length as the number of
+        parameters. 
         """
 
         # Grab the bounds from the model wrapper in case they changed
@@ -523,9 +571,6 @@ class Fitter:
 
     @names.setter
     def names(self,names):
-        """
-        Setter for parameter names attribute.
-        """
 
         # If the user sends in a naked string, make it into a list of strings
         if issubclass(type(names),str):
@@ -533,15 +578,16 @@ class Fitter:
 
         # Force to be an array of strings
         names = np.array(names,dtype=str)
-
+        
         if len(names) != len(set(names)):
-            err = "parameter names must all be unique.\n"
+            doc = inspect.getdoc(Fitter.names)
+            err = f"parameter names must all be unique. \n\n{doc}\n\n"
             raise ValueError(err)
 
         if self.num_params is not None:
             if names.shape[0] != self.num_params:
-                err = "length of names ({}) must match the number of parameters ({})\n".format(names.shape[0],
-                                                                                                   self.num_params)
+                doc = inspect.getdoc(Fitter.names)
+                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
                 raise ValueError(err)
         else:
             self._num_params = names.shape[0]
@@ -556,7 +602,8 @@ class Fitter:
     @property
     def y_obs(self):
         """
-        Observed y values for fit.
+        Observed y values for fit. This should be a 1D numpy array of floats 
+        the same length as the number of observations. 
         """
 
         try:
@@ -566,32 +613,29 @@ class Fitter:
 
     @y_obs.setter
     def y_obs(self,y_obs):
-        """
-        Setter for y_obs attribute.
-        """
-
-        try:
-            y_obs = np.array(y_obs,dtype=float)
-        except Exception as e:
-            err = f"y_obs must be a list or array of floats\n\n"
-            raise ValueError(err) from e
-
-        if self._num_obs is not None:
-            if y_obs.shape[0] != self._num_obs:
-                err = f"observation already loaded with a different size ({self._num_obs})\n"
-                raise ValueError(err)
-        else:
+        
+        y_obs = check_array(value=y_obs,
+                            variable_name="y_obs",
+                            expected_shape=(None,),
+                            expected_shape_names="(num_obs,)")
+        
+        if self.num_obs is None:
             self._num_obs = y_obs.shape[0]
+
+        if y_obs.shape[0] != self.num_obs:
+            doc = inspect.getdoc(Fitter.y_obs)
+            err = f"incorrectly specified y_obs. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._y_obs = y_obs
 
         self._fit_has_been_run = False
 
-
     @property
     def y_stdev(self):
         """
-        Observed y values for fit.
+        Estimated standard deviation on observed y values. This should be a 1D
+        numpy array of floats the same length as the number of observations. 
         """
 
         try:
@@ -601,22 +645,19 @@ class Fitter:
 
     @y_stdev.setter
     def y_stdev(self,y_stdev):
-        """
-        Setter for y_stdev attribute.
-        """
 
-        try:
-            y_stdev = np.array(y_stdev,dtype=float)
-        except Exception as e:
-            err = f"y_stdev must be a list or array of floats\n"
-            raise ValueError(err) from e
-
-        if self._num_obs is not None:
-            if y_stdev.shape[0] != self._num_obs:
-                err = "observation already loaded with a different size ({self._num_obs})\n"
-                raise ValueError(err)
-        else:
+        y_stdev = check_array(value=y_stdev,
+                              variable_name="y_stdev",
+                              expected_shape=(None,),
+                              expected_shape_names="(num_obs,)")
+        
+        if self.num_obs is None:
             self._num_obs = y_stdev.shape[0]
+
+        if y_stdev.shape[0] != self.num_obs:
+            doc = inspect.getdoc(Fitter.y_stdev)
+            err = f"incorrectly specified y_stdev. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._y_stdev = y_stdev
 

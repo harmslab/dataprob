@@ -6,6 +6,7 @@ from dataprob.fitters.base import Fitter
 from dataprob.check import check_int
 from dataprob.check import check_float
 from dataprob.check import check_bool
+from dataprob.check import check_array
 
 import emcee
 
@@ -33,36 +34,40 @@ def _find_normalization(scale,rv,**kwargs):
     Returns
     -------
     offset : float
-        offset to add to rv.logpdf(x) to normalize pdf to 1.0 
+        offset to add to frozen_rv.logpdf(x) to normalize pdf to 1.0 
 
     Notes
     -----
 
-    First, calculate the unnormalized pdf at the center of the distribution
-    (loc):
+    Calculate the minimum difference between floats we can represent using our
+    data type. This sets the bin width for a discrete approximation of the
+    continuous distribution.
 
-        un_norm_prob = rv.pdf(loc)
+        res = np.finfo(dtype).resolution
+    
+    Calculate the sum of the un-normalized pdf over a range spanning zero. We
+    use a range of -num_to_same*res -> num_to_sample*res, taking steps of res:
 
-    Second, calculate the minimum difference between floats we can represent
-    using our data type. This sets the bin width for a discrete approximation
-    of the continuous distribution.
+        frozen_rv = rv(loc=0,scale=scale,**kwargs)
+        x = np.arange(-num_to_sample*res,
+                      num_to_sample*(res + 1),
+                      res)
+        un_norm_prob = np.sum(frozen_rv.pdf(loc=x))
 
-        res = np.finfo(un_norm_prob.dtype).resolution
+    Calculate the difference in the cdf between num_to_sample*res and 
+    -num_to_sample*res. This is the normalized probability of the slice
+    centered on zero we calculated above. 
 
-    Third, calculate the difference in the cdf between loc + num_to_sample*res
-    and loc - num_to_sample*res. This is the normalized probability of the slice
-    centered on loc. 
-
-        norm_prob = cdf(loc + num_to_sample*res) - cdf(loc - num_to_sample*res). 
+        norm_prob = cdf(num_to_sample*res) - cdf(-num_to_sample*res). 
 
     The ratio of norm_prob and un_norm_prob is a scalar that converts from raw
     pdf calculations to normalized probabilities. 
 
-        norm_prob_x = rv.pdf(x)*norm_prob/un_norm_prob
+        norm_prob_x = frozen_rv.pdf(x)*norm_prob/un_norm_prob
 
     Since we care about log versions of this, it becomes:
 
-        log_norm_prob_x = rv.logpdf(x) + log(norm_prob) - log(un_norm_prob)
+        log_norm_prob_x = frozen_rv.logpdf(x) + log(norm_prob) - log(un_norm_prob)
 
     We can define a pre-calculated offset;
 
@@ -70,10 +75,7 @@ def _find_normalization(scale,rv,**kwargs):
 
     So, finally:
 
-        log_norm_prob_x = rv.logpdf(x) + offset
-
-    This is most numerically stable at loc = 0, so figure out the
-    normalization using all other shape parameters but loc = 0. 
+        log_norm_prob_x = frozen_rv.logpdf(x) + offset
     """
 
     # Create frozen distribution located at 0.0
@@ -360,6 +362,22 @@ class BayesianFitter(Fitter):
         self._gauss_prior_offsets = np.array(gauss_prior_offsets,dtype=float)
         self._gauss_prior_mask = np.array(gauss_prior_mask,dtype=bool)
 
+    def _ln_prior(self,param):
+        """
+        Private function that gets the log prior without error checking. 
+        """
+
+        # If any parameter falls outside of the bounds, make the prior -infinity
+        if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
+            return -np.inf
+
+        # Get priors for parameters we're treating with gaussian priors
+        z = (param[self._gauss_prior_mask] - self._gauss_prior_means)/self._gauss_prior_stds
+        gauss = np.sum(self._prior_frozen_rv.logpdf(z) + self._gauss_prior_offsets)
+
+        # Return total priors
+        return self._uniform_priors + gauss
+
     def ln_prior(self,param):
         """
         Log prior of fit parameters.  
@@ -375,16 +393,34 @@ class BayesianFitter(Fitter):
             log of priors.
         """
 
-        # If any parameter falls outside of the bounds, make the prior -infinity
-        if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
+        self._sanity_check("fit can be done",["priors","bounds"])     
+
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
+
+        return self._ln_prior(param)
+
+
+    def _ln_prob(self,param):
+        """
+        Private function that gets log probability without error checking.
+        """
+
+        # log posterior is log prior plus log likelihood
+        ln_prob = self._ln_prior(param) + self._ln_like(param)
+
+        # If result is not finite, this solution has an -infinity log
+        # probability
+        if not np.isfinite(ln_prob):
             return -np.inf
 
-        # Get priors for parameters we're treating with gaussian priors
-        z = (param[self._gauss_prior_mask] - self._gauss_prior_means)/self._gauss_prior_stds
-        gauss = np.sum(self._prior_frozen_rv.logpdf(z) + self._gauss_prior_offsets)
-
-        # Return total priors
-        return self._uniform_priors + gauss
+        return ln_prob
 
     def ln_prob(self,param):
         """
@@ -401,22 +437,18 @@ class BayesianFitter(Fitter):
             log posterior proability
         """
 
-        # Calculate prior.  
-        ln_prior = self.ln_prior(param)
+        self._sanity_check("fit can be done",["model","y_obs","y_stdev","priors","bounds"])
+        
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
 
-        # Calculate likelihood.  
-        ln_like = self.ln_like(param)
-
-        # log posterior is log prior plus log likelihood
-        ln_prob = ln_prior + ln_like
-
-        # If result is not finite, this solution has an -infinity log
-        # probability
-        if not np.isfinite(ln_prob):
-            return -np.inf
-
-        return ln_prob
-
+        return self._ln_prob(param)
 
     def _fit(self,**kwargs):
         """
@@ -451,7 +483,7 @@ class BayesianFitter(Fitter):
         # Sample using walkers
         self._fit_result = emcee.EnsembleSampler(self._num_walkers,
                                                  ndim,
-                                                 self.ln_prob,
+                                                 self._ln_prob,
                                                  **kwargs)
 
         self._fit_result.run_mcmc(pos, self._num_steps,progress=True)

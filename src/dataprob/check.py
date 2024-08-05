@@ -69,11 +69,11 @@ def check_bool(value,variable_name=None):
 
 
 def check_float(value,
-                  variable_name=None,
-                  minimum_allowed=-np.inf,
-                  maximum_allowed=np.inf,
-                  minimum_inclusive=True,
-                  maximum_inclusive=True):
+                variable_name=None,
+                minimum_allowed=-np.inf,
+                maximum_allowed=np.inf,
+                minimum_inclusive=True,
+                maximum_inclusive=True):
     """
     Process a `float` argument and do error checking.
 
@@ -265,6 +265,66 @@ def check_int(value,
         raise ValueError(err)
 
     return value
+
+def check_array(value,
+                variable_name=None,
+                expected_shape=None,
+                expected_shape_names=None):
+
+    """
+    Do a sanity check on arguments that send in parameters (ln_like, etc.).
+
+    Parameters
+    ----------
+    value :
+        input value to check/process
+    variable_name : str
+        name of variable (string, for error message)
+    expected_shape : tuple
+        expected dimensions. None entries indicate that dimension must be 
+        present but does not have a specified length
+    expected_shape_names : str
+        name of dimensions (string, for error message)
+        
+    Returns
+    -------
+    value : numpy.ndarray
+        value validated and coerced (if necessary) into a float array
+    """
+    
+    err = f"'{value}' must be a float numpy array"
+
+    if variable_name is not None:
+        err = f"{variable_name} {err}"
+    
+    if expected_shape is not None:
+        if expected_shape_names is not None:
+            err = f"{err} with shape {expected_shape_names}"
+        else:
+            err = f"{err} with shape {expected_shape}"
+    
+    err = f"\n{err}\n"
+
+    if not hasattr(value,"__iter__"):
+        raise ValueError(err)
+
+    try:
+        value = np.array(value,dtype=float)
+    except Exception as e:
+        raise ValueError(err) from e
+    
+    if expected_shape is not None:
+
+        if len(value.shape) != len(expected_shape):
+            raise ValueError(err)
+        
+        for i in range(len(expected_shape)):
+            if expected_shape[i] is not None:
+                if value.shape[i] != expected_shape[i]:
+                    raise ValueError(err)
+    
+    return value
+
 
 
 def column_to_bool(column,column_name):

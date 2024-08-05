@@ -27,7 +27,8 @@ def binding_curve_test_data():
     json_data["df"] = pd.read_csv(f,index_col=0)
 
     # ------------------------------------------------------------
-    # Create a pre-wrapped model for testing generic model fitting
+    # Generic method that can be fit (observable takes a single
+    # numpy array of arguments and returns an array of y_calc)
     # ------------------------------------------------------------
     class BindingCurve:
         """
@@ -36,10 +37,10 @@ def binding_curve_test_data():
         def __init__(self,X):
             self.X = X
         def observable(self,K):
-            return K*self.X/(1 + K*self.X)
+            return K[0]*self.X/(1 + K[0]*self.X)
 
     lm = BindingCurve(X=json_data["df"].X)
-    json_data["prewrapped_model"] = lm.observable
+    json_data["generic_model"] = lm.observable
 
     # ------------------------------------------------------------
     # Save a model that should be readily wrapped by ModelWrapper
@@ -80,7 +81,7 @@ def fitter_object(binding_curve_test_data):
 
     wrapped_fit = dataprob.MLFitter()
 
-    model = binding_curve_test_data["prewrapped_model"]
+    model = binding_curve_test_data["generic_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
 

@@ -92,7 +92,7 @@ def test__find_normalization():
         assert pct_diff < 0.01
 
 
-def xtest__reconcile_bounds_and_priors():
+def test__reconcile_bounds_and_priors():
 
     frozen_rv = stats.norm(loc=0,scale=1)
     
@@ -210,7 +210,7 @@ def test__find_uniform_value():
     assert np.isclose(value,expected_value)
 
 
-def xtest_BayesianFitter__init__():
+def test_BayesianFitter__init__():
 
     # default args work. check to make sure super().__init__ actually ran.
     f = BayesianFitter()
@@ -395,8 +395,47 @@ def test_BayesianFitter_ln_prior():
     value = f.ln_prior(np.array([-1,2]))
     assert np.isclose(-np.inf,value)
 
-def xtest_BayesianFitter_ln_prob():
+def test_BayesianFitter__ln_prob(binding_curve_test_data):
     pass
+    
+    
+def test_BayesianFitter_ln_prob(binding_curve_test_data):
+    """
+    Test calculation ,looking for proper error checking.
+    """
+    
+    f = BayesianFitter()
+
+    input_params = binding_curve_test_data["input_params"]
+
+    # Should fail, haven't loaded a model, y_obs or y_stdev yet
+    with pytest.raises(RuntimeError):
+        f.ln_prob(input_params)
+
+    f.model = binding_curve_test_data["generic_model"]
+
+    # Should fail, haven't loaded y_obs or y_stdev yet
+    with pytest.raises(RuntimeError):
+        f.ln_prob(input_params)
+
+    df = binding_curve_test_data["df"]
+    f.y_obs = df.Y
+
+    # Should fail, haven't loaded y_stdev yet
+    with pytest.raises(RuntimeError):
+        f.ln_prob(input_params)
+    f.y_stdev = df.Y_stdev
+
+    # Should fail, haven't loaded priors or bounds yet
+    with pytest.raises(RuntimeError):
+        f.ln_prob(input_params)
+    
+    # Set bounds and priors
+    f.bounds = [[-np.inf],[np.inf]]
+    f.priors = [[0],[2]]
+    f._setup_priors()
+
+    L = f.ln_prob(input_params)
 
 def xtest_BayesianFitter__fit():
     pass
@@ -407,16 +446,17 @@ def xtest_BayesianFitter__update_estimates():
 def xtest_BayesianFitter_fit_info():
     pass
 
+
 @pytest.mark.slow
 def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     """
     Test the ability to fit the test data in binding_curve_test_data.
     """
 
-    # Do fit using a manually wrapped model (prewrapped model) and then
-    # creating and using a ModelWrapper model instance
+    # Do fit using a generic unwrapped model and then creating and using a
+    # ModelWrapper model instance
 
-    for model_key in ["prewrapped_model","wrappable_model"]:
+    for model_key in ["generic_model","wrappable_model"]:
 
         f = BayesianFitter()
         model = binding_curve_test_data[model_key]

@@ -28,7 +28,6 @@ def test_Fitter__init__():
     assert f._fit_has_been_run is False
     assert f._fit_type == ""
 
-
 def test_Fitter__sanity_check():
     
     f = Fitter()
@@ -49,6 +48,22 @@ def test__update_estimates():
     with pytest.raises(NotImplementedError):
         f._fit()
 
+def test__unweighted_residuals(binding_curve_test_data):
+    """
+    Test unweighted residuals call against "manual" code used to generate
+    test data. Just make sure answer is right; no error checking on this 
+    function. 
+    """
+    f = Fitter()
+    input_params = binding_curve_test_data["input_params"]
+    f.model = binding_curve_test_data["generic_model"]
+    df = binding_curve_test_data["df"]
+    f.y_obs = df.Y
+
+    r = f._unweighted_residuals(input_params)
+
+    assert np.allclose(r,df.residual)
+
 
 def test_unweighted_residuals(binding_curve_test_data):
     """
@@ -60,13 +75,13 @@ def test_unweighted_residuals(binding_curve_test_data):
 
     input_params = binding_curve_test_data["input_params"]
 
-    # Should fail, haven't loaded a model or y_obs yet
+    # Should fail, haven't loaded a model, y_obs or y_stdev yet
     with pytest.raises(RuntimeError):
         f.unweighted_residuals(input_params)
 
-    f.model = binding_curve_test_data["prewrapped_model"]
+    f.model = binding_curve_test_data["generic_model"]
 
-    # Should fail, haven't loaded y_obs yet
+    # Should fail, haven't loaded y_obs or y_stdev yet
     with pytest.raises(RuntimeError):
         f.unweighted_residuals(input_params)
 
@@ -76,6 +91,29 @@ def test_unweighted_residuals(binding_curve_test_data):
     r = f.unweighted_residuals(input_params)
 
     assert np.allclose(r,df.residual)
+
+    # Make sure error check is running
+    f._num_params = 2
+    with pytest.raises(ValueError):
+        f.unweighted_residuals([1,])
+
+def test__weighted_residuals(binding_curve_test_data):
+    """
+    Test weighted residuals call against "manual" code used to generate
+    test data. Just make sure answer is right; no error checking on this 
+    function. 
+    """
+
+    f = Fitter()
+    input_params = np.array(binding_curve_test_data["input_params"])
+    f.model = binding_curve_test_data["generic_model"]
+    df = binding_curve_test_data["df"]
+    f.y_obs = df.Y
+    f.y_stdev = df.Y_stdev
+
+    r = f._weighted_residuals(input_params)
+
+    assert np.allclose(r,df.weighted_residual)
 
 
 def test_weighted_residuals(binding_curve_test_data):
@@ -92,7 +130,7 @@ def test_weighted_residuals(binding_curve_test_data):
     with pytest.raises(RuntimeError):
         f.weighted_residuals(input_params)
 
-    f.model = binding_curve_test_data["prewrapped_model"]
+    f.model = binding_curve_test_data["generic_model"]
 
     # Should fail, haven't loaded y_obs or y_stdev yet
     with pytest.raises(RuntimeError):
@@ -110,6 +148,23 @@ def test_weighted_residuals(binding_curve_test_data):
 
     assert np.allclose(r,df.weighted_residual)
 
+    # Make sure error check is running
+    f._num_params = 2
+    with pytest.raises(ValueError):
+        f.weighted_residuals([1,])
+
+def test__ln_like(binding_curve_test_data):
+    """
+    Test internal function -- no error checking. 
+    """
+    f = Fitter()
+    input_params = binding_curve_test_data["input_params"]
+    f.model = binding_curve_test_data["generic_model"]
+    df = binding_curve_test_data["df"]
+    f.y_obs = df.Y
+    f.y_stdev = df.Y_stdev
+    L = f.ln_like(input_params)
+    assert np.allclose(L,binding_curve_test_data["ln_like"])
 
 def test_ln_like(binding_curve_test_data):
     """
@@ -125,7 +180,7 @@ def test_ln_like(binding_curve_test_data):
     with pytest.raises(RuntimeError):
         f.ln_like(input_params)
 
-    f.model = binding_curve_test_data["prewrapped_model"]
+    f.model = binding_curve_test_data["generic_model"]
 
     # Should fail, haven't loaded y_obs or y_stdev yet
     with pytest.raises(RuntimeError):
@@ -139,9 +194,16 @@ def test_ln_like(binding_curve_test_data):
         f.ln_like(input_params)
 
     f.y_stdev = df.Y_stdev
+    assert f.num_params is None
     L = f.ln_like(input_params)
+    assert f.num_params == 1
 
     assert np.allclose(L,binding_curve_test_data["ln_like"])
+
+    # make sure input params sanity check is running
+    input_params = [1,2,3]
+    with pytest.raises(ValueError):
+        f.ln_like(input_params)
 
 # ---------------------------------------------------------------------------- #
 # Test setters, getters, and internal sanity checks
@@ -163,10 +225,10 @@ def test_model_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.model = dummy
 
-    # Test passing a simple, prewrapped model (not a ModelWrapper)
-    f.model = binding_curve_test_data["prewrapped_model"]
+    # Test passing a generic model (not a ModelWrapper)
+    f.model = binding_curve_test_data["generic_model"]
     assert f.model is not None
-    assert f.model == binding_curve_test_data["prewrapped_model"]
+    assert f.model == binding_curve_test_data["generic_model"]
     assert f.guesses is None
     assert f.bounds is None
     assert f.names is None
@@ -345,6 +407,15 @@ def test_priors_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.priors = priors
 
+    # Pass in new otherwise valid priors with wrong dimensions
+    f = Fitter()
+    priors = np.ones((2,len(binding_curve_test_data["guesses"])),dtype=float)
+    f.priors = priors
+    assert np.array_equal(f.priors,priors)
+    priors = np.ones((2,len(binding_curve_test_data["guesses"])+1),dtype=float)
+    with pytest.raises(ValueError):
+        f.priors = priors
+
     # Test match with the number of parameters
     f = Fitter()
     f.names = ["A","B"]
@@ -356,8 +427,7 @@ def test_priors_setter_getter(binding_curve_test_data):
     f.priors = [[1,2],[1,2]]
     assert np.array_equal(f.priors,np.array([[1,2],[1,2]]))
 
-
-    # Test setting bounds with a model wrapper
+    # Test setting priors with a model wrapper
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = ModelWrapper(model_to_test_wrap)
 
@@ -573,24 +643,21 @@ def test_base_properties():
 
 def xtest_fit_df(fitter_object):
 
-    print(fitter_object["wrapped_fit"])
+    wrapped_fit = fitter_object["wrapped_fit"]
+    assert wrapped_fit.success
 
-    assert False
-    #wrapped_fit = fitter_object["wrapped_fit"]
-    #assert wrapped_fit.success
+    f = Fitter()
 
-    # f = Fitter()
+    # Check success gatekeeper
+    assert f.success is None
+    f._success = False
+    assert f.success is False
+    value = f.fit_df
+    assert value is None
 
-    # # Check success gatekeeper
-    # assert f.success is None
-    # f._success = False
-    # assert f.success is False
-    # value = f.fit_df
-    # assert value is None
+    f = Fitter()
 
-    # f = Fitter()
-
-    # model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+    # model_to_test_wrap = fitter_object["unwrapped_fit"]
     # mw = ModelWrapper(model_to_test_wrap)
     # f.model = mw
     # mw.fit_parameters["K1"]._value = 5
@@ -744,7 +811,7 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
     with pytest.raises(RuntimeError):
         f.fit()
 
-    f.model = binding_curve_test_data["prewrapped_model"]
+    f.model = binding_curve_test_data["generic_model"]
 
     # This should not work because we have not specified guesses or y_obs
     # yet.

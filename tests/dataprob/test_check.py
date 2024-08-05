@@ -2,6 +2,7 @@
 from dataprob.check import check_bool
 from dataprob.check import check_float
 from dataprob.check import check_int
+from dataprob.check import check_array
 from dataprob.check import column_to_bool
 
 import pytest
@@ -89,6 +90,134 @@ def test_check_int():
 
     value = check_int(1,minimum_allowed=1,maximum_inclusive=True)
     assert value == 1
+
+def test_check_array():
+    
+    for variable_name in [None,"variable_name"]:
+
+        print("variable_name",variable_name)
+    
+        # Stuff without iter that could go in 
+        bad_value = [None,1.0,float,np.nan]
+        for b in bad_value:
+            print("bad value",b)
+            with pytest.raises(ValueError):
+                check_array(b,variable_name=variable_name)
+
+        # stuff with iter that can't be coerced to float
+        bad_value = ["test",{"x":1},{"x":[1,2]},["a",1.0]]
+        for b in bad_value:
+            print("bad value",b)
+            with pytest.raises(ValueError):
+                check_array(b,variable_name=variable_name)
+
+        # stuff that should be fine 
+        good_value = [[1.0],[1],[np.ones(1)[0]],np.ones(1)]
+        for g in good_value:
+            print("good value",g)
+            value = check_array(g,variable_name=variable_name)
+            assert np.array_equal;(value,g)
+
+        for expected_shape_name in [None,"expected_shape_name"]:
+
+            print("expected_shape_name",expected_shape_name)
+
+            # Should be fine with dimensions specified
+            good_value = [[1.0],[1],[np.ones(1)[0]],np.ones(1)]
+            for g in good_value:
+                print('good value',g)
+                value = check_array(g,
+                                    variable_name=g,
+                                    expected_shape=(1,),
+                                    expected_shape_names=expected_shape_name)
+                assert np.array_equal(value,g)
+
+            # Should fail now with dimensions specified
+            good_value = [[1.0],[1],[np.ones(1)[0]],np.ones(1)]
+            for g in good_value:
+                print('good value, now bad',g)
+                with pytest.raises(ValueError):
+                    check_array(g,
+                                variable_name=g,
+                                expected_shape=(1,2),
+                                expected_shape_names=expected_shape_name)
+                          
+            # right number of dimensions, wrong length
+            good_value = [[1.0],[1],[np.ones(1)[0]],np.ones(1)]
+            for g in good_value:
+                print('good value, now bad',g)
+                with pytest.raises(ValueError):
+                    check_array(g,
+                                variable_name=g,
+                                expected_shape=(10,),
+                                expected_shape_names=expected_shape_name)
+            
+            # good, 2D but no specific lengths
+            good_value = [[[1.0,1.0,1.0],
+                           [1.0,1.0,1.0]],
+                           np.ones((2,3),dtype=float)]
+            for g in good_value:
+                print('good value',g)
+                value = check_array(g,
+                                    variable_name=g,
+                                    expected_shape=(None,None),
+                                    expected_shape_names=expected_shape_name)
+                assert np.array_equal(value,g)
+
+            # good, 2D but specific first length
+            good_value = [[[1.0,1.0,1.0],
+                           [1.0,1.0,1.0]],
+                           np.ones((2,3),dtype=float)]
+            for g in good_value:
+                print('good value',g)
+                value = check_array(g,
+                                    variable_name=g,
+                                    expected_shape=(2,None),
+                                    expected_shape_names=expected_shape_name)
+                assert np.array_equal(value,g)
+
+            # good, 2D but specific second length
+            good_value = [[[1.0,1.0,1.0],
+                           [1.0,1.0,1.0]],
+                           np.ones((2,3),dtype=float)]
+            for g in good_value:
+                print('good value',g)
+                value = check_array(g,
+                                    variable_name=g,
+                                    expected_shape=(None,3),
+                                    expected_shape_names=expected_shape_name)
+                assert np.array_equal(value,g)
+
+
+            # good, specific both lengths
+            good_value = [[[1.0,1.0,1.0],
+                           [1.0,1.0,1.0]],
+                           np.ones((2,3),dtype=float)]
+            for g in good_value:
+                print('good value',g)
+                value = check_array(g,
+                                    variable_name=g,
+                                    expected_shape=(2,3),
+                                    expected_shape_names=expected_shape_name)
+                assert np.array_equal(value,g)
+
+
+            # bad lengths
+            shapes = [(3,3),(3,None),(None,2)]
+            for s in shapes:
+                print("shape",s)
+                bad_value = [[[1.0,1.0,1.0],
+                            [1.0,1.0,1.0]],
+                            np.ones((2,3),dtype=float)]
+                for b in bad_value:
+                    print('bad_value',g)
+                    with pytest.raises(ValueError):
+                        check_array(g,
+                                    variable_name=g,
+                                    expected_shape=s,
+                                    expected_shape_names=expected_shape_name)
+
+
 
 
 def test_column_to_bool():
