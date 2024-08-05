@@ -27,7 +27,8 @@ def binding_curve_test_data():
     json_data["df"] = pd.read_csv(f,index_col=0)
 
     # ------------------------------------------------------------
-    # Create a pre-wrapped model for testing generic model fitting
+    # Generic method that can be fit (observable takes a single
+    # numpy array of arguments and returns an array of y_calc)
     # ------------------------------------------------------------
     class BindingCurve:
         """
@@ -36,10 +37,10 @@ def binding_curve_test_data():
         def __init__(self,X):
             self.X = X
         def observable(self,K):
-            return K*self.X/(1 + K*self.X)
+            return K[0]*self.X/(1 + K[0]*self.X)
 
     lm = BindingCurve(X=json_data["df"].X)
-    json_data["prewrapped_model"] = lm.observable
+    json_data["generic_model"] = lm.observable
 
     # ------------------------------------------------------------
     # Save a model that should be readily wrapped by ModelWrapper
@@ -78,26 +79,57 @@ def fitter_object(binding_curve_test_data):
     Do a successful fit that can be passed into other functions
     """
 
-    f = dataprob.MLFitter()
+    out_dict = {}
 
-    model = binding_curve_test_data["prewrapped_model"]
+    # Do a generic fit where the input function (generic_model) is run without
+    # an intervening ModelWrapper
+
+    generic_fit = dataprob.MLFitter()
+
+    model = binding_curve_test_data["generic_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
-    input_params = np.array(binding_curve_test_data["input_params"])
 
-    f.fit(model,guesses,df.Y)
+    generic_fit.fit(model=model,
+                    guesses=guesses,
+                    y_obs=df.Y)
 
-    if not f.success:
-        raise RuntimeError("test fit did not converge!")
+    if not generic_fit.success:
+        raise RuntimeError("generic test fit did not converge!")
 
-    return f
+    out_dict["generic_fit"] = generic_fit
+
+    # Do a fit where the input function is wrapped by ModelWrapper
+
+    wrapped_fit = dataprob.MLFitter()
+    
+    model = binding_curve_test_data["wrappable_model"]
+    model = dataprob.ModelWrapper(model)
+    df = binding_curve_test_data["df"]
+    model.df = df
+
+    guesses = binding_curve_test_data["guesses"]
+    
+
+    wrapped_fit.fit(model=model,
+                    guesses=guesses,
+                    y_obs=df.Y)
+    
+    if not wrapped_fit.success:
+        raise RuntimeError("wrapped test fit did not converge!")
+
+    out_dict["wrapped_fit"] = wrapped_fit
+
+
+    return out_dict
 
 ## Code for skipping slow tests.
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--runslow", action="store_true", default=False, help="run slow tests"
-    )
+    parser.addoption("--runslow",
+                     action="store_true",
+                     default=False,
+                     help="run slow tests")
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "slow: mark test as slow to run")

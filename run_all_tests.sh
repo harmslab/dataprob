@@ -16,13 +16,9 @@ mkdir reports/badges
 echo "Running flake8, aggressive"
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics > reports/flake.txt
 
-echo "Checking for test file completeness"
-./tests/completeness_crawler.py src/dataprob/ tests/  > reports/completeness-crawler.txt
-grep MISSING reports/completeness-crawler.txt
-
 echo "Running coverage.py"
 coverage erase
-coverage run --branch -m pytest tests/dataprob --runslow --junit-xml=reports/junit/junit.xml
+coverage run --source ~/miniconda3/lib/python3.12/site-packages/dataprob --branch -m pytest tests/dataprob --runslow --junit-xml=reports/junit/junit.xml
 
 echo "Generating reports"
 coverage html

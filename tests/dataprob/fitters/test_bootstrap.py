@@ -17,11 +17,11 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
     """
     Test the ability to fit the test data in binding_curve_test_data.
     """
+    
+    # Do fit using a generic unwrapped model and then creating and using a
+    # ModelWrapper model instance
 
-    # Do fit using a manually wrapped model (prewrapped model) and then
-    # creating and using a ModelWrapper model instance
-
-    for model_key in ["prewrapped_model","wrappable_model"]:
+    for model_key in ["generic_model","wrappable_model"]:
 
         f = dataprob.BootstrapFitter()
         model = binding_curve_test_data[model_key]
@@ -62,7 +62,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert corner_fig is not None
 
         # Make sure data frame that comes out is correct
-        df = f.fit_to_df
+        df = f.fit_df
 
         assert isinstance(df,pd.DataFrame)
         assert np.allclose(df["estimate"].iloc[:],

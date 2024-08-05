@@ -1,5 +1,8 @@
+"""
+Class for wrapping models for use in likelihood calculations. 
+"""
 
-from .fit_param import FitParameter
+from dataprob.fit_param import FitParameter
 
 import numpy as np
 
@@ -25,8 +28,13 @@ class ModelWrapper:
 
     def __init__(self,model_to_fit,fittable_params=None):
         """
-        model_to_fit: a function or method to fit.
-        fittable_params: list of arguments to fit.
+
+        Parameters
+        ----------
+        model_to_fit : callable
+            a function or method to fit.
+        fittable_params : list-like, optional
+            list of arguments to fit.
         """
 
         # Define these here so __setattr__ and __getattr__ are looking at
@@ -42,6 +50,11 @@ class ModelWrapper:
         Load a model into the wrapper, making the arguments into attributes.
         Fittable arguments are made into FitParameter instances.  Non-fittable
         arguments are set as generic attributes.
+
+        Parameters
+        ----------
+        fittable_params : list-like or None
+            list of parameters to fit 
         """
 
         # model arguments
@@ -58,7 +71,7 @@ class ModelWrapper:
                 err += "Please change the argument name in your function.\n"
                 raise ValueError(err)
 
-            # See if this parameter can concievably be a fit parameter: either
+            # See if this parameter can conceivably be a fit parameter: either
             # no default or default can be coerced into a float
             try:
                 float(self._mw_signature.parameters[p].default)
@@ -210,7 +223,7 @@ class ModelWrapper:
     @property
     def model(self):
         """
-        Return the observable.
+        The observable.
         """
 
         # Update mapping between parameters and model arguments in case
@@ -255,6 +268,24 @@ class ModelWrapper:
             bounds[1].append(self.fit_parameters[p].bounds[1])
 
         return np.array(bounds)
+
+    @property
+    def priors(self):
+        """
+        Return an array of the priors for the model (only including the unfixed
+        parameters).
+        """
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        priors = [[],[]]
+        for p in self.position_to_param:
+            priors[0].append(self.fit_parameters[p].prior[0])
+            priors[1].append(self.fit_parameters[p].prior[1])
+
+        return np.array(priors)
 
     @property
     def names(self):

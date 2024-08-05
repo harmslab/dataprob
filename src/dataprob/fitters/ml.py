@@ -1,9 +1,6 @@
-__description__ = \
 """
 Fitter subclass for performing maximum likelihood fits.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-10"
 
 from .base import Fitter
 
@@ -27,12 +24,15 @@ class MLFitter(Fitter):
         """
         Initialize the fitter.
 
-        num_samples: number of samples for generating corner plot
+        Parameters
+        ----------
+        num_samples : int
+            number of samples for generating corner plot
         """
 
         super(MLFitter,self).__init__()
 
-        self.fit_type = "maximum likelihood"
+        self._fit_type = "maximum likelihood"
         self._num_samples = num_samples
 
     def _fit(self,**kwargs):
@@ -41,8 +41,8 @@ class MLFitter(Fitter):
 
         Parameters
         ----------
-
-        **kwargs : any keyword arguments are passed as **kwargs to
+        kwargs : dict
+            any keyword arguments are passed as **kwargs to
             scipy.optimize.least_squares
         """
 
@@ -58,7 +58,10 @@ class MLFitter(Fitter):
         self._update_estimates()
 
     def _update_estimates(self):
-
+        """
+        Recalculate the parameter estimates from any new samples.
+        """
+        
         self._estimate = self._fit_result.x
 
         # Extract standard error on the fit parameter from the covariance

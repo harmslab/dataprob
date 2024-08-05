@@ -1,19 +1,19 @@
-__description__ = \
 """
 Fitter base class allowing different classes of fits.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-10"
 
 import numpy as np
-import scipy.stats
-import scipy.optimize as optimize
-import corner
 import pandas as pd
+import corner
 
-import re, inspect, pickle, os, warnings
+
+import re
+import inspect
+import pickle
+import os
 
 import dataprob
+from dataprob.check import check_array
 
 class Fitter:
     """
@@ -37,13 +37,18 @@ class Fitter:
         # fit results.
         self._fit_has_been_run = False
 
-        self.fit_type = ""
+        self._fit_type = ""
 
     def _sanity_check(self,call_string,attributes_to_check):
         """
         Do a sanity check before doing model calculations.
 
-        call_string: string to dump into output on error.
+        Parameters
+        ----------
+        call_string : str
+            string to dump into output on error.
+        attributes_to_check : list
+            list of attributes to check
         """
 
         for a in attributes_to_check:
@@ -54,7 +59,15 @@ class Fitter:
                 err = f"'{a}' must be set before {call_string}\n"
                 raise RuntimeError(err)
 
-    def fit(self,model=None,guesses=None,y_obs=None,bounds=None,names=None,y_stdev=None,**kwargs):
+    def fit(self,
+            model=None,
+            guesses=None,
+            y_obs=None,
+            bounds=None,
+            priors=None,
+            names=None,
+            y_stdev=None,
+            **kwargs):
         """
         Fit the parameters.
 
@@ -70,15 +83,19 @@ class Fitter:
             guesses for parameters to be optimized.
         y_obs : array of floats
             observations in an concatenated array
-        bounds : list
+        bounds : list, optional
             list of two lists containing lower and upper bounds.  If None,
             bounds are set to -np.inf and np.inf
+        priors : list, optional
+            list of two lists containing the mean and standard deviation of 
+            gaussian priors. None entries use uniform priors. If whole argument
+            is None, use uniform priors for all parameters. 
         names : array of str
             names of parameters.  If None, parameters assigned names p0,p1,..pN
         y_stdev : array of floats or None
             standard deviation of each observation.  if None, each observation
             is assigned an error of 1.
-        **kwargs : any remaining keywaord arguments are passed as **kwargs to
+        **kwargs : any remaining keyword arguments are passed as **kwargs to
             core engine (optimize.least_squares or emcee.EnsembleSampler)
         """
 
@@ -95,32 +112,31 @@ class Fitter:
             self.guesses = guesses
         else:
             if self.guesses is None:
-                if self._model_is_model_wrapper:
-                    self.guesses = self.model.guesses
-                else:
-                    err = "parameter guesses must be specified before fit\n"
-                    raise RuntimeError(err)
+                err = "parameter guesses must be specified before fit\n"
+                raise RuntimeError(err)
 
         # Record bounds, grab from ModelWrapper model, or make infinite
         if bounds is not None:
             self.bounds = bounds
         else:
             if self.bounds is None:
-                if self._model_is_model_wrapper:
-                    self.bounds = self.model.bounds
-                else:
-                    tmp = np.ones(len(self.guesses))
-                    self.bounds = [-np.inf*tmp,np.inf*tmp]
+                tmp = np.ones(len(self.guesses))
+                self.bounds = [-np.inf*tmp,np.inf*tmp]
+
+        # Record priors, grab from ModelWrapper model, or make infinite
+        if priors is not None:
+            self.priors = priors
+        else:
+            if self.priors is None:
+                self.priors = np.nan*np.ones((2,len(self.guesses)),
+                                                dtype=float)
 
         # Record names, grab from ModelWrapper model, or use default
         if names is not None:
             self.names = names
         else:
             if self.names is None:
-                if self._model_is_model_wrapper:
-                    self.names = self.model.names
-                else:
-                    self.names = ["p{}".format(i) for i in range(len(self.guesses))]
+                self.names = ["p{}".format(i) for i in range(len(self.guesses))]
 
         # Record y_obs, check for preloaded, or fail
         if y_obs is not None:
@@ -160,122 +176,164 @@ class Fitter:
         Should be redefined in subclass.
         """
 
-        pass
+        raise NotImplementedError("should be implemented in subclass\n")
 
     def _update_estimates(self):
         """
         Should be redefined in subclass.
         """
 
-        pass
-
-
-    @property
-    def fit_to_df(self):
+        raise NotImplementedError("should be implemented in subclass\n")
+    
+    
+    def _unweighted_residuals(self,param):
         """
-        Return the fit results as a dataframe.
+        Private function calculating residuals with no error checking. 
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values
         """
-
-        if not self.success:
-            return None
-
-        out_dict = {"param":[],
-                    "estimate":[],
-                    "stdev":[],
-                    "low_95":[],
-                    "high_95":[],
-                    "guess":[],
-                    "lower_bound":[],
-                    "upper_bound":[]}
-
-        if self._model_is_model_wrapper:
-
-            m = self._model
-
-            out_dict["fixed"] = []
-            for p in m.fit_parameters.keys():
-                out_dict["param"].append(m.fit_parameters[p].name)
-                out_dict["estimate"].append(m.fit_parameters[p].value)
-                out_dict["fixed"].append(m.fit_parameters[p].fixed)
-
-                if m.fit_parameters[p].fixed:
-                    for col in ["stdev","low_95","high_95","guess","lower_bound","upper_bound"]:
-                        out_dict[col].append(None)
-                else:
-                    out_dict["stdev"].append(m.fit_parameters[p].stdev)
-
-                    if m.fit_parameters[p].ninetyfive is not None:
-                        out_dict["low_95"].append(m.fit_parameters[p].ninetyfive[0])
-                        out_dict["high_95"].append(m.fit_parameters[p].ninetyfive[1])
-                    else:
-                        out_dict["low_95"].append(np.nan)
-                        out_dict["high_95"].append(np.nan)
-
-                    out_dict["guess"].append(m.fit_parameters[p].guess)
-                    out_dict["lower_bound"].append(m.fit_parameters[p].bounds[0])
-                    out_dict["upper_bound"].append(m.fit_parameters[p].bounds[1])
-
-        else:
-
-            for i in range(len(self.names)):
-                out_dict["param"].append(self.names[i])
-                out_dict["estimate"].append(self.estimate[i])
-                out_dict["stdev"].append(self.stdev[i])
-
-                if self.ninetyfive is not None:
-                    out_dict["low_95"].append(self.ninetyfive[0,i])
-                    out_dict["high_95"].append(self.ninetyfive[1,i])
-                else:
-                    out_dict["low_95"].append(np.nan)
-                    out_dict["high_95"].append(np.nan)
-
-                out_dict["guess"].append(self.guesses[i])
-                out_dict["lower_bound"].append(self.bounds[0,i])
-                out_dict["upper_bound"].append(self.bounds[1,i])
-
-        return pd.DataFrame(out_dict)
-
-
-    def unweighted_residuals(self,param):
-        """
-        Calculate residuals.
-        """
-
-        self._sanity_check("fit can be done",["model","y_obs"])
 
         y_calc = self.model(param)
         return self._y_obs - y_calc
 
-
-    def weighted_residuals(self,param):
+    def unweighted_residuals(self,param):
         """
-        Calculate weighted residuals.
+        Calculate residuals: (y_obs - y_calc)
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values
         """
 
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
+        self._sanity_check("fit can be done",["model","y_obs"])
+
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
+
+        return self._unweighted_residuals(param)
+
+    def _weighted_residuals(self,param):
+        """
+        Private function calculating weighted residuals without error checking
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values weighted by
+            standard deviation
+        """
 
         y_calc = self.model(param)
         return (self.y_obs - y_calc)/self.y_stdev
 
-    def ln_like(self,param):
+    def weighted_residuals(self,param):
         """
-        Log likelihood of function given parameters.
+        Calculate weighted residuals: (y_obs - y_calc)/y_stdev
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        residuals : numpy.ndarray
+            difference between observed and calculated values weighted by
+            standard deviation
         """
 
         self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
 
-        if self.model is not None:
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
 
-            y_calc = self.model(param)
-            sigma2 = self._y_stdev**2
-            return -0.5*(np.sum((self._y_obs - y_calc)**2/sigma2 + np.log(sigma2)))
-        else:
-            return None
+        return self._weighted_residuals(param)
+
+    def _ln_like(self,param):
+        """
+        Private log likelihood, no error checking.
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        ln_like : numpy.ndarray
+            log likelihood 
+        """
+
+        y_calc = self.model(param)
+        sigma2 = self._y_stdev**2
+        return -0.5*(np.sum((self._y_obs - y_calc)**2/sigma2 + np.log(sigma2)))
+
+    def ln_like(self,param):
+        """
+        Log likelihood: P(obs|model(param))
+
+        Parameters
+        ----------
+        param : numpy.ndarray
+            float array of parameters
+
+        Returns
+        -------
+        ln_like : numpy.ndarray
+            log likelihood
+        """
+
+        self._sanity_check("fit can be done",["model","y_obs","y_stdev",])
+
+        param = check_array(value=param,
+                            variable_name="param",
+                            expected_shape=(self.num_params,),
+                            expected_shape_names="(num_param,)")
+        
+        # This call should finalize the number of parameters if not already set
+        if self.num_params is None:
+            self._num_params = len(param)
+
+        return self._ln_like(param)
 
     @property
     def model(self):
         """
-        Model used for fit.
+        Model to use for calculating y_calc. The model should either be an 
+        instance of dataprob.ModelWrapper OR a function that takes param (a 1D
+        numpy array) as its only argument and returns y_calc (a 1D numpy array)
+        as its only returned value. 
         """
 
         try:
@@ -288,12 +346,6 @@ class Fitter:
 
     @model.setter
     def model(self,model):
-        """
-        Setter for "model" attribute.
-        """
-
-        if model is None:
-            return
 
         # If this is a ModelWrapper instance, grab the model method rather than
         # the model instance for the check below.
@@ -360,24 +412,20 @@ class Fitter:
 
     @guesses.setter
     def guesses(self,guesses):
-        """
-        Setter for guess attribute.
-        """
 
-        try:
-            guesses = np.array(guesses,dtype=float)
-        except (ValueError,TypeError) as err:
-            err = f"{err}\n\nguesses must be a list or array of floats\n\n"
-            raise ValueError(err)
-
-        if self.num_params is not None:
-            if guesses.shape[0] != self.num_params:
-                err = "length of guesses ({}) must match the number of parameters ({})\n".format(guesses.shape[0],
-                                                                                                 self.num_params)
-                raise ValueError(err)
-        else:
+        guesses = check_array(value=guesses,
+                              variable_name="guesses",
+                              expected_shape=(None,),
+                              expected_shape_names="(num_param,)")
+        
+        if self.num_params is None:
             self._num_params = guesses.shape[0]
 
+        if guesses.shape[0] != self.num_params:
+            err = "guesses should be a numpy array the same length as the\n"
+            err += "number of guesses\n"
+            raise ValueError(err)
+        
         self._guesses = guesses
 
         # Update the underlying guesses in each FitParameter instance
@@ -391,6 +439,15 @@ class Fitter:
     def bounds(self):
         """
         Bounds for fit parameters.
+
+        bounds must be a (2 x num_parameters) numpy array of floats with the
+        form:
+
+        [[lower_0, lower_1, ..., lower_n],
+         [upper_0, upper_1, ..., upper_n]]
+
+        np.inf values are allowed, indicating no bounds on that parameter.
+        np.nan are not allowed. 
         """
 
         # Grab the bounds from the model wrapper in case they changed
@@ -404,26 +461,19 @@ class Fitter:
 
     @bounds.setter
     def bounds(self,bounds):
-        """
-        Setter for bounds attribute.
-        """
 
-        try:
-            bounds = np.array(bounds,dtype=float)
-            if len(bounds.shape) != 2 or bounds.shape[0] != 2:
-                raise ValueError("incorrect dimensions!\n")
-        except (ValueError,TypeError) as err:
-            err = f"{err}\n\nguesses must be a 2 x num_params list or array of floats:\n\n"
-            err += "   [[lower_1,lower_2,...lower_n],[upper_1,upper_2,...upper_n]]\n\n"
-            raise ValueError(err)
-
-        if self.num_params is not None:
-            if bounds.shape[1] != self.num_params:
-                err = "length of bounds ({}) must match the number of parameters ({})\n".format(bounds.shape[1],
-                                                                                                self.num_params)
-                raise ValueError(err)
-        else:
+        bounds = check_array(value=bounds,
+                              variable_name="bounds",
+                              expected_shape=(2,None),
+                              expected_shape_names="(2,num_param)")
+        
+        if self.num_params is None:
             self._num_params = bounds.shape[1]
+
+        if bounds.shape[1] != self.num_params:
+            doc = inspect.getdoc(Fitter.bounds)
+            err = f"incorrectly specified bounds. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._bounds = bounds
 
@@ -434,11 +484,67 @@ class Fitter:
 
         self._fit_has_been_run = False
 
+    @property
+    def priors(self):
+        """
+        Gaussian priors to use for each parameter.
+
+        priors must be a (2 x num_parameters) numpy array of floats with the
+        form:
+
+        [[mean_0,   mean_1, ...,  mean_n],
+         [stdev_0, stdev_1, ..., stdev_n]]
+
+        np.inf values are not allowed. np.nan entries indicate that uniform
+        priors should be used for that parameter.        
+        """
+
+        # Grab the priors from the model wrapper in case they changed
+        if self._model_is_model_wrapper:
+            self._priors = self._model.priors
+
+        try:
+            return self._priors
+        except AttributeError:
+            return None
+
+    @priors.setter
+    def priors(self,priors):
+
+        priors = check_array(value=priors,
+                             variable_name="priors",
+                             expected_shape=(2,None),
+                             expected_shape_names="(2,num_param)")
+        
+        if self.num_params is None:
+            self._num_params = priors.shape[1]
+
+        if priors.shape[1] != self.num_params:
+            doc = inspect.getdoc(Fitter.priors)
+            err = f"incorrectly specified priors. \n\n{doc}\n\n"
+            raise ValueError(err)
+
+        if np.sum(np.isinf(priors)) > 0:
+            doc = inspect.getdoc(Fitter.priors)
+            err = f"priors cannot be infinite. \n\n{doc}\n\n"
+            raise ValueError(err)
+
+        self._priors = priors
+
+        # Update the underlying guesses in each FitParameter instance
+        if self._model_is_model_wrapper:
+            for i, p in enumerate(self._model.position_to_param):
+                self._model.fit_parameters[p].prior = priors[:,i]
+
+        self._fit_has_been_run = False
 
     @property
     def names(self):
         """
         Parameter names for fit parameters.
+
+        Should be an array of unique strings the same length as the number of
+        parameters. 
         """
 
         # Grab the bounds from the model wrapper in case they changed
@@ -452,31 +558,23 @@ class Fitter:
 
     @names.setter
     def names(self,names):
-        """
-        Setter for parameter names attribute.
-        """
 
-        try:
-            names = np.array(names,dtype=str)
+        # If the user sends in a naked string, make it into a list of strings
+        if issubclass(type(names),str):
+            names = [names]
 
-            # Will throw a type error if the user puts in a single value
-            try:
-                len(names)
-            except TypeError:
-                names = np.array([names])
-
-        except ValueError as err:
-            err = f"{err}\n\nnames must be a list or array of strings\n\n"
-            raise ValueError(err)
-
+        # Force to be an array of strings
+        names = np.array(names,dtype=str)
+        
         if len(names) != len(set(names)):
-            err = "parameter names must all be unique.\n"
+            doc = inspect.getdoc(Fitter.names)
+            err = f"parameter names must all be unique. \n\n{doc}\n\n"
             raise ValueError(err)
 
         if self.num_params is not None:
             if names.shape[0] != self.num_params:
-                err = "length of names ({}) must match the number of parameters ({})\n".format(names.shape[0],
-                                                                                                   self.num_params)
+                doc = inspect.getdoc(Fitter.names)
+                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
                 raise ValueError(err)
         else:
             self._num_params = names.shape[0]
@@ -491,7 +589,8 @@ class Fitter:
     @property
     def y_obs(self):
         """
-        Observed y values for fit.
+        Observed y values for fit. This should be a 1D numpy array of floats 
+        the same length as the number of observations. 
         """
 
         try:
@@ -501,32 +600,29 @@ class Fitter:
 
     @y_obs.setter
     def y_obs(self,y_obs):
-        """
-        Setter for y_obs attribute.
-        """
-
-        try:
-            y_obs = np.array(y_obs,dtype=float)
-        except (ValueError,TypeError) as err:
-            err = f"{err}\n\ny_obs must be a list or array of floats\n\n"
-            raise ValueError(err)
-
-        if self._num_obs is not None:
-            if y_obs.shape[0] != self._num_obs:
-                err = "observation already loaded with a different size ({})\n".format(self._num_obs)
-                raise ValueError(err)
-        else:
+        
+        y_obs = check_array(value=y_obs,
+                            variable_name="y_obs",
+                            expected_shape=(None,),
+                            expected_shape_names="(num_obs,)")
+        
+        if self.num_obs is None:
             self._num_obs = y_obs.shape[0]
+
+        if y_obs.shape[0] != self.num_obs:
+            doc = inspect.getdoc(Fitter.y_obs)
+            err = f"incorrectly specified y_obs. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._y_obs = y_obs
 
         self._fit_has_been_run = False
 
-
     @property
     def y_stdev(self):
         """
-        Observed y values for fit.
+        Estimated standard deviation on observed y values. This should be a 1D
+        numpy array of floats the same length as the number of observations. 
         """
 
         try:
@@ -536,22 +632,19 @@ class Fitter:
 
     @y_stdev.setter
     def y_stdev(self,y_stdev):
-        """
-        Setter for y_stdev attribute.
-        """
 
-        try:
-            y_stdev = np.array(y_stdev,dtype=float)
-        except (ValueError,TypeError) as err:
-            err = f"{err}\n\ny_stdev must be a list or array of floats\n\n"
-            raise ValueError(err)
-
-        if self._num_obs is not None:
-            if y_stdev.shape[0] != self._num_obs:
-                err = "observation already loaded with a different size ({})\n".format(self._num_obs)
-                raise ValueError(err)
-        else:
+        y_stdev = check_array(value=y_stdev,
+                              variable_name="y_stdev",
+                              expected_shape=(None,),
+                              expected_shape_names="(num_obs,)")
+        
+        if self.num_obs is None:
             self._num_obs = y_stdev.shape[0]
+
+        if y_stdev.shape[0] != self.num_obs:
+            doc = inspect.getdoc(Fitter.y_stdev)
+            err = f"incorrectly specified y_stdev. \n\n{doc}\n\n"
+            raise ValueError(err)
 
         self._y_stdev = y_stdev
 
@@ -657,6 +750,88 @@ class Fitter:
         except AttributeError:
             return None
 
+    @property
+    def fit_type(self):
+        """
+        Fit type. 
+        """
+        return self._fit_type
+
+    @property
+    def fit_df(self):
+        """
+        Return the fit results as a dataframe.
+        """
+
+        if not self.success:
+            return None
+
+        out_dict = {"param":[],
+                    "estimate":[],
+                    "stdev":[],
+                    "low_95":[],
+                    "high_95":[],
+                    "guess":[],
+                    "prior_mean":[],
+                    "prior_std":[],
+                    "lower_bound":[],
+                    "upper_bound":[]}
+
+        if self._model_is_model_wrapper:
+
+            m = self._model
+
+            out_dict["fixed"] = []
+            for p in m.fit_parameters.keys():
+                out_dict["param"].append(m.fit_parameters[p].name)
+                out_dict["estimate"].append(m.fit_parameters[p].value)
+                out_dict["fixed"].append(m.fit_parameters[p].fixed)
+
+                if m.fit_parameters[p].fixed:
+                    for col in ["stdev","low_95","high_95","guess",
+                                "lower_bound","upper_bound",
+                                "prior_mean","prior_std"]:
+                        out_dict[col].append(None)
+                else:
+                    out_dict["stdev"].append(m.fit_parameters[p].stdev)
+
+                    if m.fit_parameters[p].ninetyfive is not None:
+                        out_dict["low_95"].append(m.fit_parameters[p].ninetyfive[0])
+                        out_dict["high_95"].append(m.fit_parameters[p].ninetyfive[1])
+                    else:
+                        out_dict["low_95"].append(np.nan)
+                        out_dict["high_95"].append(np.nan)
+
+                    out_dict["guess"].append(m.fit_parameters[p].guess)
+                    out_dict["lower_bound"].append(m.fit_parameters[p].bounds[0])
+                    out_dict["upper_bound"].append(m.fit_parameters[p].bounds[1])
+                    out_dict["prior_mean"].append(m.fit_parameters[p].prior[0])
+                    out_dict["prior_std"].append(m.fit_parameters[p].prior[1])
+
+        else:
+
+            for i in range(len(self.names)):
+
+                out_dict["param"].append(self.names[i])
+                out_dict["estimate"].append(self.estimate[i])
+                out_dict["stdev"].append(self.stdev[i])
+
+                if self.ninetyfive is not None:
+                    out_dict["low_95"].append(self.ninetyfive[0,i])
+                    out_dict["high_95"].append(self.ninetyfive[1,i])
+                else:
+                    out_dict["low_95"].append(np.nan)
+                    out_dict["high_95"].append(np.nan)
+
+                out_dict["guess"].append(self.guesses[i])
+                out_dict["lower_bound"].append(self.bounds[0,i])
+                out_dict["upper_bound"].append(self.bounds[1,i])
+                out_dict["prior_mean"].append(self.priors[0,i])
+                out_dict["prior_std"].append(self.priors[1,i])
+
+        return pd.DataFrame(out_dict)
+
+
     def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
         """
         Create a "corner plot" that shows distributions of values for each
@@ -706,7 +881,6 @@ class Fitter:
             est_values.append(self.estimate[i])
 
         to_plot = s[:,np.array(keep_indexes,dtype=int)]
-        #to_plot = np.swapaxes(to_plot,0,1)
 
         fig = corner.corner(to_plot,labels=names,range=corner_range,
                             truths=est_values,*args,**kwargs)
@@ -717,7 +891,10 @@ class Fitter:
         """
         Write the samples from the fit out to a pickle file.
 
-        output_file: output pickle file to write to.
+        Parameters
+        ----------
+        output_file : str
+            output pickle file to write to
         """
 
         # See if the file exists already.
@@ -727,7 +904,8 @@ class Fitter:
 
         # If there are samples, write them out.
         if self.samples is not None:
-            pickle.dump(self.samples,open(output_file,'wb'))
+            with open(output_file,"wb") as p:
+                pickle.dump(self.samples,p)
 
     def append_samples(self,sample_file=None,sample_array=None):
         """
@@ -735,13 +913,22 @@ class Fitter:
         with the shape: num_samples, num_parameters. This can come from a
         pickle file (sample_file) or array.  Only one of these can be specified.
 
-        sample_file: Pickle file of the numpy array.
-        sample_array: Array of samples.
+        Parameters
+        ----------
+        sample_file : str
+            Pickle file of the numpy array
+        sample_array : numpy.ndarray
+            array of samples
         """
 
         # Nothing to do; no new samples specified
         if sample_file is None and sample_array is None:
             return
+
+        # Samples must already exist to append
+        if self.samples is None:
+            err = "You can only append samples to a fit that has already been done.\n"
+            raise ValueError(err)
 
         # Cannot specify both sample file and sample array
         if sample_file is not None and sample_array is not None:
@@ -762,35 +949,19 @@ class Fitter:
                 raise pickle.UnpicklingError(err)
 
         # Check sanity of sample_array; update num_params if not specified
-        has_err = False
-        if isinstance(sample_array,np.ndarray) and isinstance(np.zeros(1,dtype=sample_array.dtype)[0],np.floating):
-            if len(sample_array.shape) == 2:
-                if self.num_params is not None:
-                    if sample_array.shape[1] != self.num_params:
-                        has_err = True
-                else:
-                    self._num_params = sample_array.shape[1]
-            else:
-                has_err = True
-        else:
-            has_err = True
-
-        if has_err:
-            err = "sample_array should be a float numpy array of shape\n"
-            err += "(num_samples,num_param)\n"
+        try:
+            sample_array = np.array(sample_array,dtype=float)
+        except Exception as e:
+            err = "sample_array should be a float numpy array\n"
+            raise ValueError(err) from e
+        
+        if len(sample_array.shape) != 2:
+            err = "sample_array should have dimensions (num_samples,num_param)\n"
             raise ValueError(err)
 
-        if self.samples is None:
-            err = "You can only append samples to  a fit that has already been done.\n"
+        if sample_array.shape[1] != self.num_params:
+            err = "sample_array should have dimensions (num_samples,num_param)\n"
             raise ValueError(err)
-
-        warn = "\n\nThis function only checks to see if the input samples array\n"
-        warn += "has the same number of parameters as the current number of\n"
-        warn += "parameters. It does not check the identity of those parameters.\n"
-        warn += "It will happily combine samples from one model with samples\n"
-        warn += "from a different model.  It's up to you to make sure that does\n"
-        warn += "not happen.  Happy Sampling. \U0001F600\n\n"
-        warnings.warn(warn,UserWarning)
 
         # Concatenate the new samples to the existing samples
         self._samples = np.concatenate((self.samples,sample_array))

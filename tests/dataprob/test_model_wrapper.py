@@ -22,7 +22,7 @@ def test_init(binding_curve_test_data):
     assert not isinstance(mw.extra_stuff,dataprob.FitParameter)
     assert not isinstance(mw.K3,dataprob.FitParameter)
 
-    assert mw.K1.guess == 1   # No guess specified --> should be 1.0
+    assert mw.K1.guess == 0   # No guess specified --> should be 0.0
     assert mw.K2.guess == 20  # Default (guess) specified
 
     # Make sure that we only grab K1 if specified, not the other possible
@@ -78,7 +78,7 @@ def test_expand_to_model_inputs(binding_curve_test_data):
     assert args[0] == "extra_stuff" and args[1] == "K3"
 
     # Check guesses
-    assert np.array_equal(mw.guesses,np.array((1,20)))
+    assert np.array_equal(mw.guesses,np.array((0,20)))
 
     # Check bounds
     assert np.array_equal(mw.bounds[0],np.array((-np.inf,-np.inf)))
@@ -95,7 +95,7 @@ def test_setting_guess(binding_curve_test_data):
 
     # Default values set correctly
     mw = dataprob.ModelWrapper(model_to_test_wrap)
-    assert mw.K1.guess == 1
+    assert mw.K1.guess == 0
     assert mw.K2.guess == 20
     with pytest.raises(AttributeError):
         mw.K3.guess == 20
@@ -137,15 +137,18 @@ def test_setting_bounds(binding_curve_test_data):
     mw.K1.bounds = [0,500]
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-    # Try, but fail, to set bounds that do not encompass guess
-    with pytest.raises(ValueError):
-        mw.K1.bounds = [-500,-50]
-    assert np.array_equal(mw.K1.bounds,np.array([0,500]))
-
     # Try, but fail, to set bounds that are backwards
     with pytest.raises(ValueError):
         mw.K1.bounds = [500,-50]
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
+
+    # Set bounds that do not encompass guess and make sure guess shifts
+    mw.K1.guess = 0
+    assert mw.K1.guess == 0
+    with pytest.warns():
+        mw.K1.bounds = [-500,-50]
+    assert np.array_equal(mw.K1.bounds,np.array([-500,-50]))
+    assert mw.K1.guess == -50
 
     # Test setting by fit_parameters dict
     mw = dataprob.ModelWrapper(model_to_test_wrap)
@@ -200,7 +203,7 @@ def test_setting_fixed(binding_curve_test_data):
     # Unfix a parameter
     mw.K1.fixed = False
     assert mw.names[0] == "K1"
-    assert mw.guesses[0] == 1
+    assert mw.guesses[0] == 0
     with pytest.raises(IndexError):
         mw.names[1]
 
@@ -233,6 +236,9 @@ def test_model_output(binding_curve_test_data):
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
 
     mw = dataprob.ModelWrapper(model_to_test_wrap)
+    
+    # Override K1 default to make nt all zero
+    mw.K1.guess = 1
 
     # Test call with default parameters
     assert mw.model() == 1*20*42
