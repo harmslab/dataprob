@@ -54,9 +54,6 @@ def binding_curve_test_data():
 
     json_data["wrappable_model"] = wrappable_model
 
-    
-
-
     def model_to_test_wrap(K1,K2=20,extra_stuff="test",K3=42):
 
         K1 = float(K1)

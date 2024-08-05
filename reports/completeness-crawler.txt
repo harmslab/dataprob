@@ -1,21 +1,28 @@
 FOUND tests.dataprob.fitters.test_base.test_Fitter__sanity_check
+FOUND tests.dataprob.fitters.test_base.test_Fitter_fit
 FOUND tests.dataprob.fitters.test_bayesian.test_BayesianFitter_ln_prior
+FOUND tests.dataprob.fitters.test_bayesian.test_BayesianFitter_ln_prob
 FOUND tests.dataprob.fitters.test_bayesian.test__find_normalization
 FOUND tests.dataprob.fitters.test_bayesian.test__find_uniform_value
+FOUND tests.dataprob.fitters.test_bayesian.test__reconcile_bounds_and_priors
+FOUND tests.dataprob.test_check.test_check_array
 FOUND tests.dataprob.test_check.test_check_bool
 FOUND tests.dataprob.test_check.test_check_float
 FOUND tests.dataprob.test_check.test_check_int
 FOUND tests.dataprob.test_check.test_column_to_bool
 FOUND tests.dataprob.test_fit_param.test__guess_setter_from_bounds
 FOUND & INTEGRATION tests.dataprob.test_integration.test_integrated_ml_fit
+FAKE tests.dataprob.fitters.test_bayesian.test_BayesianFitter__ln_prob
 MISSING tests.dataprob.fitters.test_base.test_Fitter
 MISSING tests.dataprob.fitters.test_base.test_Fitter__fit
+MISSING tests.dataprob.fitters.test_base.test_Fitter__ln_like
+MISSING tests.dataprob.fitters.test_base.test_Fitter__unweighted_residuals
 MISSING tests.dataprob.fitters.test_base.test_Fitter__update_estimates
+MISSING tests.dataprob.fitters.test_base.test_Fitter__weighted_residuals
 MISSING tests.dataprob.fitters.test_base.test_Fitter_append_samples
 MISSING tests.dataprob.fitters.test_base.test_Fitter_bounds
 MISSING tests.dataprob.fitters.test_base.test_Fitter_corner_plot
 MISSING tests.dataprob.fitters.test_base.test_Fitter_estimate
-MISSING tests.dataprob.fitters.test_base.test_Fitter_fit
 MISSING tests.dataprob.fitters.test_base.test_Fitter_fit_df
 MISSING tests.dataprob.fitters.test_base.test_Fitter_fit_info
 MISSING tests.dataprob.fitters.test_base.test_Fitter_fit_result
@@ -38,11 +45,10 @@ MISSING tests.dataprob.fitters.test_base.test_Fitter_y_obs
 MISSING tests.dataprob.fitters.test_base.test_Fitter_y_stdev
 MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter
 MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter__fit
+MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter__ln_prior
 MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter__setup_priors
 MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter__update_estimates
 MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter_fit_info
-MISSING tests.dataprob.fitters.test_bayesian.test_BayesianFitter_ln_prob
-MISSING tests.dataprob.fitters.test_bayesian.test__reconcile_bounds_and_priors
 MISSING tests.dataprob.fitters.test_bootstrap.test_BootstrapFitter
 MISSING tests.dataprob.fitters.test_bootstrap.test_BootstrapFitter__fit
 MISSING tests.dataprob.fitters.test_bootstrap.test_BootstrapFitter__update_estimates
@@ -80,11 +86,15 @@ MISSING tests.dataprob.test_model_wrapper.test_ModelWrapper_position_to_param
 MISSING tests.dataprob.test_model_wrapper.test_ModelWrapper_priors
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_Fitter__init__
 FOUND & EXTRA tests.dataprob.fitters.test_base.test__fit
+FOUND & EXTRA tests.dataprob.fitters.test_base.test__ln_like
+FOUND & EXTRA tests.dataprob.fitters.test_base.test__unweighted_residuals
 FOUND & EXTRA tests.dataprob.fitters.test_base.test__update_estimates
+FOUND & EXTRA tests.dataprob.fitters.test_base.test__weighted_residuals
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_append_samples
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_base_properties
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_bounds_setter_getter
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_fit_completeness_sanity_checking
+FOUND & EXTRA tests.dataprob.fitters.test_base.test_fit_df
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_guesses_setter_getter
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_ln_like
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_model_setter_getter
@@ -97,6 +107,7 @@ FOUND & EXTRA tests.dataprob.fitters.test_base.test_weighted_residuals
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_write_samples
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_y_obs_setter_getter
 FOUND & EXTRA tests.dataprob.fitters.test_base.test_y_stdev_setter_getter
+FOUND & EXTRA tests.dataprob.fitters.test_bayesian.test_BayesianFitter__init__
 FOUND & EXTRA tests.dataprob.fitters.test_bayesian.test__setup_priors
 FOUND & EXTRA tests.dataprob.fitters.test_bayesian.test_fit
 FOUND & EXTRA tests.dataprob.fitters.test_bootstrap.test_fit
@@ -122,5 +133,3 @@ FOUND & EXTRA tests.dataprob.test_model_wrapper.test_setting_fixed
 FOUND & EXTRA tests.dataprob.test_model_wrapper.test_setting_guess
 FOUND & EXTRA tests.dataprob.test_model_wrapper.test_setting_name
 FOUND & EXTRA tests.dataprob.test_model_wrapper.test_setting_other_arguments
-FOUND & EXTRA tests.dataprob.test_sampling.test_init
-FOUND & EXTRA tests.dataprob.test_sampling.test_write_append_samples

@@ -112,43 +112,31 @@ class Fitter:
             self.guesses = guesses
         else:
             if self.guesses is None:
-                if self._model_is_model_wrapper:
-                    self.guesses = self.model.guesses
-                else:
-                    err = "parameter guesses must be specified before fit\n"
-                    raise RuntimeError(err)
+                err = "parameter guesses must be specified before fit\n"
+                raise RuntimeError(err)
 
         # Record bounds, grab from ModelWrapper model, or make infinite
         if bounds is not None:
             self.bounds = bounds
         else:
             if self.bounds is None:
-                if self._model_is_model_wrapper:
-                    self.bounds = self.model.bounds
-                else:
-                    tmp = np.ones(len(self.guesses))
-                    self.bounds = [-np.inf*tmp,np.inf*tmp]
+                tmp = np.ones(len(self.guesses))
+                self.bounds = [-np.inf*tmp,np.inf*tmp]
 
         # Record priors, grab from ModelWrapper model, or make infinite
         if priors is not None:
             self.priors = priors
         else:
             if self.priors is None:
-                if self._model_is_model_wrapper:
-                    self.priors = self.model.priors
-                else:
-                    self.priors = np.nan*np.ones((2,len(self.guesses)),
-                                                 dtype=float)
+                self.priors = np.nan*np.ones((2,len(self.guesses)),
+                                                dtype=float)
 
         # Record names, grab from ModelWrapper model, or use default
         if names is not None:
             self.names = names
         else:
             if self.names is None:
-                if self._model_is_model_wrapper:
-                    self.names = self.model.names
-                else:
-                    self.names = ["p{}".format(i) for i in range(len(self.guesses))]
+                self.names = ["p{}".format(i) for i in range(len(self.guesses))]
 
         # Record y_obs, check for preloaded, or fail
         if y_obs is not None:
@@ -339,7 +327,6 @@ class Fitter:
 
         return self._ln_like(param)
 
-    
     @property
     def model(self):
         """
@@ -547,7 +534,7 @@ class Fitter:
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
             for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].priors = priors[:,i]
+                self._model.fit_parameters[p].prior = priors[:,i]
 
         self._fit_has_been_run = False
 
@@ -801,7 +788,9 @@ class Fitter:
                 out_dict["fixed"].append(m.fit_parameters[p].fixed)
 
                 if m.fit_parameters[p].fixed:
-                    for col in ["stdev","low_95","high_95","guess","lower_bound","upper_bound"]:
+                    for col in ["stdev","low_95","high_95","guess",
+                                "lower_bound","upper_bound",
+                                "prior_mean","prior_std"]:
                         out_dict[col].append(None)
                 else:
                     out_dict["stdev"].append(m.fit_parameters[p].stdev)
@@ -892,7 +881,6 @@ class Fitter:
             est_values.append(self.estimate[i])
 
         to_plot = s[:,np.array(keep_indexes,dtype=int)]
-        #to_plot = np.swapaxes(to_plot,0,1)
 
         fig = corner.corner(to_plot,labels=names,range=corner_range,
                             truths=est_values,*args,**kwargs)

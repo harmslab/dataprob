@@ -14,11 +14,6 @@
 ./build/lib/dataprob/check.py:53:27: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:58:22: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:71:1: C901 'check_float' is too complex (17)
-./build/lib/dataprob/check.py:72:19: E127 continuation line over-indented for visual indent
-./build/lib/dataprob/check.py:73:19: E127 continuation line over-indented for visual indent
-./build/lib/dataprob/check.py:74:19: E127 continuation line over-indented for visual indent
-./build/lib/dataprob/check.py:75:19: E127 continuation line over-indented for visual indent
-./build/lib/dataprob/check.py:76:19: E127 continuation line over-indented for visual indent
 ./build/lib/dataprob/check.py:109:34: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:113:25: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:117:34: E231 missing whitespace after ','
@@ -31,17 +26,30 @@
 ./build/lib/dataprob/check.py:214:34: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:241:23: E231 missing whitespace after ','
 ./build/lib/dataprob/check.py:241:33: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:270:26: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:305:43: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:306:44: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:308:34: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:312:36: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:316:36: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:320:36: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:321:54: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:322:40: E231 missing whitespace after ','
-./build/lib/dataprob/check.py:330:22: F541 f-string is missing placeholders
-./build/lib/dataprob/check.py:336:37: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:269:1: C901 'check_array' is too complex (12)
+./build/lib/dataprob/check.py:269:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/check.py:284:74: W291 trailing whitespace
+./build/lib/dataprob/check.py:288:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:294:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:299:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:305:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:308:25: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:312:31: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:315:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:320:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:325:1: W293 blank line contains whitespace
+./build/lib/dataprob/check.py:330:1: E303 too many blank lines (3)
+./build/lib/dataprob/check.py:330:26: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:365:43: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:366:44: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:368:34: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:372:36: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:376:36: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:380:36: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:381:54: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:382:40: E231 missing whitespace after ','
+./build/lib/dataprob/check.py:390:22: F541 f-string is missing placeholders
+./build/lib/dataprob/check.py:396:37: E231 missing whitespace after ','
 ./build/lib/dataprob/fit_param.py:14:1: E302 expected 2 blank lines, found 1
 ./build/lib/dataprob/fit_param.py:22:59: W291 trailing whitespace
 ./build/lib/dataprob/fit_param.py:31:29: E231 missing whitespace after ','
@@ -86,244 +94,258 @@
 ./build/lib/dataprob/fit_param.py:273:1: W293 blank line contains whitespace
 ./build/lib/dataprob/fit_param.py:276:1: W293 blank line contains whitespace
 ./build/lib/dataprob/fit_param.py:280:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:291:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:304:32: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:313:5: E265 block comment should start with '# '
-./build/lib/dataprob/fit_param.py:326:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:328:19: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:334:9: E122 continuation line missing indentation or outdented
-./build/lib/dataprob/fit_param.py:336:75: W291 trailing whitespace
-./build/lib/dataprob/fit_param.py:338:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:339:76: W291 trailing whitespace
-./build/lib/dataprob/fit_param.py:342:56: W291 trailing whitespace
-./build/lib/dataprob/fit_param.py:347:37: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:351:35: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:354:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:367:1: W293 blank line contains whitespace
-./build/lib/dataprob/fit_param.py:372:5: E303 too many blank lines (2)
-./build/lib/dataprob/fit_param.py:372:5: E265 block comment should start with '# '
-./build/lib/dataprob/fit_param.py:375:5: E301 expected 1 blank line, found 0
-./build/lib/dataprob/fit_param.py:387:5: E303 too many blank lines (2)
-./build/lib/dataprob/fit_param.py:418:5: E303 too many blank lines (2)
-./build/lib/dataprob/fit_param.py:418:29: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:418:36: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:293:1: W293 blank line contains whitespace
+./build/lib/dataprob/fit_param.py:306:32: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:312:5: E265 block comment should start with '# '
+./build/lib/dataprob/fit_param.py:325:1: W293 blank line contains whitespace
+./build/lib/dataprob/fit_param.py:327:19: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:333:9: E122 continuation line missing indentation or outdented
+./build/lib/dataprob/fit_param.py:335:75: W291 trailing whitespace
+./build/lib/dataprob/fit_param.py:337:1: W293 blank line contains whitespace
+./build/lib/dataprob/fit_param.py:338:76: W291 trailing whitespace
+./build/lib/dataprob/fit_param.py:341:56: W291 trailing whitespace
+./build/lib/dataprob/fit_param.py:346:37: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:350:35: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:353:1: W293 blank line contains whitespace
+./build/lib/dataprob/fit_param.py:366:1: W293 blank line contains whitespace
+./build/lib/dataprob/fit_param.py:371:5: E303 too many blank lines (2)
+./build/lib/dataprob/fit_param.py:371:5: E265 block comment should start with '# '
+./build/lib/dataprob/fit_param.py:374:5: E301 expected 1 blank line, found 0
+./build/lib/dataprob/fit_param.py:386:5: E303 too many blank lines (2)
+./build/lib/dataprob/fit_param.py:417:5: E303 too many blank lines (2)
+./build/lib/dataprob/fit_param.py:417:29: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:417:36: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:434:65: E231 missing whitespace after ','
 ./build/lib/dataprob/fit_param.py:435:65: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:436:65: E231 missing whitespace after ','
-./build/lib/dataprob/fit_param.py:438:52: E231 missing whitespace after ','
+./build/lib/dataprob/fit_param.py:437:52: E231 missing whitespace after ','
 ./build/lib/dataprob/fitters/__init__.py:2:1: F401 '.ml.MLFitter' imported but unused
 ./build/lib/dataprob/fitters/__init__.py:3:1: F401 '.bootstrap.BootstrapFitter' imported but unused
 ./build/lib/dataprob/fitters/__init__.py:4:1: F401 '.bayesian.BayesianFitter' imported but unused
-./build/lib/dataprob/fitters/base.py:17:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/fitters/base.py:41:27: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:41:39: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:61:5: C901 'Fitter.fit' is too complex (21)
-./build/lib/dataprob/fitters/base.py:89:76: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:91:60: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:129:47: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:139:52: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:165:55: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:170:45: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:170:54: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:170:62: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:185:18: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:198:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:199:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:200:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:200:34: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:215:45: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:215:54: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:221:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:221:32: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:237:45: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:237:54: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:237:62: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:242:21: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:257:45: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:257:54: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:257:62: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:262:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:264:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:279:5: C901 'Fitter.model' is too complex (12)
-./build/lib/dataprob/fitters/base.py:279:19: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:286:28: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:348:21: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:354:9: E122 continuation line missing indentation or outdented
-./build/lib/dataprob/fitters/base.py:357:20: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:358:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:362:39: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:366:74: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:375:38: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:402:20: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:408:9: E122 continuation line missing indentation or outdented
-./build/lib/dataprob/fitters/base.py:409:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:419:37: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:422:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:425:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:430:51: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:440:64: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:460:20: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:466:9: E122 continuation line missing indentation or outdented
-./build/lib/dataprob/fitters/base.py:467:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:476:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:480:37: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:483:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:486:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:489:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:495:51: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:505:64: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:525:19: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:531:34: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:535:31: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:544:100: E127 continuation line over-indented for visual indent
-./build/lib/dataprob/fitters/base.py:568:19: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:574:35: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:576:19: F541 f-string is missing placeholders
-./build/lib/dataprob/fitters/base.py:591:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:603:21: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:609:39: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:611:19: F541 f-string is missing placeholders
-./build/lib/dataprob/fitters/base.py:626:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:728:18: W291 trailing whitespace
-./build/lib/dataprob/fitters/base.py:741:28: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:742:31: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:743:28: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:744:29: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:745:30: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:746:28: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:747:33: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:748:32: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:749:34: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:750:34: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/base.py:763:40: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:763:49: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:763:59: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:763:67: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:763:81: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:790:64: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:791:65: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:797:61: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:798:61: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:799:60: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:800:59: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:805:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/base.py:805:25: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:805:57: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:805:63: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:844:61: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:849:50: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:849:58: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:849:69: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:853:22: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:853:44: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:854:9: E265 block comment should start with '# '
-./build/lib/dataprob/fitters/base.py:856:36: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:856:49: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:857:46: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:857:52: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:861:27: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:878:34: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:879:41: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:881:5: C901 'Fitter.append_samples' is too complex (12)
-./build/lib/dataprob/fitters/base.py:881:28: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:881:45: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:914:60: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:924:49: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/base.py:928:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/base.py:938:53: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:19:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/fitters/bayesian.py:19:30: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:19:33: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:21:71: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:22:50: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:36:62: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:54:21: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:56:81: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:59:50: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:69:52: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:76:64: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:80:27: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:80:39: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:86:43: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:95:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:97:39: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:99:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:102:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/fitters/bayesian.py:102:40: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:104:79: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:111:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:115:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:116:76: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:117:32: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:127:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:133:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:134:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:135:20: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:136:36: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:140:20: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:153:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/fitters/bayesian.py:155:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:156:19: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:161:75: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:162:71: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:163:25: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:164:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:166:79: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:167:79: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:172:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:176:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:180:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:181:74: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:183:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:185:64: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:186:38: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:190:31: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:208:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:219:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:226:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:18:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/fitters/base.py:42:27: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:42:39: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:62:5: C901 'Fitter.fit' is too complex (17)
+./build/lib/dataprob/fitters/base.py:90:76: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:92:60: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:124:43: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:131:48: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:132:49: E127 continuation line over-indented for visual indent
+./build/lib/dataprob/fitters/base.py:154:55: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:159:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:159:54: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:159:62: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:174:18: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:187:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:188:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:189:5: E303 too many blank lines (2)
+./build/lib/dataprob/fitters/base.py:189:35: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:191:71: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:207:34: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:222:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:222:54: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:228:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:235:33: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:254:32: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:270:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:270:54: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:270:62: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:276:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:283:22: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:295:27: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:302:21: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:317:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:317:54: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:317:62: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:323:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:333:75: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:336:36: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:348:5: C901 'Fitter.model' is too complex (12)
+./build/lib/dataprob/fitters/base.py:348:19: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:352:28: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:414:21: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:420:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:428:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:450:32: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:463:20: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:466:31: E127 continuation line over-indented for visual indent
+./build/lib/dataprob/fitters/base.py:467:31: E127 continuation line over-indented for visual indent
+./build/lib/dataprob/fitters/base.py:467:48: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:468:31: E127 continuation line over-indented for visual indent
+./build/lib/dataprob/fitters/base.py:469:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:483:64: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:499:50: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:512:20: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:516:47: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:518:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:537:63: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:547:20: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:560:19: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:563:34: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:567:31: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:568:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:577:128: E501 line too long (129 > 127 characters)
+./build/lib/dataprob/fitters/base.py:592:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:593:55: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:602:19: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:603:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:608:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:625:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:634:21: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:640:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:654:5: E303 too many blank lines (2)
+./build/lib/dataprob/fitters/base.py:756:18: W291 trailing whitespace
+./build/lib/dataprob/fitters/base.py:769:28: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:770:31: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:771:28: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:772:29: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:773:30: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:774:28: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:775:33: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:776:32: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:777:34: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:778:34: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/base.py:791:40: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:791:49: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:791:59: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:792:46: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:793:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:820:64: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:821:65: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:827:61: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:828:61: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:829:60: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:830:59: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:835:5: E303 too many blank lines (2)
+./build/lib/dataprob/fitters/base.py:835:25: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:835:57: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:835:63: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:874:61: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:879:50: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:879:58: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:879:69: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:883:22: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:883:44: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:885:36: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:885:49: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:886:46: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:886:52: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:890:27: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:907:34: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:908:41: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:910:5: C901 'Fitter.append_samples' is too complex (12)
+./build/lib/dataprob/fitters/base.py:910:28: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:910:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:943:60: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:953:49: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/base.py:957:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/base.py:967:53: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:20:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/fitters/bayesian.py:20:30: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:20:33: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:22:71: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:23:50: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:37:69: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:47:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:57:70: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:59:42: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:61:70: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:64:50: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:74:52: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:82:27: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:82:39: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:88:43: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:97:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:99:39: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:101:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:104:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/fitters/bayesian.py:104:40: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:106:79: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:113:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:117:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:118:76: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:119:32: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:129:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:135:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:136:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:137:20: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:138:36: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:142:20: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:155:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/fitters/bayesian.py:157:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:158:19: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:163:75: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:164:71: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:165:25: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:166:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:168:79: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:169:79: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:174:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:178:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:182:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:183:74: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:185:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:187:64: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:188:38: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:192:31: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:210:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:221:1: W293 blank line contains whitespace
 ./build/lib/dataprob/fitters/bayesian.py:228:1: W293 blank line contains whitespace
 ./build/lib/dataprob/fitters/bayesian.py:230:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:234:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:241:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:250:49: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:277:77: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:290:75: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:306:51: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:313:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:326:49: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:330:50: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:339:35: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:340:35: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:355:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/bayesian.py:358:61: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:359:59: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:360:65: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:232:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:236:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:243:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:252:49: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:279:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:292:75: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:308:51: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:315:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:328:49: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:332:50: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:341:35: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:342:35: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:357:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:360:61: E231 missing whitespace after ','
 ./build/lib/dataprob/fitters/bayesian.py:361:59: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:363:22: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:365:37: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:379:40: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:379:80: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:389:21: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:404:27: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:407:32: W291 trailing whitespace
-./build/lib/dataprob/fitters/bayesian.py:421:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/bayesian.py:421:18: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:436:13: E731 do not assign a lambda expression, use a def
-./build/lib/dataprob/fitters/bayesian.py:437:47: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:437:63: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:457:55: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:460:61: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:461:63: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:461:65: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:461:80: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:468:58: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:470:57: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:480:47: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:481:43: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:485:55: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:486:55: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:487:31: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:489:41: E231 missing whitespace after ','
-./build/lib/dataprob/fitters/bayesian.py:509:60: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:362:65: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:363:59: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:365:23: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:367:73: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:371:40: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:371:80: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:381:22: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:383:37: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:396:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:396:55: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:396:66: W291 trailing whitespace
+./build/lib/dataprob/fitters/bayesian.py:402:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:410:5: E303 too many blank lines (2)
+./build/lib/dataprob/fitters/bayesian.py:410:22: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:425:21: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:440:45: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:440:54: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:440:62: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:440:72: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:440:81: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:441:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:446:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/bayesian.py:453:18: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:468:13: E731 do not assign a lambda expression, use a def
+./build/lib/dataprob/fitters/bayesian.py:469:47: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:469:63: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:489:55: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:492:61: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:493:63: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:493:65: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:493:80: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:500:58: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:502:57: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:512:47: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:513:43: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:517:55: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:518:55: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:519:31: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:521:41: E231 missing whitespace after ','
+./build/lib/dataprob/fitters/bayesian.py:541:60: E231 missing whitespace after ','
 ./build/lib/dataprob/fitters/bootstrap.py:12:1: E302 expected 2 blank lines, found 1
 ./build/lib/dataprob/fitters/bootstrap.py:17:22: E231 missing whitespace after ','
 ./build/lib/dataprob/fitters/bootstrap.py:17:40: E231 missing whitespace after ','
@@ -441,11 +463,6 @@
 ./src/dataprob/check.py:53:27: E231 missing whitespace after ','
 ./src/dataprob/check.py:58:22: E231 missing whitespace after ','
 ./src/dataprob/check.py:71:1: C901 'check_float' is too complex (17)
-./src/dataprob/check.py:72:19: E127 continuation line over-indented for visual indent
-./src/dataprob/check.py:73:19: E127 continuation line over-indented for visual indent
-./src/dataprob/check.py:74:19: E127 continuation line over-indented for visual indent
-./src/dataprob/check.py:75:19: E127 continuation line over-indented for visual indent
-./src/dataprob/check.py:76:19: E127 continuation line over-indented for visual indent
 ./src/dataprob/check.py:109:34: E231 missing whitespace after ','
 ./src/dataprob/check.py:113:25: E231 missing whitespace after ','
 ./src/dataprob/check.py:117:34: E231 missing whitespace after ','
@@ -458,17 +475,30 @@
 ./src/dataprob/check.py:214:34: E231 missing whitespace after ','
 ./src/dataprob/check.py:241:23: E231 missing whitespace after ','
 ./src/dataprob/check.py:241:33: E231 missing whitespace after ','
-./src/dataprob/check.py:270:26: E231 missing whitespace after ','
-./src/dataprob/check.py:305:43: E231 missing whitespace after ','
-./src/dataprob/check.py:306:44: E231 missing whitespace after ','
-./src/dataprob/check.py:308:34: E231 missing whitespace after ','
-./src/dataprob/check.py:312:36: E231 missing whitespace after ','
-./src/dataprob/check.py:316:36: E231 missing whitespace after ','
-./src/dataprob/check.py:320:36: E231 missing whitespace after ','
-./src/dataprob/check.py:321:54: E231 missing whitespace after ','
-./src/dataprob/check.py:322:40: E231 missing whitespace after ','
-./src/dataprob/check.py:330:22: F541 f-string is missing placeholders
-./src/dataprob/check.py:336:37: E231 missing whitespace after ','
+./src/dataprob/check.py:269:1: C901 'check_array' is too complex (12)
+./src/dataprob/check.py:269:1: E302 expected 2 blank lines, found 1
+./src/dataprob/check.py:284:74: W291 trailing whitespace
+./src/dataprob/check.py:288:1: W293 blank line contains whitespace
+./src/dataprob/check.py:294:1: W293 blank line contains whitespace
+./src/dataprob/check.py:299:1: W293 blank line contains whitespace
+./src/dataprob/check.py:305:1: W293 blank line contains whitespace
+./src/dataprob/check.py:308:25: E231 missing whitespace after ','
+./src/dataprob/check.py:312:31: E231 missing whitespace after ','
+./src/dataprob/check.py:315:1: W293 blank line contains whitespace
+./src/dataprob/check.py:320:1: W293 blank line contains whitespace
+./src/dataprob/check.py:325:1: W293 blank line contains whitespace
+./src/dataprob/check.py:330:1: E303 too many blank lines (3)
+./src/dataprob/check.py:330:26: E231 missing whitespace after ','
+./src/dataprob/check.py:365:43: E231 missing whitespace after ','
+./src/dataprob/check.py:366:44: E231 missing whitespace after ','
+./src/dataprob/check.py:368:34: E231 missing whitespace after ','
+./src/dataprob/check.py:372:36: E231 missing whitespace after ','
+./src/dataprob/check.py:376:36: E231 missing whitespace after ','
+./src/dataprob/check.py:380:36: E231 missing whitespace after ','
+./src/dataprob/check.py:381:54: E231 missing whitespace after ','
+./src/dataprob/check.py:382:40: E231 missing whitespace after ','
+./src/dataprob/check.py:390:22: F541 f-string is missing placeholders
+./src/dataprob/check.py:396:37: E231 missing whitespace after ','
 ./src/dataprob/fit_param.py:14:1: E302 expected 2 blank lines, found 1
 ./src/dataprob/fit_param.py:22:59: W291 trailing whitespace
 ./src/dataprob/fit_param.py:31:29: E231 missing whitespace after ','
@@ -513,244 +543,258 @@
 ./src/dataprob/fit_param.py:273:1: W293 blank line contains whitespace
 ./src/dataprob/fit_param.py:276:1: W293 blank line contains whitespace
 ./src/dataprob/fit_param.py:280:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:291:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:304:32: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:313:5: E265 block comment should start with '# '
-./src/dataprob/fit_param.py:326:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:328:19: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:334:9: E122 continuation line missing indentation or outdented
-./src/dataprob/fit_param.py:336:75: W291 trailing whitespace
-./src/dataprob/fit_param.py:338:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:339:76: W291 trailing whitespace
-./src/dataprob/fit_param.py:342:56: W291 trailing whitespace
-./src/dataprob/fit_param.py:347:37: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:351:35: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:354:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:367:1: W293 blank line contains whitespace
-./src/dataprob/fit_param.py:372:5: E303 too many blank lines (2)
-./src/dataprob/fit_param.py:372:5: E265 block comment should start with '# '
-./src/dataprob/fit_param.py:375:5: E301 expected 1 blank line, found 0
-./src/dataprob/fit_param.py:387:5: E303 too many blank lines (2)
-./src/dataprob/fit_param.py:418:5: E303 too many blank lines (2)
-./src/dataprob/fit_param.py:418:29: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:418:36: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:293:1: W293 blank line contains whitespace
+./src/dataprob/fit_param.py:306:32: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:312:5: E265 block comment should start with '# '
+./src/dataprob/fit_param.py:325:1: W293 blank line contains whitespace
+./src/dataprob/fit_param.py:327:19: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:333:9: E122 continuation line missing indentation or outdented
+./src/dataprob/fit_param.py:335:75: W291 trailing whitespace
+./src/dataprob/fit_param.py:337:1: W293 blank line contains whitespace
+./src/dataprob/fit_param.py:338:76: W291 trailing whitespace
+./src/dataprob/fit_param.py:341:56: W291 trailing whitespace
+./src/dataprob/fit_param.py:346:37: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:350:35: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:353:1: W293 blank line contains whitespace
+./src/dataprob/fit_param.py:366:1: W293 blank line contains whitespace
+./src/dataprob/fit_param.py:371:5: E303 too many blank lines (2)
+./src/dataprob/fit_param.py:371:5: E265 block comment should start with '# '
+./src/dataprob/fit_param.py:374:5: E301 expected 1 blank line, found 0
+./src/dataprob/fit_param.py:386:5: E303 too many blank lines (2)
+./src/dataprob/fit_param.py:417:5: E303 too many blank lines (2)
+./src/dataprob/fit_param.py:417:29: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:417:36: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:434:65: E231 missing whitespace after ','
 ./src/dataprob/fit_param.py:435:65: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:436:65: E231 missing whitespace after ','
-./src/dataprob/fit_param.py:438:52: E231 missing whitespace after ','
+./src/dataprob/fit_param.py:437:52: E231 missing whitespace after ','
 ./src/dataprob/fitters/__init__.py:2:1: F401 '.ml.MLFitter' imported but unused
 ./src/dataprob/fitters/__init__.py:3:1: F401 '.bootstrap.BootstrapFitter' imported but unused
 ./src/dataprob/fitters/__init__.py:4:1: F401 '.bayesian.BayesianFitter' imported but unused
-./src/dataprob/fitters/base.py:17:1: E302 expected 2 blank lines, found 1
-./src/dataprob/fitters/base.py:41:27: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:41:39: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:61:5: C901 'Fitter.fit' is too complex (21)
-./src/dataprob/fitters/base.py:89:76: W291 trailing whitespace
-./src/dataprob/fitters/base.py:91:60: W291 trailing whitespace
-./src/dataprob/fitters/base.py:129:47: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:139:52: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:165:55: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:170:45: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:170:54: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:170:62: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:185:18: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:198:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:199:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:200:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:200:34: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:215:45: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:215:54: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:221:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:221:32: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:237:45: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:237:54: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:237:62: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:242:21: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:257:45: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:257:54: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:257:62: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:262:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:264:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:279:5: C901 'Fitter.model' is too complex (12)
-./src/dataprob/fitters/base.py:279:19: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:286:28: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:348:21: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:354:9: E122 continuation line missing indentation or outdented
-./src/dataprob/fitters/base.py:357:20: W291 trailing whitespace
-./src/dataprob/fitters/base.py:358:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:362:39: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:366:74: W291 trailing whitespace
-./src/dataprob/fitters/base.py:375:38: W291 trailing whitespace
-./src/dataprob/fitters/base.py:402:20: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:408:9: E122 continuation line missing indentation or outdented
-./src/dataprob/fitters/base.py:409:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:419:37: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:422:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:425:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:430:51: W291 trailing whitespace
-./src/dataprob/fitters/base.py:440:64: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:460:20: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:466:9: E122 continuation line missing indentation or outdented
-./src/dataprob/fitters/base.py:467:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:476:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:480:37: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:483:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:486:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:489:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:495:51: W291 trailing whitespace
-./src/dataprob/fitters/base.py:505:64: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:525:19: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:531:34: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:535:31: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:544:100: E127 continuation line over-indented for visual indent
-./src/dataprob/fitters/base.py:568:19: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:574:35: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:576:19: F541 f-string is missing placeholders
-./src/dataprob/fitters/base.py:591:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:603:21: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:609:39: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:611:19: F541 f-string is missing placeholders
-./src/dataprob/fitters/base.py:626:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:728:18: W291 trailing whitespace
-./src/dataprob/fitters/base.py:741:28: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:742:31: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:743:28: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:744:29: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:745:30: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:746:28: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:747:33: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:748:32: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:749:34: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:750:34: E231 missing whitespace after ':'
-./src/dataprob/fitters/base.py:763:40: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:763:49: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:763:59: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:763:67: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:763:81: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:790:64: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:791:65: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:797:61: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:798:61: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:799:60: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:800:59: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:805:5: E303 too many blank lines (2)
-./src/dataprob/fitters/base.py:805:25: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:805:57: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:805:63: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:844:61: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:849:50: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:849:58: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:849:69: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:853:22: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:853:44: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:854:9: E265 block comment should start with '# '
-./src/dataprob/fitters/base.py:856:36: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:856:49: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:857:46: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:857:52: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:861:27: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:878:34: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:879:41: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:881:5: C901 'Fitter.append_samples' is too complex (12)
-./src/dataprob/fitters/base.py:881:28: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:881:45: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:914:60: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:924:49: E231 missing whitespace after ','
-./src/dataprob/fitters/base.py:928:1: W293 blank line contains whitespace
-./src/dataprob/fitters/base.py:938:53: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:19:1: E302 expected 2 blank lines, found 1
-./src/dataprob/fitters/bayesian.py:19:30: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:19:33: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:21:71: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:22:50: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:36:62: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:54:21: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:56:81: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:59:50: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:69:52: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:76:64: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:80:27: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:80:39: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:86:43: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:95:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:97:39: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:99:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:102:1: E302 expected 2 blank lines, found 1
-./src/dataprob/fitters/bayesian.py:102:40: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:104:79: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:111:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:115:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:116:76: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:117:32: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:127:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:133:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:134:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:135:20: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:136:36: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:140:20: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:153:1: E302 expected 2 blank lines, found 1
-./src/dataprob/fitters/bayesian.py:155:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:156:19: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:161:75: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:162:71: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:163:25: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:164:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:166:79: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:167:79: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:172:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:176:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:180:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:181:74: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:183:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:185:64: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:186:38: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:190:31: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:208:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:219:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:226:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:18:1: E302 expected 2 blank lines, found 1
+./src/dataprob/fitters/base.py:42:27: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:42:39: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:62:5: C901 'Fitter.fit' is too complex (17)
+./src/dataprob/fitters/base.py:90:76: W291 trailing whitespace
+./src/dataprob/fitters/base.py:92:60: W291 trailing whitespace
+./src/dataprob/fitters/base.py:124:43: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:131:48: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:132:49: E127 continuation line over-indented for visual indent
+./src/dataprob/fitters/base.py:154:55: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:159:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:159:54: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:159:62: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:174:18: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:187:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:188:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:189:5: E303 too many blank lines (2)
+./src/dataprob/fitters/base.py:189:35: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:191:71: W291 trailing whitespace
+./src/dataprob/fitters/base.py:207:34: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:222:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:222:54: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:228:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:235:33: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:254:32: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:270:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:270:54: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:270:62: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:276:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:283:22: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:295:27: W291 trailing whitespace
+./src/dataprob/fitters/base.py:302:21: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:317:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:317:54: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:317:62: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:323:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:333:75: W291 trailing whitespace
+./src/dataprob/fitters/base.py:336:36: W291 trailing whitespace
+./src/dataprob/fitters/base.py:348:5: C901 'Fitter.model' is too complex (12)
+./src/dataprob/fitters/base.py:348:19: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:352:28: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:414:21: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:420:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:428:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:450:32: W291 trailing whitespace
+./src/dataprob/fitters/base.py:463:20: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:466:31: E127 continuation line over-indented for visual indent
+./src/dataprob/fitters/base.py:467:31: E127 continuation line over-indented for visual indent
+./src/dataprob/fitters/base.py:467:48: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:468:31: E127 continuation line over-indented for visual indent
+./src/dataprob/fitters/base.py:469:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:483:64: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:499:50: W291 trailing whitespace
+./src/dataprob/fitters/base.py:512:20: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:516:47: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:518:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:537:63: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:547:20: W291 trailing whitespace
+./src/dataprob/fitters/base.py:560:19: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:563:34: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:567:31: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:568:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:577:128: E501 line too long (129 > 127 characters)
+./src/dataprob/fitters/base.py:592:77: W291 trailing whitespace
+./src/dataprob/fitters/base.py:593:55: W291 trailing whitespace
+./src/dataprob/fitters/base.py:602:19: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:603:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:608:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:625:77: W291 trailing whitespace
+./src/dataprob/fitters/base.py:634:21: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:640:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:654:5: E303 too many blank lines (2)
+./src/dataprob/fitters/base.py:756:18: W291 trailing whitespace
+./src/dataprob/fitters/base.py:769:28: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:770:31: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:771:28: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:772:29: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:773:30: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:774:28: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:775:33: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:776:32: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:777:34: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:778:34: E231 missing whitespace after ':'
+./src/dataprob/fitters/base.py:791:40: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:791:49: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:791:59: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:792:46: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:793:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:820:64: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:821:65: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:827:61: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:828:61: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:829:60: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:830:59: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:835:5: E303 too many blank lines (2)
+./src/dataprob/fitters/base.py:835:25: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:835:57: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:835:63: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:874:61: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:879:50: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:879:58: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:879:69: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:883:22: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:883:44: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:885:36: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:885:49: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:886:46: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:886:52: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:890:27: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:907:34: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:908:41: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:910:5: C901 'Fitter.append_samples' is too complex (12)
+./src/dataprob/fitters/base.py:910:28: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:910:45: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:943:60: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:953:49: E231 missing whitespace after ','
+./src/dataprob/fitters/base.py:957:1: W293 blank line contains whitespace
+./src/dataprob/fitters/base.py:967:53: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:20:1: E302 expected 2 blank lines, found 1
+./src/dataprob/fitters/bayesian.py:20:30: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:20:33: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:22:71: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:23:50: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:37:69: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:47:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:57:70: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:59:42: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:61:70: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:64:50: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:74:52: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:82:27: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:82:39: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:88:43: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:97:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:99:39: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:101:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:104:1: E302 expected 2 blank lines, found 1
+./src/dataprob/fitters/bayesian.py:104:40: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:106:79: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:113:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:117:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:118:76: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:119:32: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:129:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:135:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:136:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:137:20: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:138:36: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:142:20: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:155:1: E302 expected 2 blank lines, found 1
+./src/dataprob/fitters/bayesian.py:157:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:158:19: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:163:75: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:164:71: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:165:25: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:166:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:168:79: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:169:79: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:174:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:178:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:182:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:183:74: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:185:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:187:64: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:188:38: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:192:31: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:210:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:221:1: W293 blank line contains whitespace
 ./src/dataprob/fitters/bayesian.py:228:1: W293 blank line contains whitespace
 ./src/dataprob/fitters/bayesian.py:230:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:234:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:241:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:250:49: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:277:77: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:290:75: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:306:51: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:313:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:326:49: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:330:50: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:339:35: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:340:35: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:355:1: W293 blank line contains whitespace
-./src/dataprob/fitters/bayesian.py:358:61: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:359:59: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:360:65: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:232:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:236:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:243:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:252:49: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:279:77: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:292:75: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:308:51: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:315:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:328:49: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:332:50: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:341:35: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:342:35: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:357:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:360:61: E231 missing whitespace after ','
 ./src/dataprob/fitters/bayesian.py:361:59: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:363:22: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:365:37: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:379:40: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:379:80: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:389:21: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:404:27: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:407:32: W291 trailing whitespace
-./src/dataprob/fitters/bayesian.py:421:5: E303 too many blank lines (2)
-./src/dataprob/fitters/bayesian.py:421:18: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:436:13: E731 do not assign a lambda expression, use a def
-./src/dataprob/fitters/bayesian.py:437:47: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:437:63: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:457:55: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:460:61: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:461:63: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:461:65: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:461:80: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:468:58: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:470:57: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:480:47: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:481:43: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:485:55: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:486:55: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:487:31: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:489:41: E231 missing whitespace after ','
-./src/dataprob/fitters/bayesian.py:509:60: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:362:65: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:363:59: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:365:23: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:367:73: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:371:40: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:371:80: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:381:22: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:383:37: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:396:45: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:396:55: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:396:66: W291 trailing whitespace
+./src/dataprob/fitters/bayesian.py:402:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:410:5: E303 too many blank lines (2)
+./src/dataprob/fitters/bayesian.py:410:22: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:425:21: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:440:45: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:440:54: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:440:62: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:440:72: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:440:81: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:441:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:446:1: W293 blank line contains whitespace
+./src/dataprob/fitters/bayesian.py:453:18: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:468:13: E731 do not assign a lambda expression, use a def
+./src/dataprob/fitters/bayesian.py:469:47: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:469:63: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:489:55: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:492:61: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:493:63: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:493:65: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:493:80: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:500:58: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:502:57: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:512:47: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:513:43: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:517:55: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:518:55: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:519:31: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:521:41: E231 missing whitespace after ','
+./src/dataprob/fitters/bayesian.py:541:60: E231 missing whitespace after ','
 ./src/dataprob/fitters/bootstrap.py:12:1: E302 expected 2 blank lines, found 1
 ./src/dataprob/fitters/bootstrap.py:17:22: E231 missing whitespace after ','
 ./src/dataprob/fitters/bootstrap.py:17:40: E231 missing whitespace after ','
@@ -858,211 +902,412 @@
 ./tests/conftest.py:22:41: E231 missing whitespace after ','
 ./tests/conftest.py:26:33: E231 missing whitespace after ','
 ./tests/conftest.py:27:36: E231 missing whitespace after ','
-./tests/conftest.py:36:26: E231 missing whitespace after ','
-./tests/conftest.py:38:9: E306 expected 1 blank line before a nested definition, found 0
-./tests/conftest.py:38:28: E231 missing whitespace after ','
-./tests/conftest.py:48:28: E231 missing whitespace after ','
-./tests/conftest.py:56:30: E231 missing whitespace after ','
-./tests/conftest.py:56:36: E231 missing whitespace after ','
-./tests/conftest.py:56:55: E231 missing whitespace after ','
-./tests/conftest.py:68:1: E302 expected 2 blank lines, found 1
-./tests/conftest.py:75:1: E302 expected 2 blank lines, found 1
-./tests/conftest.py:95:1: W293 blank line contains whitespace
-./tests/conftest.py:103:1: W293 blank line contains whitespace
-./tests/conftest.py:107:30: E231 missing whitespace after ':'
-./tests/conftest.py:108:32: E231 missing whitespace after ':'
-./tests/conftest.py:112:1: E266 too many leading '#' for block comment
-./tests/conftest.py:114:1: E302 expected 2 blank lines, found 1
-./tests/conftest.py:120:1: E302 expected 2 blank lines, found 1
-./tests/conftest.py:123:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:8:1: F401 'pandas as pd' imported but unused
+./tests/conftest.py:37:26: E231 missing whitespace after ','
+./tests/conftest.py:39:9: E306 expected 1 blank line before a nested definition, found 0
+./tests/conftest.py:39:28: E231 missing whitespace after ','
+./tests/conftest.py:49:28: E231 missing whitespace after ','
+./tests/conftest.py:57:30: E231 missing whitespace after ','
+./tests/conftest.py:57:36: E231 missing whitespace after ','
+./tests/conftest.py:57:55: E231 missing whitespace after ','
+./tests/conftest.py:69:1: E302 expected 2 blank lines, found 1
+./tests/conftest.py:76:1: E302 expected 2 blank lines, found 1
+./tests/conftest.py:105:1: W293 blank line contains whitespace
+./tests/conftest.py:112:1: W293 blank line contains whitespace
+./tests/conftest.py:114:5: E303 too many blank lines (2)
+./tests/conftest.py:117:1: W293 blank line contains whitespace
+./tests/conftest.py:124:5: E303 too many blank lines (2)
+./tests/conftest.py:126:1: E266 too many leading '#' for block comment
+./tests/conftest.py:128:1: E302 expected 2 blank lines, found 1
+./tests/conftest.py:134:1: E302 expected 2 blank lines, found 1
+./tests/conftest.py:137:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/fitters/test_base.py:15:16: W291 trailing whitespace
 ./tests/dataprob/fitters/test_base.py:18:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/fitters/test_base.py:24:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:33:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:35:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:37:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:39:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:42:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:47:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:78:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:111:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:144:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:150:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:156:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:182:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:182:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:183:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:183:54: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:183:63: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:183:71: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:184:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:184:49: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:194:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:194:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:195:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:195:54: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:195:63: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:195:71: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:196:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:196:49: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:198:4: E114 indentation is not a multiple of 4 (comment)
-./tests/dataprob/fitters/test_base.py:205:23: W291 trailing whitespace
-./tests/dataprob/fitters/test_base.py:219:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:219:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:219:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:31:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:32:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:34:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:36:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:41:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:44:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:45:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:46:20: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:46:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:46:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:50:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:53:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:54:13: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:55:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:58:77: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:59:36: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:63:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:64:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:65:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:66:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:66:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:69:18: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:70:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:71:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:72:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:73:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:74:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:75:23: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:75:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:76:23: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:76:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:78:77: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:82:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:85:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:86:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:87:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:88:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:89:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:90:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:90:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:91:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:101:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:102:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:108:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:109:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:115:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:120:32: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:120:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:122:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:127:32: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:129:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:136:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:143:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:149:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:151:66: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:156:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:158:76: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:165:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:167:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:168:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:168:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:168:57: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:169:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:170:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:173:74: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:179:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:185:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:186:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:187:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:187:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:187:57: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:188:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:189:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:201:18: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:203:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:208:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:213:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:216:73: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:217:14: W291 trailing whitespace
 ./tests/dataprob/fitters/test_base.py:227:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:236:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:240:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:243:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:244:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:244:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:244:43: W291 trailing whitespace
-./tests/dataprob/fitters/test_base.py:253:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:253:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:255:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:256:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:256:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:261:24: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:265:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:265:49: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:266:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:266:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:268:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:283:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:285:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:285:63: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:286:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:287:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:291:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:300:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:304:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:304:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:305:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:306:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:307:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:312:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:320:24: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:320:65: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:323:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:339:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:343:24: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:343:65: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:344:13: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:350:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:353:24: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:355:23: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:355:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:355:28: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:355:31: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:355:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:356:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:356:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:356:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:357:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:357:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:357:51: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:357:54: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:360:5: E303 too many blank lines (2)
-./tests/dataprob/fitters/test_base.py:370:22: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:370:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:371:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:372:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:373:11: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:378:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:387:20: E127 continuation line over-indented for visual indent
-./tests/dataprob/fitters/test_base.py:390:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:396:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:402:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:408:23: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:417:23: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:426:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:426:40: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:429:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:430:19: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:431:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:431:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:435:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:441:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:444:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:451:23: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:456:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:461:34: W291 trailing whitespace
-./tests/dataprob/fitters/test_base.py:462:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:463:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:475:40: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:478:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:484:25: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:485:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:492:38: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:493:40: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:494:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:501:38: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:502:40: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:503:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:519:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:524:28: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:528:32: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:528:34: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:528:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:531:28: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:531:30: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:536:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:558:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:574:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:579:5: E265 block comment should start with '# '
-./tests/dataprob/fitters/test_base.py:580:5: E265 block comment should start with '# '
-./tests/dataprob/fitters/test_base.py:602:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:607:1: E303 too many blank lines (3)
-./tests/dataprob/fitters/test_base.py:610:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:611:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:625:30: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:625:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:626:12: E714 test for object identity should be 'is not'
-./tests/dataprob/fitters/test_base.py:632:24: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:634:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:637:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:639:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:645:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:651:32: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:651:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:652:28: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:653:33: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:654:29: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:657:76: W291 trailing whitespace
-./tests/dataprob/fitters/test_base.py:662:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:662:52: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:663:20: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:671:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:686:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:686:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:687:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:689:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:689:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:692:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:692:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:695:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:695:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:706:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:706:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:707:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:707:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:708:35: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:708:39: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:715:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:716:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:720:51: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:720:54: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:725:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:725:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:727:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:727:47: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:728:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:729:20: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:732:1: W293 blank line contains whitespace
-./tests/dataprob/fitters/test_base.py:738:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_base.py:763:79: W291 trailing whitespace
-./tests/dataprob/fitters/test_base.py:767:1: W391 blank line at end of file
+./tests/dataprob/fitters/test_base.py:255:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:262:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:265:73: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:266:14: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:278:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:311:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:318:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:320:49: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:329:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:331:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:362:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:363:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:366:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:366:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:378:1: E303 too many blank lines (4)
+./tests/dataprob/fitters/test_base.py:382:1: E302 expected 2 blank lines, found 4
+./tests/dataprob/fitters/test_base.py:388:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:414:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:414:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:415:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:415:54: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:415:63: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:415:71: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:416:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:416:49: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:426:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:426:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:427:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:427:54: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:427:63: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:427:71: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:428:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:428:49: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:430:4: E114 indentation is not a multiple of 4 (comment)
+./tests/dataprob/fitters/test_base.py:437:23: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:451:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:451:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:451:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:459:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:468:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:472:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:475:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:476:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:476:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:476:43: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:485:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:485:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:487:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:488:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:488:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:493:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:497:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:497:49: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:498:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:498:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:500:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:515:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:517:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:517:63: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:518:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:519:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:523:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:532:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:536:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:536:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:537:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:538:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:539:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:544:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:552:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:552:65: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:555:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:571:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:575:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:575:65: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:576:13: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:582:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:582:65: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:584:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:585:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:585:67: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:591:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:594:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:596:23: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:596:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:596:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:596:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:596:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:597:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:597:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:597:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:598:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:598:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:598:51: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:598:54: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:610:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:610:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:611:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:612:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:613:11: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:624:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:624:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:624:57: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:625:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:625:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:625:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:626:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:626:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:626:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:626:45: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:628:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:628:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:628:43: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:628:46: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:630:57: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:630:68: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:634:1: E303 too many blank lines (3)
+./tests/dataprob/fitters/test_base.py:643:20: E127 continuation line over-indented for visual indent
+./tests/dataprob/fitters/test_base.py:646:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:652:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:658:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:664:23: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:673:23: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:682:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:682:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:685:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:686:19: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:687:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:687:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:691:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:697:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:700:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:707:23: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:712:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:717:34: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:718:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:719:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:731:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:734:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:740:25: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:741:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:748:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:749:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:750:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:757:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:758:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:759:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:775:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:780:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:784:32: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:784:34: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:784:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:787:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:787:30: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:792:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:814:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:830:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:830:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:832:20: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:832:22: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:832:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:836:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:839:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:840:13: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:841:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:844:77: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:845:36: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:849:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:850:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:851:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:852:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:852:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:853:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:854:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:857:18: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:858:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:859:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:860:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:861:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:862:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:863:23: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:863:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:864:23: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:864:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:884:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:886:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:888:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:889:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:890:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:891:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:892:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:893:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:894:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:895:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:896:43: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:897:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:898:44: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:899:44: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:901:40: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:905:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:908:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:909:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:909:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:910:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:910:49: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:915:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:920:18: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:921:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:922:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:923:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:925:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:926:5: E303 too many blank lines (2)
+./tests/dataprob/fitters/test_base.py:926:40: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:930:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:932:31: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:933:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:933:45: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:934:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:934:43: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:935:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:935:43: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:936:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:944:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:944:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:944:55: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:945:40: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:945:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:945:56: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:952:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:953:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:956:18: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:957:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:958:22: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:959:24: E231 missing whitespace after ':'
+./tests/dataprob/fitters/test_base.py:961:40: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:965:14: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:968:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:968:44: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:969:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:969:46: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:970:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:970:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:971:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:971:54: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:972:49: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:972:55: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:973:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:973:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:974:52: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:974:58: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:975:51: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:975:57: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:976:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:976:59: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:977:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:977:59: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:983:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:984:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:998:30: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:998:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:999:12: E714 test for object identity should be 'is not'
+./tests/dataprob/fitters/test_base.py:1005:24: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1007:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1010:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1012:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1018:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:1024:32: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1024:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1025:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1026:33: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1027:29: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1030:76: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:1035:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1035:52: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1036:20: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1044:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1059:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1059:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1060:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1062:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1062:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1065:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1065:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1068:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1068:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1079:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1079:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1080:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1080:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1081:35: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1081:39: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1088:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1089:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1093:51: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1093:54: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1098:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1098:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1100:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1100:47: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1101:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1102:20: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:1105:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_base.py:1111:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_base.py:1136:79: W291 trailing whitespace
+./tests/dataprob/fitters/test_base.py:1140:1: W391 blank line at end of file
 ./tests/dataprob/fitters/test_bayesian.py:17:1: W293 blank line contains whitespace
 ./tests/dataprob/fitters/test_bayesian.py:19:72: W291 trailing whitespace
 ./tests/dataprob/fitters/test_bayesian.py:20:31: E231 missing whitespace after ','
@@ -1265,38 +1510,45 @@
 ./tests/dataprob/fitters/test_bayesian.py:395:36: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bayesian.py:396:30: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bayesian.py:398:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_bayesian.py:401:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_bayesian.py:404:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_bayesian.py:407:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_bayesian.py:410:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/fitters/test_bayesian.py:411:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:419:41: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:430:32: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:432:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:400:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_bayesian.py:401:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_bayesian.py:406:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_bayesian.py:432:1: W293 blank line contains whitespace
 ./tests/dataprob/fitters/test_bayesian.py:434:26: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:434:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:434:53: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:437:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:437:50: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:449:36: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:462:29: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:467:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:468:45: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:469:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:470:43: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:470:58: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:471:44: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:471:59: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:472:42: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:473:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:473:59: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:474:48: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:474:59: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:475:46: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bayesian.py:475:52: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:435:20: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:438:5: F841 local variable 'L' is assigned to but never used
+./tests/dataprob/fitters/test_bayesian.py:440:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_bayesian.py:443:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_bayesian.py:446:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/fitters/test_bayesian.py:451:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:459:38: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:470:32: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:472:28: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:474:26: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:474:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:474:53: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:477:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:477:50: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:489:36: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:502:29: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:507:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:508:45: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:509:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:510:43: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:510:58: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:511:44: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:511:59: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:512:42: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:513:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:513:59: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:514:48: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:514:59: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:515:46: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bayesian.py:515:52: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bootstrap.py:15:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/fitters/test_bootstrap.py:16:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_bootstrap.py:24:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_bootstrap.py:20:1: W293 blank line contains whitespace
+./tests/dataprob/fitters/test_bootstrap.py:24:38: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bootstrap.py:35:32: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bootstrap.py:37:28: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_bootstrap.py:39:26: E231 missing whitespace after ','
@@ -1322,7 +1574,7 @@
 ./tests/dataprob/fitters/test_ml.py:8:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/fitters/test_ml.py:13:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/fitters/test_ml.py:13:37: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_ml.py:21:41: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_ml.py:21:38: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_ml.py:32:32: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_ml.py:34:28: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_ml.py:36:26: E231 missing whitespace after ','
@@ -1344,106 +1596,211 @@
 ./tests/dataprob/fitters/test_ml.py:75:59: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_ml.py:76:48: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_ml.py:76:59: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:11:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_check.py:13:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:13:28: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:13:30: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:13:40: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:17:26: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:17:30: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:17:32: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:17:43: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:22: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:26: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:29: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:34: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:43: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:48: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:53: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:67: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:73: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:21:76: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:24:13: F841 local variable 'value' is assigned to but never used
-./tests/dataprob/test_check.py:32:22: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:31: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:36: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:41: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:55: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:61: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:64: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:32:70: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:37:26: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:37:33: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:37:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:37:37: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:42:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:45:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:45:44: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:47:28: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:47:48: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:51:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:54:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:54:44: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:56:28: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:56:48: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:22: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:31: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:36: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:41: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:55: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:61: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:64: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:70: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:74: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:81: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:65:88: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:71:22: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:71:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:71:27: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:71:32: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:76:20: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:79:20: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:79:38: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:81:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:81:42: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:85:20: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:88:20: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:88:38: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:90:24: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:90:42: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:96:30: E231 missing whitespace after ':'
-./tests/dataprob/test_check.py:96:36: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:97:38: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:98:33: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:99:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:100:37: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:101:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:102:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:27: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:29: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:31: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:33: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:37: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:39: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:41: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:43: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:45: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:47: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:49: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:51: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:104:54: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:105:36: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:106:30: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:108:30: E231 missing whitespace after ':'
+./tests/dataprob/test_check.py:12:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_check.py:14:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:14:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:14:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:14:40: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:18:26: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:18:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:18:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:18:43: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:22: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:26: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:29: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:34: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:43: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:48: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:53: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:67: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:73: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:22:76: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:25:13: F841 local variable 'value' is assigned to but never used
+./tests/dataprob/test_check.py:33:22: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:55: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:61: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:64: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:33:70: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:38:26: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:38:33: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:38:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:38:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:43:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:46:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:46:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:48:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:48:48: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:52:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:55:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:55:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:57:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:57:48: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:22: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:55: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:61: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:64: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:70: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:74: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:81: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:66:88: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:72:22: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:72:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:72:27: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:72:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:77:20: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:80:20: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:80:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:82:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:82:42: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:86:20: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:89:20: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:89:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:91:24: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:91:42: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:94:1: C901 'test_check_array' is too complex (15)
+./tests/dataprob/test_check.py:94:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_check.py:95:1: W293 blank line contains whitespace
+./tests/dataprob/test_check.py:96:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:98:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:99:1: W293 blank line contains whitespace
+./tests/dataprob/test_check.py:100:46: W291 trailing whitespace
+./tests/dataprob/test_check.py:101:26: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:101:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:101:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:103:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:105:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:108:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:108:33: E231 missing whitespace after ':'
 ./tests/dataprob/test_check.py:108:36: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:109:38: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:110:33: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:111:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:112:37: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:113:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:114:35: E231 missing whitespace after ','
-./tests/dataprob/test_check.py:116:40: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:108:41: E231 missing whitespace after ':'
+./tests/dataprob/test_check.py:108:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:108:48: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:108:53: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:110:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:112:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:114:36: W291 trailing whitespace
+./tests/dataprob/test_check.py:115:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:115:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:115:48: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:117:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:118:34: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:119:34: E702 multiple statements on one line (semicolon)
+./tests/dataprob/test_check.py:119:34: E231 missing whitespace after ';'
+./tests/dataprob/test_check.py:119:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:121:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:123:40: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:126:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:126:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:126:52: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:128:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:133:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:136:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:136:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:136:52: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:138:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:142:50: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:144:1: W293 blank line contains whitespace
+./tests/dataprob/test_check.py:146:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:146:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:146:52: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:148:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:154:1: W293 blank line contains whitespace
+./tests/dataprob/test_check.py:156:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:156:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:157:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:157:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:158:28: E127 continuation line over-indented for visual indent
+./tests/dataprob/test_check.py:158:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:158:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:160:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:163:57: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:165:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:168:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:168:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:169:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:169:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:170:28: E127 continuation line over-indented for visual indent
+./tests/dataprob/test_check.py:170:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:170:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:172:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:175:54: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:177:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:180:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:180:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:181:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:181:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:182:28: E127 continuation line over-indented for visual indent
+./tests/dataprob/test_check.py:182:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:182:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:184:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:187:57: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:189:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:192:13: E303 too many blank lines (2)
+./tests/dataprob/test_check.py:193:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:193:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:194:32: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:194:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:195:28: E127 continuation line over-indented for visual indent
+./tests/dataprob/test_check.py:195:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:195:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:197:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:200:54: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:202:44: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:205:13: E303 too many blank lines (2)
+./tests/dataprob/test_check.py:206:25: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:206:28: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:206:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:206:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:206:43: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:208:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:209:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:209:39: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:210:29: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_check.py:210:33: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:210:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:211:39: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:211:42: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:213:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:223:1: E303 too many blank lines (4)
+./tests/dataprob/test_check.py:225:30: E231 missing whitespace after ':'
+./tests/dataprob/test_check.py:225:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:226:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:227:33: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:228:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:229:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:230:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:231:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:27: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:29: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:31: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:33: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:39: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:41: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:43: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:45: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:47: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:49: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:51: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:233:54: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:234:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:235:30: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:237:30: E231 missing whitespace after ':'
+./tests/dataprob/test_check.py:237:36: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:238:38: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:239:33: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:240:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:241:37: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:242:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:243:35: E231 missing whitespace after ','
+./tests/dataprob/test_check.py:245:40: E231 missing whitespace after ','
 ./tests/dataprob/test_fit_param.py:8:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_fit_param.py:11:1: W293 blank line contains whitespace
 ./tests/dataprob/test_fit_param.py:12:47: E231 missing whitespace after ','
@@ -1691,76 +2048,59 @@
 ./tests/dataprob/test_model_wrapper.py:137:22: E231 missing whitespace after ','
 ./tests/dataprob/test_model_wrapper.py:138:39: E231 missing whitespace after ','
 ./tests/dataprob/test_model_wrapper.py:138:51: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:142:29: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:142:28: E231 missing whitespace after ','
 ./tests/dataprob/test_model_wrapper.py:143:39: E231 missing whitespace after ','
 ./tests/dataprob/test_model_wrapper.py:143:51: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:147:28: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:148:39: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:148:51: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:152:57: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:152:75: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:153:40: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:154:57: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:154:69: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:155:39: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:155:51: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:157:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_model_wrapper.py:176:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_model_wrapper.py:221:28: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:222:28: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:223:41: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:224:32: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:231:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_model_wrapper.py:236:1: W293 blank line contains whitespace
-./tests/dataprob/test_model_wrapper.py:242:23: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:243:24: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:247:27: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:251:21: E231 missing whitespace after ','
-./tests/dataprob/test_model_wrapper.py:251:24: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:9:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_sampling.py:14:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_sampling.py:14:54: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:19:40: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:20:40: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:26:5: F841 local variable 'input_params' is assigned to but never used
-./tests/dataprob/test_sampling.py:32:22: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:32:38: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:32:49: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:38:42: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:38:58: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:59:47: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:63:48: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:68:42: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:68:58: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:72:42: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:72:58: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:84:42: E231 missing whitespace after ','
-./tests/dataprob/test_sampling.py:84:58: E231 missing whitespace after ','
-16    C901 'check_float' is too complex (17)
+./tests/dataprob/test_model_wrapper.py:149:29: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:150:39: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:150:54: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:155:57: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:155:75: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:156:40: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:157:57: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:157:69: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:158:39: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:158:51: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:160:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_model_wrapper.py:179:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_model_wrapper.py:224:28: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:225:28: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:226:41: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:227:32: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:234:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_model_wrapper.py:239:1: W293 blank line contains whitespace
+./tests/dataprob/test_model_wrapper.py:245:23: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:246:24: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:250:27: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:254:21: E231 missing whitespace after ','
+./tests/dataprob/test_model_wrapper.py:254:24: E231 missing whitespace after ','
+19    C901 'check_float' is too complex (17)
 1     E114 indentation is not a multiple of 4 (comment)
-12    E122 continuation line missing indentation or outdented
+6     E122 continuation line missing indentation or outdented
 15    E127 continuation line over-indented for visual indent
-10    E128 continuation line under-indented for visual indent
+11    E128 continuation line under-indented for visual indent
 8     E225 missing whitespace around operator
-1194  E231 missing whitespace after ','
+1450  E231 missing whitespace after ','
 3     E261 at least two spaces before inline comment
 2     E262 inline comment should start with '# '
-16    E265 block comment should start with '# '
+12    E265 block comment should start with '# '
 1     E266 too many leading '#' for block comment
 4     E301 expected 1 blank line, found 0
-74    E302 expected 2 blank lines, found 1
-32    E303 too many blank lines (2)
+77    E302 expected 2 blank lines, found 1
+34    E303 too many blank lines (2)
 1     E306 expected 1 blank line before a nested definition, found 0
 2     E401 multiple imports on one line
+2     E501 line too long (129 > 127 characters)
+1     E702 multiple statements on one line (semicolon)
 3     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
 1     E714 test for object identity should be 'is not'
 4     E731 do not assign a lambda expression, use a def
-21    F401 '.fitters.MLFitter' imported but unused
-8     F541 f-string is missing placeholders
+20    F401 '.fitters.MLFitter' imported but unused
+4     F541 f-string is missing placeholders
 1     F811 redefinition of unused 'test_stdev_getter' from line 294
 4     F841 local variable 'extra_fake_tests' is assigned to but never used
-157   W291 trailing whitespace
+189   W291 trailing whitespace
 1     W292 no newline at end of file
-146   W293 blank line contains whitespace
+199   W293 blank line contains whitespace
 1     W391 blank line at end of file
-1738
+2076
