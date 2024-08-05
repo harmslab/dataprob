@@ -286,6 +286,8 @@ class FitParameter:
         if bounds[1] <= bounds[0]:
             raise ValueError(err_msg)
 
+        self._bounds = bounds
+
         # Shift existing guess if necessary
         if self.guess is not None:
         
@@ -305,9 +307,6 @@ class FitParameter:
 
                 self.guess = new_guess
 
-        print(bounds)
-
-        self._bounds = bounds
         self._clear_fit_result()
 
     #--------------------------------------------------------------------------

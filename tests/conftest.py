@@ -54,6 +54,9 @@ def binding_curve_test_data():
 
     json_data["wrappable_model"] = wrappable_model
 
+    
+
+
     def model_to_test_wrap(K1,K2=20,extra_stuff="test",K3=42):
 
         K1 = float(K1)
@@ -79,34 +82,47 @@ def fitter_object(binding_curve_test_data):
     Do a successful fit that can be passed into other functions
     """
 
-    wrapped_fit = dataprob.MLFitter()
+    out_dict = {}
+
+    # Do a generic fit where the input function (generic_model) is run without
+    # an intervening ModelWrapper
+
+    generic_fit = dataprob.MLFitter()
 
     model = binding_curve_test_data["generic_model"]
     guesses = binding_curve_test_data["guesses"]
     df = binding_curve_test_data["df"]
 
-    wrapped_fit.fit(model=model,
+    generic_fit.fit(model=model,
                     guesses=guesses,
                     y_obs=df.Y)
 
+    if not generic_fit.success:
+        raise RuntimeError("generic test fit did not converge!")
+
+    out_dict["generic_fit"] = generic_fit
+
+    # Do a fit where the input function is wrapped by ModelWrapper
+
+    wrapped_fit = dataprob.MLFitter()
+    
+    model = binding_curve_test_data["wrappable_model"]
+    model = dataprob.ModelWrapper(model)
+    df = binding_curve_test_data["df"]
+    model.df = df
+
+    guesses = binding_curve_test_data["guesses"]
+    
+
+    wrapped_fit.fit(model=model,
+                    guesses=guesses,
+                    y_obs=df.Y)
+    
     if not wrapped_fit.success:
         raise RuntimeError("wrapped test fit did not converge!")
 
-    unwrapped_fit = dataprob.MLFitter()
-    
-    model = binding_curve_test_data["model_to_test_wrap"]
-    guesses = binding_curve_test_data["guesses"]
-    df = binding_curve_test_data["df"]
+    out_dict["wrapped_fit"] = wrapped_fit
 
-    unwrapped_fit.fit(model=model,
-                      guesses=guesses,
-                      y_obs=df.Y)
-    
-    if not unwrapped_fit.success:
-        raise RuntimeError("unwrapped test fit did not converge!")
-
-    out_dict = {"wrapped_fit":wrapped_fit,
-                "unwrapped_fit":unwrapped_fit}
 
     return out_dict
 

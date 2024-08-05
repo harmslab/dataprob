@@ -643,8 +643,8 @@ def test_base_properties():
 
 def xtest_fit_df(fitter_object):
 
-    wrapped_fit = fitter_object["wrapped_fit"]
-    assert wrapped_fit.success
+    generic_fit = fitter_object["generic_fit"]
+    assert generic_fit.success
 
     f = Fitter()
 

@@ -137,15 +137,18 @@ def test_setting_bounds(binding_curve_test_data):
     mw.K1.bounds = [0,500]
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-    # Try, but fail, to set bounds that do not encompass guess
-    with pytest.raises(ValueError):
-        mw.K1.bounds = [-500,-50]
-    assert np.array_equal(mw.K1.bounds,np.array([0,500]))
-
     # Try, but fail, to set bounds that are backwards
     with pytest.raises(ValueError):
         mw.K1.bounds = [500,-50]
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
+
+    # Set bounds that do not encompass guess and make sure guess shifts
+    mw.K1.guess = 0
+    assert mw.K1.guess == 0
+    with pytest.warns():
+        mw.K1.bounds = [-500,-50]
+    assert np.array_equal(mw.K1.bounds,np.array([-500,-50]))
+    assert mw.K1.guess == -50
 
     # Test setting by fit_parameters dict
     mw = dataprob.ModelWrapper(model_to_test_wrap)
