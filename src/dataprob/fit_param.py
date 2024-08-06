@@ -447,3 +447,23 @@ class FitParameter:
         self._stdev = None
         self._ninetyfive = None
         self._is_fit_result = False
+
+
+    def __repr__(self):
+        
+        msg = "FitParameter:\n"
+        msg += f"  Inputs:\n"
+        msg += f"          name: {self.name}\n"
+        msg += f"         guess: {self.guess}\n"
+        msg += f"         fixed: {self.fixed}\n"
+        msg += f"        bounds: {self.bounds}\n"
+        msg += f"         prior: {self.prior}\n"
+        msg += f"     is_result: {self.is_fit_result}\n\n"
+
+        if self.is_fit_result:
+            msg += "  Results:\n"
+            msg += "      estimate: {self.value}\n"
+            msg += "         stdev: {self.stdev}\n"
+            msg += "    ninetyfive: {self.stdev}\n\n"
+
+        return msg

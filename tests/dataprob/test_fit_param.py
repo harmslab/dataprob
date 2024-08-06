@@ -410,6 +410,25 @@ def test_load_clear_fit_results(fitter_object):
     assert p.ninetyfive is None
     assert not p.is_fit_result
 
+def test_FitParameter___repr__(fitter_object):
+
+    generic_fit = fitter_object["generic_fit"]
+
+    # --- Make sure we can load fit result into parameter ---
+    p = FitParameter(name="test")
+    assert p.value == p.guess
+    assert p.stdev is None
+    assert p.ninetyfive is None
+    assert np.array_equal(p.prior,[np.nan,np.nan],equal_nan=True)
+    assert not p.is_fit_result
+
+    assert len(p.__repr__().split("\n")) == 10
+
+    p.load_fit_result(generic_fit,0)
+
+    assert len(p.__repr__().split("\n")) == 15
+
+
 
 def test_interaction_bounds_guesses():
 

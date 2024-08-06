@@ -10,7 +10,7 @@ from dataprob.fitters.bayesian import _find_normalization
 from dataprob.fitters.bayesian import _reconcile_bounds_and_priors
 from dataprob.fitters.bayesian import _find_uniform_value
 
-from dataprob.model_wrapper import ModelWrapper
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 
 def test__find_normalization():

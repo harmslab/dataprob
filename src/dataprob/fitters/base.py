@@ -14,6 +14,7 @@ import os
 
 import dataprob
 from dataprob.check import check_array
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 class Fitter:
     """
@@ -349,7 +350,7 @@ class Fitter:
 
         # If this is a ModelWrapper instance, grab the model method rather than
         # the model instance for the check below.
-        if isinstance(model,dataprob.model_wrapper.ModelWrapper):
+        if isinstance(model,ModelWrapper):
             model = model.model
 
         has_err = False

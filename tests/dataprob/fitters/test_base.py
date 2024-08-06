@@ -2,7 +2,7 @@
 import pytest
 
 from dataprob.fitters.base import Fitter
-from dataprob.model_wrapper import ModelWrapper
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 import numpy as np
 import pandas as pd

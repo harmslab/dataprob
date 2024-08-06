@@ -1,203 +1,9 @@
 import pytest
 
-from dataprob.model_wrapper import _analyze_fcn_sig
-from dataprob.model_wrapper import _reconcile_fittable
-from dataprob.model_wrapper import _param_sanity_check
-from dataprob.model_wrapper import ModelWrapper
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.fit_param import FitParameter
 
 import numpy as np
-
-import copy
-
-def test__analyze_fcn_sig():
-
-    def test_fcn(a,b=2,c="test",d=3,*args,**kwargs): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a","b","c","d"])
-    assert len(can_be_fit) == 3
-    assert can_be_fit["a"] is None
-    assert can_be_fit["b"] == 2
-    assert can_be_fit["d"] == 3
-    assert len(cannot_be_fit) == 1
-    assert cannot_be_fit["c"] == "test"
-    assert has_kwargs is True
-
-    # Drop kwargs
-    def test_fcn(a,b=2,c="test",d=3,*args): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a","b","c","d"])
-    assert len(can_be_fit) == 3
-    assert can_be_fit["a"] is None
-    assert can_be_fit["b"] == 2
-    assert can_be_fit["d"] == 3
-    assert len(cannot_be_fit) == 1
-    assert cannot_be_fit["c"] == "test"
-    assert has_kwargs is False
-
-    # Drop args, but keep kwargs
-    def test_fcn(a,b=2,c="test",d=3,**kwargs): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a","b","c","d"])
-    assert len(can_be_fit) == 3
-    assert can_be_fit["a"] is None
-    assert can_be_fit["b"] == 2
-    assert can_be_fit["d"] == 3
-    assert len(cannot_be_fit) == 1
-    assert cannot_be_fit["c"] == "test"
-    assert has_kwargs is True
-
-    # Nothing
-    def test_fcn(): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert len(all_args) == 0
-    assert len(can_be_fit) == 0
-    assert len(cannot_be_fit) == 0
-    assert has_kwargs is False
-
-    # one fittable arg, no default
-    def test_fcn(a): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a"])
-    assert len(can_be_fit) == 1
-    assert can_be_fit["a"] is None
-    assert len(cannot_be_fit) == 0
-    assert has_kwargs is False
-
-    # one fittable arg, no default
-    def test_fcn(a): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a"])
-    assert len(can_be_fit) == 1
-    assert can_be_fit["a"] is None
-    assert len(cannot_be_fit) == 0
-    assert has_kwargs is False
-
-    # one non-fittable arg
-    def test_fcn(a="test"): pass
-    
-    all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(test_fcn)
-    assert np.array_equal(all_args,["a"])
-    assert len(can_be_fit) == 0
-    assert len(cannot_be_fit) == 1
-    assert cannot_be_fit["a"] == "test"
-    assert has_kwargs is False
-
-def test__reconcile_fittable():
-
-    base_kwargs = {"fittable_params":None,
-                   "all_args":[],
-                   "can_be_fit":{},
-                   "cannot_be_fit":{},
-                   "has_kwargs":False}
-
-
-    # no parameters at all
-    kwargs = copy.deepcopy(base_kwargs)
-    with pytest.raises(ValueError):
-        fittable, not_fittable = _reconcile_fittable(**kwargs)
-
-    # No fittable parameters
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["all_args"] = ["a"]
-    kwargs["cannot_be_fit"] = {"a":"test"}
-    with pytest.raises(ValueError):
-        fittable, not_fittable = _reconcile_fittable(**kwargs)
-
-    # No fittable parameter, but we tell function to use "a" anyway
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a"]
-    kwargs["all_args"] = ["a"]
-    kwargs["cannot_be_fit"] = {"a":"test"}
-    with pytest.raises(ValueError):
-        fittable, not_fittable = _reconcile_fittable(**kwargs)
-    
-    # No fittable parameter. tell it to use "b" (not in function, no kwarg)
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["b"]
-    kwargs["all_args"] = ["a"]
-    kwargs["cannot_be_fit"] = {"a":"test"}
-    with pytest.raises(ValueError):
-        fittable, not_fittable = _reconcile_fittable(**kwargs)
-
-    # No fittable parameter, but kwarg. tell it to use "b"
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["b"]
-    kwargs["all_args"] = ["a"]
-    kwargs["cannot_be_fit"] = {"a":"test"}
-    kwargs["has_kwargs"] = True
-    fittable, not_fittable = _reconcile_fittable(**kwargs)
-    assert np.array_equal(fittable,["b"])
-    assert np.array_equal(not_fittable,["a"])
-
-    # Make sure it trims off after first fittable arg
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
-    kwargs["all_args"] = ["a","b","c"]
-    kwargs["can_be_fit"] = {"a":1,"c":2}
-    kwargs["cannot_be_fit"] = {"b":"test"}
-    kwargs["has_kwargs"] = False
-    fittable, not_fittable = _reconcile_fittable(**kwargs)
-    assert np.array_equal(fittable,["a"])
-    assert np.array_equal(not_fittable,["b","c"])
-
-    # Make sure we can force it to take after non-fittable breaks arg list
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","c"]
-    kwargs["all_args"] = ["a","b","c"]
-    kwargs["can_be_fit"] = {"a":1,"c":2}
-    kwargs["cannot_be_fit"] = {"b":"test"}
-    kwargs["has_kwargs"] = False
-    fittable, not_fittable = _reconcile_fittable(**kwargs)
-    assert np.array_equal(fittable,["a","c"])
-    assert np.array_equal(not_fittable,["b"])
-
-    # Fail. non-fittable in the mix
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
-    kwargs["all_args"] = ["a","b","c"]
-    kwargs["can_be_fit"] = {"a":1,"c":2}
-    kwargs["cannot_be_fit"] = {"b":"test"}
-    kwargs["has_kwargs"] = False
-    with pytest.raises(ValueError):
-        fittable, not_fittable = _reconcile_fittable(**kwargs)
-
-    # Fail. non-fittable in the mix
-    kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","d"]
-    kwargs["all_args"] = ["a","b","c"]
-    kwargs["can_be_fit"] = {"a":1,"c":2}
-    kwargs["cannot_be_fit"] = {"b":"test"}
-    kwargs["has_kwargs"] = True
-    
-    fittable, not_fittable = _reconcile_fittable(**kwargs)
-    assert np.array_equal(fittable,["a","d"])
-    assert np.array_equal(not_fittable,["b","c"])
-    
-def test__param_sanity_check():
-
-    result = _param_sanity_check(fittable_params=["a","b"],
-                                 reserved_params=None)
-    assert np.array_equal(result,["a","b"])
-
-    with pytest.raises(ValueError):
-        result = _param_sanity_check(fittable_params=["a","b"],
-                                     reserved_params=["a"])
-    
-    result = _param_sanity_check(fittable_params=[],
-                                 reserved_params=None)
-    assert np.array_equal(result,[])
-
-    result = _param_sanity_check(fittable_params=[],
-                                 reserved_params=["a","b"])
-    assert np.array_equal(result,[])
-
 
 def test_init(binding_curve_test_data):
 
@@ -248,7 +54,11 @@ def test_init(binding_curve_test_data):
 
     # pass model that uses a reserved name as an argument
     def bad_model_with_reserved_name(guesses=2): return guesses
+    with pytest.raises(ValueError):
+        mw = ModelWrapper(bad_model_with_reserved_name)
 
+    # pass model that uses a reserved name as a non-fittable argument
+    def bad_model_with_reserved_name(a=2,b="test",guesses=2): return guesses
     with pytest.raises(ValueError):
         mw = ModelWrapper(bad_model_with_reserved_name)
 
@@ -286,16 +96,14 @@ def test_init(binding_curve_test_data):
         mw = ModelWrapper(test_fcn,fittable_params=["a","b","c","e"])
 
 
-
-
-
-
-
-
-
-
-
 def test_expand_to_model_inputs(binding_curve_test_data):
+
+
+    # Make sure function check works
+    not_a_function = ["test",1,None,np.nan]
+    for n in not_a_function:
+        with pytest.raises(ValueError):
+            ModelWrapper(n)
 
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
 
