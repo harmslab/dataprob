@@ -8,6 +8,167 @@ import numpy as np
 
 import inspect
 
+def _analyze_fcn_sig(fcn):
+    """
+    Extract information about function being fit.
+
+    Parameters
+    ----------
+    fcn : callable
+        function or method used for fitting
+
+    Returns
+    -------
+    all_args : list
+        list of string names for all function arguments. This excludes
+        *args and **kwargs
+    can_be_fit : dict
+        dictionary of arguments that can concievably fit. parameter names
+        are keys, values are parameter defaults (float or None)
+    cannot_be_fit : dict
+        dictionary of arguments that cannot be fit. parameter names are
+        keys, values are parameter defaults
+    has_kwargs : bool
+        whether or not this function takes kwargs
+    """
+
+    # Various codes classifying argument types
+    kwargs_kind = inspect.Parameter.VAR_KEYWORD
+    args_kind = inspect.Parameter.VAR_POSITIONAL
+    empty = inspect.Parameter.empty
+
+    # Get function signature
+    sig = inspect.signature(fcn)
+
+    # Function outputs
+    all_args = []
+    can_be_fit = {}
+    cannot_be_fit = {}
+    has_kwargs = False
+
+    # Go through parameters
+    for p in sig.parameters:
+
+        # If kwargs, record we saw it and skip
+        if sig.parameters[p].kind is kwargs_kind:
+            has_kwargs = True
+            continue
+
+        # If args, skip
+        if sig.parameters[p].kind is args_kind:
+            continue
+
+        all_args.append(p)
+
+        # Get default for argument
+        default = sig.parameters[p].default
+
+        # If empty, assume it is fittable
+        if default == empty:
+            can_be_fit[p] = None    
+            continue
+
+        # Fittable if it can be coerced as a float
+        try:
+            can_be_fit[p] = float(default)
+        except (TypeError,ValueError):
+            cannot_be_fit[p] = default
+
+    return all_args, can_be_fit, cannot_be_fit, has_kwargs
+
+def _reconcile_fittable(fittable_params,
+                        all_args,
+                        can_be_fit,
+                        cannot_be_fit,
+                        has_kwargs):
+    """
+    Find fittable and not fittable parameters for this function. 
+
+    Parameters
+    ----------
+    fittable_params : list-like or None
+        list of parameter names to fits (strings). If None, infer the
+        fittable parameters
+    all_args : list
+        list of string names for all function arguments. This excludes
+        *args and **kwargs
+    can_be_fit : dict
+        dictionary of arguments that can concievably fit. parameter names
+        are keys, values are parameter defaults (float or None)
+    cannot_be_fit : dict
+        dictionary of arguments that cannot be fit. parameter names are
+        keys, values are parameter defaults
+    has_kwargs : bool
+        whether or not this function takes kwargs
+
+    Returns
+    -------
+    fittable_params : list-like
+        list of fittable parameters built from fittable_params input and
+        can_be_fit
+    not_fittable_params : list-like
+        list of unfittable params built from all_args and cannot_be_fit
+    """
+    
+    # If fittable_params are not specified, construct
+    if fittable_params is None:
+
+        fittable_params = []
+        for a in all_args:
+            if a in can_be_fit:
+                fittable_params.append(a)
+            else:
+                break
+            
+    if len(fittable_params) == 0:
+        err = "no parameters to fit!\n"
+        raise ValueError(err)
+
+    for p in fittable_params:
+        
+        if p in cannot_be_fit:
+            err = f"parameter '{p}' cannot be fit. It should have an empty\n"
+            err += f"or float default argument in the function definition.\n"
+            raise ValueError(err)
+
+        if p not in can_be_fit and not has_kwargs:
+            err = f"parameter '{p}' cannot be fit because is not in the\n"
+            err += f"function definition.\n"
+            raise ValueError(err)
+        
+    not_fittable_params = []
+    for p in all_args:
+        if p not in fittable_params:
+            not_fittable_params.append(p)
+
+    return fittable_params, not_fittable_params
+
+
+def _param_sanity_check(fittable_params,
+                        reserved_params=None):
+    """
+    Check fittable parameters against list of reserved parameters.
+
+    Parameters
+    ----------
+    fittable_params : list
+        list of parameters to fit
+    reserved_params : list
+        list of reserved names we cannot use for parameters
+    """
+
+    if reserved_params is None:
+        reserved_params = []
+
+    for p in fittable_params:
+        if p in reserved_params:
+            err = f"parameter '{p}' is reserved by dataprob. Please use a different parameter name\n"
+            raise ValueError(err)
+
+    return fittable_params
+
+
+
 class ModelWrapper:
     """
     Wrap a model for use in likelihood calculations.
@@ -57,76 +218,36 @@ class ModelWrapper:
             list of parameters to fit 
         """
 
-        # model arguments
-        self._mw_signature = inspect.signature(self._model_to_fit)
+        all_args, can_be_fit, cannot_be_fit, has_kwargs = _analyze_fcn_sig(fcn=self._model_to_fit)
 
-        # Figure out which arguments to make fittable.
-        argument_gettable = []
-        for p in self._mw_signature.parameters:
+        fittable_params, not_fittable_parameters = \
+            _reconcile_fittable(fittable_params=fittable_params,
+                                all_args=all_args,
+                                can_be_fit=can_be_fit,
+                                cannot_be_fit=cannot_be_fit,
+                                has_kwargs=has_kwargs)
 
-            # Make sure that this parameter name isn't already being used by
-            # the wrapper.
-            if p in dir(self.__class__):
-                err = f"Parameter name '{p}' reserved by this class.\n"
-                err += "Please change the argument name in your function.\n"
-                raise ValueError(err)
+        reserved_params = dir(self.__class__)
+        fittable_params = _param_sanity_check(fittable_params=fittable_params,
+                                              reserved_params=reserved_params)
 
-            # See if this parameter can conceivably be a fit parameter: either
-            # no default or default can be coerced into a float
-            try:
-                float(self._mw_signature.parameters[p].default)
-                argument_gettable.append(p)
-            except (TypeError,ValueError):
-                if self._mw_signature.parameters[p].default == inspect._empty:
-                    argument_gettable.append(p)
-                else:
-                    argument_gettable.append(None)
+        for p in fittable_params:
 
-        # If the fittable params were not specified by the user, take all params
-        # up to the first one that was not gettable.
-        if fittable_params is None:
-
-            fittable_params = []
-            for p in argument_gettable:
-                if p is not None:
-                    fittable_params.append(p)
-                else:
-                    break
-
-        # Load arguments as either fit parameters or generic attributes
-        for i, p in enumerate(self._mw_signature.parameters):
-
-            if p in fittable_params:
-
-                # Remove p from _fittable_params
-                fittable_params.remove(p)
-
-                # Make sure this argument was identified as one we could use
-                # as a parameter.
-                if not argument_gettable[i]:
-                    err = f"default for function argument '{p}' cannot be\n"
-                    err += "coerced into a float\n"
-                    raise ValueError(err)
-
-                # Grab guess from default argument
-                if self._mw_signature.parameters[p].default == inspect._empty:
-                    guess = None
-                else:
-                    guess = float(self._mw_signature.parameters[p].default)
-
-                # Convert to a fit parameter
-                self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
-
+            if p in can_be_fit:
+                guess = can_be_fit[p]
             else:
-                # Record as a generic argument, not a fit parameter.
-                self._mw_other_arguments[p] = self._mw_signature.parameters[p].default
-
-        # Check to make sure we saw all of the specified fittable_params
-        if len(fittable_params) > 0:
-            err = f"Specified parameter(s) are not arguments to the model:\n\n:"
-            err += "   ({})".format(",".join(fittable_params))
-            raise ValueError(err)
-
+                guess = None
+                
+            self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
+        
+        for p in not_fittable_parameters:
+            
+            if p in can_be_fit:
+                starting_value = can_be_fit[p]
+            else:
+                starting_value = cannot_be_fit[p]
+            self._mw_other_arguments[p] = starting_value
+        
         self._update_parameter_map()
 
     def __setattr__(self, key, value):
