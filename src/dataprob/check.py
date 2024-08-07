@@ -73,7 +73,8 @@ def check_float(value,
                 minimum_allowed=-np.inf,
                 maximum_allowed=np.inf,
                 minimum_inclusive=True,
-                maximum_inclusive=True):
+                maximum_inclusive=True,
+                allow_nan=False):
     """
     Process a `float` argument and do error checking.
 
@@ -91,6 +92,8 @@ def check_float(value,
         whether lower bound is inclusive
     maximum_inclusive : bool, default=True
         whether upper bound is inclusive
+    allow_nan : bool, default=False
+        allow nan
 
     Returns
     -------
@@ -120,7 +123,8 @@ def check_float(value,
         value = float(value)
 
         if np.isnan(value):
-            raise ValueError
+            if not allow_nan:
+                raise ValueError
 
         if minimum_inclusive:
             if value < minimum_allowed:

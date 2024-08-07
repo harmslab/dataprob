@@ -9,4 +9,5 @@ from .fitters import MLFitter
 from .fitters import BootstrapFitter
 from .fitters import BayesianFitter
 from .model_wrapper.model_wrapper import ModelWrapper
+from .model_wrapper.vector_model_wrapper import VectorModelWrapper
 from .fit_param import FitParameter

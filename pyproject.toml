@@ -11,7 +11,8 @@ version = {attr = "dataprob.__version__.__version__"}
 [tool.setuptools.package-data]
 "*" = [
   "src/dataprob/data/*.txt",
-  "src/dataprob/data/*.csv"
+  "src/dataprob/data/*.csv",
+  "tests/dataprob/test_data/*"
 ]
 
 [project]

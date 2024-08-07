@@ -57,6 +57,10 @@ def test_check_float():
     value = check_float(1.0,minimum_allowed=1.0,maximum_inclusive=True)
     assert value == 1
 
+    with pytest.raises(ValueError):
+        check_float(np.nan)
+    assert np.isnan(check_float(np.nan,allow_nan=True))
+
 
 def test_check_int():
 
