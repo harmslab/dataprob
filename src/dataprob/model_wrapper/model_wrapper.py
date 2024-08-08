@@ -3,9 +3,13 @@ Class for wrapping models for use in likelihood calculations.
 """
 
 from dataprob.fit_param import FitParameter
+from dataprob.check import check_array
+
 from dataprob.model_wrapper._function_processing import analyze_fcn_sig
 from dataprob.model_wrapper._function_processing import reconcile_fittable
 from dataprob.model_wrapper._function_processing import param_sanity_check
+
+from dataprob.model_wrapper.read_spreadsheet import load_param_spreadsheet
 
 import numpy as np
 
@@ -114,11 +118,6 @@ class ModelWrapper:
         elif key in self._mw_other_arguments.keys():
             self._mw_other_arguments[key] = value
 
-        elif key in ["bounds","guesses","names","fixed"]:
-            err = f"'{key}' can only be set at the individual parameter level\n"
-            err += "for a ModelWrapper instance.\n"
-            raise TypeError(err)
-
         # Otherwise, just set it like normal
         else:
             super(ModelWrapper, self).__setattr__(key, value)
@@ -160,22 +159,24 @@ class ModelWrapper:
 
     def _mw_observable(self,params=None):
         """
-        Actual function called by the fitter.
+        Actual function called by the fitter. params are either None (saying 
+        grab parameter values from fit_paramater.value) or an array of 
+        float parameter values. 
         """
 
         # If parameters are not passed, stick in the current parameter
         # values
         if params is None:
-            for p in self.position_to_param:
+            for p in self._position_to_param:
                 self._mw_kwargs[p] = self.fit_parameters[p].value
         else:
-            if len(params) != len(self.position_to_param):
+            if len(params) != len(self._position_to_param):
                 err = f"Number of fit parameters ({len(params)}) does not match\n"
-                err += f"number of unfixed parameters ({len(self.position_to_param)})\n"
+                err += f"number of unfixed parameters ({len(self._position_to_param)})\n"
                 raise ValueError(err)
 
             for i in range(len(params)):
-                self._mw_kwargs[self.position_to_param[i]] = params[i]
+                self._mw_kwargs[self._position_to_param[i]] = params[i]
 
         try:
             return self._model_to_fit(**self._mw_kwargs)
@@ -185,16 +186,99 @@ class ModelWrapper:
 
     def load_fit_result(self,fitter):
         """
-        Load the result of a fit into all fit parameters.
+        Load the result of a fit into all fit parameters. Parameters much match
+        exactly between the two fits. 
+
+        Parameters
+        ----------
+        fitter : dataprob.Fitter
+            fitter instance that has had .fit() run previously. 
         """
 
-        for i, p in enumerate(self.position_to_param):
+        if not np.array_equal(fitter.names,self.names):
+            err = "mismatch in the parameter names between the current model\n"
+            err += "and the fit\n"
+            raise ValueError(err)
+
+        for i, p in enumerate(self._position_to_param):
             self.fit_parameters[p].load_fit_result(fitter,i)
+
+    def load_param_spreadsheet(self,spreadsheet):
+        """
+        Load parameter guesses, fixed-ness, bounds, and priors from a
+        spreadsheet. 
+
+        Parameters
+        ----------
+        spreadsheet : str or pandas.DataFrame
+            spreadsheet to read data from. If a string, the program will treat 
+            it as a filename and attempt to read (xslx, csv, tsv, and txt) will
+            be recognized. If a dataframe, values will be read directly from the
+            dataframe
+
+        Notes
+        -----
+        
+        + The 'param' column is required. All parameters in the spreadsheet must
+          match parameters in the model; however, not all parameters in the
+          model must be in the spreadsheet. Parameters not in the spreadsheet 
+          retain their current features in the class. 
+
+        + Parameter features specified in the spreadsheet will overwrite
+          features already in the class. Features not set in the spreadsheet
+          will not affect features in the class. (For example, you can safely 
+          specify a spreadsheet with a 'guess' column for each parameter without
+          altering priors set previously). 
+
+        + If a 'guess' column is in the spreadsheet, all values must be finite
+          and non-nan floats. 
+
+        + If a 'fixed' column is in the spreadsheet, all values must be TRUE or
+          FALSE.
+
+        + Bounds are specified using the 'lower_bound' and 'upper_bound' columns.
+          If only one is specified, the other is set to infinity. (For example,
+          if there is an 'upper_bound' column, the lower bound is set to 
+          -np.inf). Nan entries are interpreted as infinities. NOTE: you cannot
+          set a lower bound in the spreadsheet while preserving upper bounds 
+          already in the class (and vice versa). If you wish to set non-infinite
+          bounds with a spreadsheet, you must specify both upper and lower 
+          bounds.
+
+        + Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
+          columns, declaring the prior mean and standard deviation. If either
+          'prior_mean' or 'prior_std' is set to a non-nan value, both must be 
+          set. If both are set to nan, the priors are set to uniform for that
+          parameter. 
+        """
+
+        # Load spreadsheet
+        params_to_load = load_param_spreadsheet(spreadsheet=spreadsheet)
+
+        # Set fit parameter attributes from the spreadsheet values
+        for p in params_to_load:
+            for field in params_to_load[p]:
+
+                if p not in self.fit_parameters:
+                    err = f"parameter '{p}' is not in this model\n"
+                    raise ValueError(err)
+                
+                setattr(self.fit_parameters[p],field,params_to_load[p][field])
+        
+        # Update parameters with new information. 
+        self._update_parameter_map()
 
     @property
     def model(self):
         """
-        The observable.
+        Model observable. This function takes a 
+
+        Parameters
+        ----------
+        params : numpy.ndarray, optional
+            float numpy array the length of the number of unfixed parameters.
+            If this is not specified, the model is run using the values of each
+            parameter (that is, the values seen in the "values" attribute). 
         """
 
         # Update mapping between parameters and model arguments in case
@@ -208,8 +292,7 @@ class ModelWrapper:
     @property
     def guesses(self):
         """
-        Return an array of the guesses for the model (only including the unfixed
-        parameters).
+        Array of model guesses (only including unfixed parameters).
         """
 
         # Update mapping between parameters and model arguments in case
@@ -217,16 +300,32 @@ class ModelWrapper:
         self._update_parameter_map()
 
         guesses = []
-        for p in self.position_to_param:
+        for p in self._position_to_param:
             guesses.append(self.fit_parameters[p].guess)
 
-        return np.array(guesses)
+        return np.array(guesses,dtype=float)
+    
+    @guesses.setter
+    def guesses(self,guesses):
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        n = len(self._position_to_param)
+
+        guesses = check_array(value=guesses,
+                              variable_name="guesses",
+                              expected_shape=(n,),
+                             expected_shape_names="(num_unfixed_param,)")
+        for i, p in enumerate(self._position_to_param):
+            self._mw_fit_parameters[p].guess = guesses[i]
+
 
     @property
     def bounds(self):
         """
-        Return an array of the bounds for the model (only including the unfixed
-        parameters).
+        Array of parameter bounds (only including unfixed parameters).
         """
 
         # Update mapping between parameters and model arguments in case
@@ -234,17 +333,33 @@ class ModelWrapper:
         self._update_parameter_map()
 
         bounds = [[],[]]
-        for p in self.position_to_param:
+        for p in self._position_to_param:
             bounds[0].append(self.fit_parameters[p].bounds[0])
             bounds[1].append(self.fit_parameters[p].bounds[1])
 
-        return np.array(bounds)
+        return np.array(bounds,dtype=float)
+    
+    @bounds.setter
+    def bounds(self,bounds):
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        n = len(self._position_to_param)
+
+        bounds = check_array(value=bounds,
+                             variable_name="bounds",
+                             expected_shape=(2,n),
+                             expected_shape_names="(2,num_unfixed_param)")
+        for i, p in enumerate(self._position_to_param):
+            self._mw_fit_parameters[p].bounds = bounds[:,i]
+
 
     @property
     def priors(self):
         """
-        Return an array of the priors for the model (only including the unfixed
-        parameters).
+        Array of the priors (only including unfixed parameters).
         """
 
         # Update mapping between parameters and model arguments in case
@@ -252,17 +367,33 @@ class ModelWrapper:
         self._update_parameter_map()
 
         priors = [[],[]]
-        for p in self.position_to_param:
+        for p in self._position_to_param:
             priors[0].append(self.fit_parameters[p].prior[0])
             priors[1].append(self.fit_parameters[p].prior[1])
 
-        return np.array(priors)
+        return np.array(priors,dtype=float)
+    
+    @priors.setter
+    def priors(self,priors):
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        n = len(self._position_to_param)
+
+        priors = check_array(value=priors,
+                             variable_name="priors",
+                             expected_shape=(2,n),
+                             expected_shape_names="(2,num_unfixed_param)")
+        for i, p in enumerate(self._position_to_param):
+            self._mw_fit_parameters[p].prior = priors[:,i]
+
 
     @property
     def names(self):
         """
-        Return an array of the names of the parameters (only including the unfixed
-        parameters).
+        Array of the parameter names (only including unfixed parameters).
         """
 
         # Update mapping between parameters and model arguments in case
@@ -270,15 +401,106 @@ class ModelWrapper:
         self._update_parameter_map()
 
         names = []
-        for p in self.position_to_param:
+        for p in self._position_to_param:
             names.append(self.fit_parameters[p].name)
 
-        return names[:]
+        return np.array(names,dtype=str)
+    
+    @names.setter
+    def names(self,names):
+        
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        if not hasattr(names,'__iter__'):
+            err = "names should be an string array the same length as the\n"
+            err += "total number of unfixed parameters\n"
+            raise ValueError(err)
+        
+        if len(names) != len(self._position_to_param):
+            err = "names should be an string array the same length as the\n"
+            err += "total number of unfixed parameters\n"
+            raise ValueError(err)
+        
+        for i, p in enumerate(self._position_to_param):
+            self.fit_parameters[p].name = names[i]
+    
+    @property
+    def values(self):
+        """
+        Return an array of the current parameter values (only including the 
+        unfixed parameters). Can only be set by fit results. 
+        """
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        values = []
+        for p in self._position_to_param:
+            values.append(self.fit_parameters[p].value)
+
+        return np.array(values,dtype=float)
+
+    
+    @property
+    def fixed_mask(self):
+        """
+        Boolean array as long as the total number of parameters. True entries
+        are fixed parameters; False entries are floating.
+        """
+        
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value
+        self._update_parameter_map()
+
+        fixed_mask = []
+        for p in self._mw_fit_parameters:
+            fixed_mask.append(self._mw_fit_parameters[p].fixed)
+
+        return np.array(fixed_mask,dtype=bool)
+    
+    @fixed_mask.setter
+    def fixed_mask(self,fixed_mask):
+
+        if not hasattr(fixed_mask,'__iter__'):
+            err = "fixed_mask should be an bool array the same length as the\n"
+            err += "total number of parameters\n"
+            raise ValueError(err)
+        
+        if len(fixed_mask) != len(self._mw_fit_parameters):
+            err = "fixed_mask should be an bool array the same length as the\n"
+            err += "total number of parameters\n"
+            raise ValueError(err)
+
+        for i, p in enumerate(self._mw_fit_parameters):
+            self._mw_fit_parameters[p].fixed = fixed_mask[i]
+
+        # Update mapping between parameters and model arguments since we just
+        # set fixedness
+        self._update_parameter_map()
+
+    @property
+    def position_to_param(self):
+        """
+        Names of unfixed parameters in the order they appear in the parameters
+        array passed to model(param). 
+        """
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value. (NOTE: this update happens in the public
+        # property. Most of the time, self._position_to_param should be accessed
+        # by internal methods to avoid triggering this update.)
+        self._update_parameter_map()
+
+        return self._position_to_param
 
     @property
     def fit_parameters(self):
         """
-        A dictionary of FitParameter instances.
+        A dictionary of FitParameter instances, including both fixed and 
+        unfixed parameters. 
         """
 
         return self._mw_fit_parameters
@@ -290,13 +512,4 @@ class ModelWrapper:
         """
 
         return self._mw_other_arguments
-
-    @property
-    def position_to_param(self):
-        """
-        List mapping the position of each parameters in the output arrays to
-        their original model argument names.
-        """
-
-        return self._position_to_param
 

@@ -4,6 +4,7 @@ functions.
 """
 
 import numpy as np
+import pandas as pd
 
 import re
 
@@ -93,7 +94,7 @@ def check_float(value,
     maximum_inclusive : bool, default=True
         whether upper bound is inclusive
     allow_nan : bool, default=False
-        allow nan
+        allow nan (or pd.NA or None), which are all coerced to np.nan
 
     Returns
     -------
@@ -106,6 +107,7 @@ def check_float(value,
         If value cannot be interpreted as a float
     """
 
+        
     try:
 
         # Try to cast as string to an integer
@@ -115,16 +117,19 @@ def check_float(value,
         # See if this is an iterable
         if hasattr(value,"__iter__"):
             raise ValueError
-
+        
         # See if this is a naked type
         if issubclass(type(value),type):
             raise ValueError
+        
+        # If this is nan, null or None... If we are allowing nan,
+        # return nan and do not do further checks. Otherwise, throw an error
+        if pd.isnull(value) or value is None:
+            if allow_nan:
+                return np.nan
+            raise ValueError
 
         value = float(value)
-
-        if np.isnan(value):
-            if not allow_nan:
-                raise ValueError
 
         if minimum_inclusive:
             if value < minimum_allowed:

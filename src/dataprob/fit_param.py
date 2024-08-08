@@ -146,6 +146,7 @@ class FitParameter:
         self.name = name
         self.fixed = fixed
 
+
     #--------------------------------------------------------------------------
     # parameter name
 

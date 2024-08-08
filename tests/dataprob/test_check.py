@@ -32,6 +32,7 @@ def test_check_float():
 
     bad_value = [None,"stupid",[1.0,1.0],np.array([1.0,1.0]),{},float,np.nan]
     for b in bad_value:
+        print("bad value", b)
         with pytest.raises(ValueError):
             value = check_float(b)
 
@@ -60,6 +61,14 @@ def test_check_float():
     with pytest.raises(ValueError):
         check_float(np.nan)
     assert np.isnan(check_float(np.nan,allow_nan=True))
+    
+    with pytest.raises(ValueError):
+        check_float(pd.NA)
+    assert np.isnan(check_float(pd.NA,allow_nan=True))
+
+    with pytest.raises(ValueError):
+        check_float(None)
+    assert np.isnan(check_float(None,allow_nan=True))
 
 
 def test_check_int():

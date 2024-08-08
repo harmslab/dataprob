@@ -489,11 +489,8 @@ def test_guesses_setter_getter(binding_curve_test_data):
     assert mw.K1.guess == 2
     assert mw.K2.guess == 40
 
-    with pytest.raises(TypeError):
-        mw.guesses = [4,80]
-    mw.K1.guess = 4
-    mw.K2.guess = 80
-
+    mw.guesses = [4,80]
+    
     assert np.array_equal(mw.guesses,np.array([4,80]))
     assert np.array_equal(f.guesses,np.array([4,80]))
 
