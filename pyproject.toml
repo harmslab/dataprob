@@ -21,6 +21,7 @@ dynamic = ["version"]
 dependencies = [
   "numpy",
   "pandas",
+  "openpyxl",
   "matplotlib",
   "scipy",
   "emcee",
