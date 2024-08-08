@@ -36,7 +36,6 @@ def test_ModelWrapper___init__():
     assert mw._mw_other_arguments["e"] == 3
 
 
-
 def test_ModelWrapper__mw_load_model():
 
     # Create a ModelWrapper that has just been initialized but has not
@@ -926,6 +925,45 @@ def test_ModelWrapper_fixed_mask():
 
     with pytest.raises(ValueError):
         mw.fixed_mask = ["not",1]
+
+def test_ModelWrapper_dataframe():
+
+    # set setter
+
+    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
+    mw = ModelWrapper(model_to_test_wrap)
+    df = mw.dataframe
+    assert issubclass(type(df),pd.DataFrame)
+    assert(np.array_equal(df.columns,["param","name","guess","fixed",
+                                      "lower_bound","upper_bound",
+                                      "prior_mean","prior_std"]))
+    assert len(df.index) == 2
+    assert np.array_equal(df["param"],["a","b"])
+    assert np.array_equal(df["name"],["a","b"])
+    assert np.array_equal(df["guess"],[1,1])
+    assert np.array_equal(df["fixed"],[False,False])
+    assert np.array_equal(df["lower_bound"],[-np.inf,-np.inf])
+    assert np.array_equal(df["upper_bound"],[np.inf,np.inf])
+    assert np.sum(np.isnan(df["prior_mean"])) == 2
+    assert np.sum(np.isnan(df["prior_std"])) == 2
+
+    def model_to_test_wrap(a=1,b=1,c=5,d=3): return a*b
+    mw = ModelWrapper(model_to_test_wrap)
+    df = mw.dataframe
+    assert np.array_equal(df["param"],["a","b","c","d"])
+
+    # test getter. this tests load_param_spreadsheet, which is extensively
+    # tested. So just make sure it is running here. 
+
+    df["guess"] = [10,20,30,40]
+    mw.dataframe = df
+
+    assert mw.a.guess == 10
+    assert mw.b.guess == 20
+    assert mw.c.guess == 30
+    assert mw.d.guess == 40
+
+
 
 
 def test_ModelWrapper_position_to_param():

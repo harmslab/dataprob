@@ -1,4 +1,8 @@
 
+"""
+Class for wrapping functions that use an array as their first argument for use
+in likelihood calculations. 
+"""
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.fit_param import FitParameter
@@ -9,6 +13,10 @@ from dataprob.check import check_float
 import numpy as np
 
 class VectorModelWrapper(ModelWrapper):
+    """
+    Wrap a function that has an array as its first argument for use in 
+    likelihood calculations.
+    """
 
     def _mw_load_model(self,model_to_fit,fittable_params):
         """

@@ -1,5 +1,5 @@
 """
-Class for wrapping models for use in likelihood calculations. 
+Class for wrapping functions for use in likelihood calculations. 
 """
 
 from dataprob.fit_param import FitParameter
@@ -12,11 +12,12 @@ from dataprob.model_wrapper._function_processing import param_sanity_check
 from dataprob.model_wrapper.read_spreadsheet import load_param_spreadsheet
 
 import numpy as np
+import pandas as pd
 
 
 class ModelWrapper:
     """
-    Wrap a model for use in likelihood calculations.
+    Wrap a function for use in likelihood calculations.
 
     The first N arguments with no default argument or arguments whose
     default can be coerced as a float are converted to fit parameters. The
@@ -263,8 +264,6 @@ class ModelWrapper:
         
         # Update parameters with new information. 
         self._update_parameter_map()
-
-
 
     def load_param_spreadsheet(self,spreadsheet):
         """
@@ -549,6 +548,56 @@ class ModelWrapper:
         self._update_parameter_map()
 
     @property
+    def dataframe(self):
+        """
+        Parameters as a dataframe. Parameters can also be set using this
+        property.
+
+        ```
+        # mw is a ModelWrapper instance
+        df = mw.dataframe
+        df.loc[0,"guess"] = 5
+        mw.dataframe = df
+        ```
+        """
+
+        # Update parameter mapping and model arguments to our dataframe is in
+        # sync with the model 
+        self._update_parameter_map()
+
+        out = {"param":[],
+               "name":[],
+               "guess":[],
+               "fixed":[],
+               "lower_bound":[],
+               "upper_bound":[],
+               "prior_mean":[],
+               "prior_std":[]}
+        
+        for p in self._mw_fit_parameters:
+
+            out["param"].append(p)
+            
+            fp = self._mw_fit_parameters[p]
+
+            out["name"].append(fp.name)
+            out["guess"].append(fp.guess)
+            out["fixed"].append(fp.fixed)
+            out["lower_bound"].append(fp.bounds[0])
+            out["upper_bound"].append(fp.bounds[1])
+            out["prior_mean"].append(fp.prior[0])
+            out["prior_std"].append(fp.prior[1])
+
+        return pd.DataFrame(out)
+
+    
+    @dataframe.setter
+    def dataframe(self,dataframe):
+        
+        # Setter is a convenience wrapper for load_param_spreadsheet.
+        self.load_param_spreadsheet(dataframe)
+
+    @property
     def position_to_param(self):
         """
         Names of unfixed parameters in the order they appear in the parameters
@@ -580,3 +629,18 @@ class ModelWrapper:
 
         return self._mw_other_arguments
 
+
+    def __repr__(self):
+        
+        self._update_parameter_map()
+
+        msg = "ModelWrapper:\n"
+        msg += f"  FitParameters:\n"
+        for p in self._mw_fit_parameters:
+            msg += f"    {p}:\n"
+            p_lines = self._mw_fit_parameters[p].__repr__().split("\n")
+            p_lines = "\n".join([f"      {line}" for line in p_lines])
+            msg += f"{p_lines}\n"
+
+
+        return msg
