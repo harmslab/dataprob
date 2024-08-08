@@ -1,15 +1,17 @@
 
 import pytest
 
-import dataprob
+from dataprob.fitters.bootstrap import BootstrapFitter
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 import numpy as np
 import pandas as pd
 
 
+
 def test_init():
 
-    f = dataprob.BootstrapFitter()
+    f = BootstrapFitter()
     assert f.fit_type == "bootstrap"
 
 @pytest.mark.slow
@@ -23,14 +25,14 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     for model_key in ["generic_model","wrappable_model"]:
 
-        f = dataprob.BootstrapFitter()
+        f = BootstrapFitter()
         model = binding_curve_test_data[model_key]
         guesses = binding_curve_test_data["guesses"]
         df = binding_curve_test_data["df"]
         input_params = np.array(binding_curve_test_data["input_params"])
 
         if model_key == "wrappable_model":
-            model = dataprob.ModelWrapper(model)
+            model = ModelWrapper(model)
             model.df = df
             model.K.bounds = [0,10]
         else:

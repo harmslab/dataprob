@@ -6,7 +6,7 @@ import numpy as np
 from dataprob.check import check_bool
 from dataprob.check import check_float
 
-def _read_spreadsheet(spreadsheet):
+def read_spreadsheet(spreadsheet):
     """
     Read a spreadsheet. Use pandas to read files of various types or, if 
     spreadsheet is already a dataframe, return a copy of the dataframe. 
@@ -229,7 +229,7 @@ def load_param_spreadsheet(spreadsheet):
     """
 
     # read spreadsheet
-    df = _read_spreadsheet(spreadsheet=spreadsheet)
+    df = read_spreadsheet(spreadsheet=spreadsheet)
 
     # Make sure 'param' is present
     if "param" not in df.columns:

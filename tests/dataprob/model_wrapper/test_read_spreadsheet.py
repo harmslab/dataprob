@@ -1,7 +1,7 @@
 
 import pytest
 
-from dataprob.model_wrapper.read_spreadsheet import _read_spreadsheet
+from dataprob.model_wrapper.read_spreadsheet import read_spreadsheet
 from dataprob.model_wrapper.read_spreadsheet import _cleanup_guess
 from dataprob.model_wrapper.read_spreadsheet import _cleanup_fixed
 from dataprob.model_wrapper.read_spreadsheet import _cleanup_bounds
@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 
-def test__read_spreadsheet(spreadsheets):
+def test_read_spreadsheet(spreadsheets):
 
     expected_columns = ['param',
                         'guess',
@@ -33,7 +33,7 @@ def test__read_spreadsheet(spreadsheets):
 
     # Check excel read
     xlsx = spreadsheets["basic-spreadsheet.xlsx"]
-    df = _read_spreadsheet(spreadsheet=xlsx)
+    df = read_spreadsheet(spreadsheet=xlsx)
     
     assert np.array_equal(df.columns,expected_columns)
     for e in expected_values:
@@ -54,7 +54,7 @@ def test__read_spreadsheet(spreadsheets):
 
     # Check csv read
     csv = spreadsheets["basic-spreadsheet.csv"]
-    df = _read_spreadsheet(spreadsheet=csv)
+    df = read_spreadsheet(spreadsheet=csv)
     
     assert np.array_equal(df.columns,expected_columns)
     for e in expected_values:
@@ -76,7 +76,7 @@ def test__read_spreadsheet(spreadsheets):
 
     # Check tsv read
     tsv = spreadsheets["basic-spreadsheet.tsv"]
-    df = _read_spreadsheet(spreadsheet=tsv)
+    df = read_spreadsheet(spreadsheet=tsv)
     
     assert np.array_equal(df.columns,expected_columns)
     for e in expected_values:
@@ -97,7 +97,7 @@ def test__read_spreadsheet(spreadsheets):
 
     # Check txt read
     txt = spreadsheets["basic-spreadsheet.txt"]
-    df = _read_spreadsheet(spreadsheet=txt)
+    df = read_spreadsheet(spreadsheet=txt)
     
     assert np.array_equal(df.columns,expected_columns)
     for e in expected_values:
@@ -120,7 +120,7 @@ def test__read_spreadsheet(spreadsheets):
     xlsx = spreadsheets["basic-spreadsheet.xlsx"]
     df_in = pd.read_excel(xlsx)
 
-    df = _read_spreadsheet(spreadsheet=df_in)
+    df = read_spreadsheet(spreadsheet=df_in)
     
     assert np.array_equal(df.columns,expected_columns)
     for e in expected_values:
@@ -141,11 +141,11 @@ def test__read_spreadsheet(spreadsheets):
 
     # send in something stupid
     with pytest.raises(ValueError):
-        _read_spreadsheet(spreadsheet=1)
+        read_spreadsheet(spreadsheet=1)
 
     # file not found error
     with pytest.raises(FileNotFoundError):
-        _read_spreadsheet(spreadsheet="not_a_file.txt")
+        read_spreadsheet(spreadsheet="not_a_file.txt")
 
 def test__cleanup_guess():
 
@@ -265,7 +265,7 @@ def test__cleanup_priors():
 def test_load_param_spreadsheet(spreadsheets):
 
     xlsx = spreadsheets["basic-spreadsheet.xlsx"]
-    df = _read_spreadsheet(spreadsheet=xlsx)
+    df = read_spreadsheet(spreadsheet=xlsx)
     
     # Spreadsheets cover all scenarios of bool and float reads
     out = load_param_spreadsheet(df)
@@ -334,14 +334,14 @@ def test_load_param_spreadsheet(spreadsheets):
     # send in column with a bad fixed value
 
     # make sure we can read spreadsheet
-    df = _read_spreadsheet(spreadsheet=spreadsheets["bad-fixed.xlsx"])
+    df = read_spreadsheet(spreadsheet=spreadsheets["bad-fixed.xlsx"])
     with pytest.raises(ValueError):
         load_param_spreadsheet(spreadsheet=spreadsheets["bad-fixed.xlsx"])
 
     # send in column with a bad guess value
     
     # make sure we can read spreadsheet
-    df = _read_spreadsheet(spreadsheet=spreadsheets["bad-guess.xlsx"])
+    df = read_spreadsheet(spreadsheet=spreadsheets["bad-guess.xlsx"])
     with pytest.raises(ValueError):
         load_param_spreadsheet(spreadsheet=spreadsheets["bad-guess.xlsx"])
 

@@ -1,7 +1,8 @@
 
 import pytest
 
-import dataprob
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
+from dataprob.fitters.ml import MLFitter
 
 import numpy as np
 
@@ -11,13 +12,13 @@ def test_integrated_ml_fit(binding_curve_test_data,fit_tolerance_fixture):
     df = binding_curve_test_data["df"]
     model_to_wrap = binding_curve_test_data["wrappable_model"]
 
-    mw = dataprob.ModelWrapper(model_to_wrap)
+    mw = ModelWrapper(model_to_wrap)
     assert mw.df is None
     mw.df = df
     mw.K.bounds = [0,np.inf]
     assert np.array_equal(mw.bounds,np.array([[0],[np.inf]]))
 
-    f = dataprob.MLFitter()
+    f = MLFitter()
     f.model = mw
 
     assert f.bounds is not None

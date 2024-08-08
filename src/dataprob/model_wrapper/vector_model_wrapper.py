@@ -45,9 +45,9 @@ class VectorModelWrapper(ModelWrapper):
             if num_param < 1:
                 raise ValueError
         except Exception as e:
-                err = f"fittable_params must be a list or dictionary with at least one\n"
-                err += "fittable parameter\n"
-                raise ValueError(err) from e
+            err = f"fittable_params must be a list or dictionary with at least one\n"
+            err += "fittable parameter\n"
+            raise ValueError(err) from e
 
         # Make sure fittable param names do not conflict with argument param
         # names

@@ -1,6 +1,8 @@
 import pytest
 
-import dataprob
+from dataprob.fitters.ml import MLFitter
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
+
 
 import pandas as pd
 import os
@@ -176,7 +178,7 @@ def fitter_object(binding_curve_test_data):
     # Do a generic fit where the input function (generic_model) is run without
     # an intervening ModelWrapper
 
-    generic_fit = dataprob.MLFitter()
+    generic_fit = MLFitter()
 
     model = binding_curve_test_data["generic_model"]
     guesses = binding_curve_test_data["guesses"]
@@ -193,10 +195,10 @@ def fitter_object(binding_curve_test_data):
 
     # Do a fit where the input function is wrapped by ModelWrapper
 
-    wrapped_fit = dataprob.MLFitter()
+    wrapped_fit = MLFitter()
     
     model = binding_curve_test_data["wrappable_model"]
-    model = dataprob.ModelWrapper(model)
+    model = ModelWrapper(model)
     df = binding_curve_test_data["df"]
     model.df = df
 

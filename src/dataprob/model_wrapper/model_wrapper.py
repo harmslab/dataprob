@@ -214,6 +214,58 @@ class ModelWrapper:
         for i, p in enumerate(self._position_to_param):
             self.fit_parameters[p].load_fit_result(fitter,i)
 
+    def load_param_dict(self,params_to_load):
+        """
+        Load parameter guesses, fixed-ness, bounds, and priors from a
+        dictionary. 
+        
+        Parameters
+        ----------
+        params_to_load : dict
+            Dictionary keys should be the names of parameters loaded into the
+            model_wrapper. Values are themselves dictionaries keying attributes
+            to their appropriate value. For example, the following argument:
+                `param_to_load['K'] = {'fixed':True,'guess':5}`
+            would fix parameter 'K' and set its guess to 5. Not all parameters
+            and attributes need to be in the dictionary. Parameters not seen in 
+            the model will cause an error. 
+        
+        Note
+        ----
+        Allowed attributes: 
+
+        |----------+--------------------------------------------------------------------------|
+        | key      | value                                                                    |
+        |----------+--------------------------------------------------------------------------|
+        | 'guess'  | single float value (must be within bounds, if specified)                 |
+        | 'fixed'  | True of False                                                            | 
+        | 'bounds' | (lower,upper) as floats (-np.inf,np.inf) allowed                         | 
+        | 'prior'  | (mean,stdev) as floats (np.nan,np.nan) allowed, meaning uniform prior    |
+        |----------+--------------------------------------------------------------------------| 
+
+        """
+
+        # make sure its a dictionary
+        if not issubclass(type(params_to_load),dict):
+            err = "params_to_load should be a dictionary keying parameter names\n"
+            err += "to dictionaries of attribute values.\n"
+            raise ValueError(err)
+
+        # Set fit parameter attributes from the spreadsheet values
+        for p in params_to_load:
+            for field in params_to_load[p]:
+
+                if p not in self.fit_parameters:
+                    err = f"parameter '{p}' is not in this model\n"
+                    raise ValueError(err)
+                
+                setattr(self.fit_parameters[p],field,params_to_load[p][field])
+        
+        # Update parameters with new information. 
+        self._update_parameter_map()
+
+
+
     def load_param_spreadsheet(self,spreadsheet):
         """
         Load parameter guesses, fixed-ness, bounds, and priors from a
@@ -229,7 +281,21 @@ class ModelWrapper:
 
         Notes
         -----
-        
+
+        Allowable columns:
+
+        |---------------+---------------------------------------------------------------------|
+        | key           | value                                                               |
+        |---------------+---------------------------------------------------------------------|
+        | 'param'       | string name of the parameter                                        |
+        | 'guess'       | guess as single float value (must be within bounds, if specified)   |
+        | 'fixed'       | True of False                                                       | 
+        | 'lower_bound' | single float value; -np.inf allowed                                 | 
+        | 'upper_bound' | single float value; np.inf allowed                                  | 
+        | 'prior_mean'  | single float value; np.nan allowed                                  |
+        | 'prior_std'   | single float value; np.nan allowed                                  |
+        |---------------+---------------------------------------------------------------------| 
+
         + The 'param' column is required. All parameters in the spreadsheet must
           match parameters in the model; however, not all parameters in the
           model must be in the spreadsheet. Parameters not in the spreadsheet 
@@ -263,21 +329,11 @@ class ModelWrapper:
           parameter. 
         """
 
-        # Load spreadsheet
+        # Load spreadsheet into a dictionary
         params_to_load = load_param_spreadsheet(spreadsheet=spreadsheet)
 
-        # Set fit parameter attributes from the spreadsheet values
-        for p in params_to_load:
-            for field in params_to_load[p]:
-
-                if p not in self.fit_parameters:
-                    err = f"parameter '{p}' is not in this model\n"
-                    raise ValueError(err)
-                
-                setattr(self.fit_parameters[p],field,params_to_load[p][field])
-        
-        # Update parameters with new information. 
-        self._update_parameter_map()
+        # Load via load_param_dict
+        self.load_param_dict(params_to_load=params_to_load)
 
     @property
     def model(self):
