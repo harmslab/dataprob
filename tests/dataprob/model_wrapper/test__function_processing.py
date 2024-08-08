@@ -59,6 +59,14 @@ def test_analyze_fcn_sig():
     assert len(cannot_be_fit) == 0
     assert has_kwargs is False
 
+    # only kwargs
+    def test_fcn(**kwargs): pass
+    all_args, can_be_fit, cannot_be_fit, has_kwargs = analyze_fcn_sig(test_fcn)
+    assert len(all_args) == 0
+    assert len(can_be_fit) == 0
+    assert len(cannot_be_fit) == 0
+    assert has_kwargs is True
+
     # one fittable arg, no default
     def test_fcn(a): pass
     

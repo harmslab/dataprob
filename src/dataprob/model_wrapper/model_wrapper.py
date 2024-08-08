@@ -43,20 +43,14 @@ class ModelWrapper:
             list of arguments to fit.
         """
 
-        # Define these here so __setattr__ and __getattr__ are looking at
+        # Define these here so __setattr__ and __getattr__ end up looking at
         # instance-level attributes rather than class-level attributes.
         self._mw_fit_parameters = {}
         self._mw_other_arguments = {}
 
-        # Make sure input model is callable
-        if not hasattr(model_to_fit,"__call__"):
-            err = f"'{model_to_fit}' should be callable\n"
-            raise ValueError(err)
+        self._mw_load_model(model_to_fit,fittable_params)
 
-        self._model_to_fit = model_to_fit
-        self._mw_load_model(fittable_params)
-
-    def _mw_load_model(self,fittable_params):
+    def _mw_load_model(self,model_to_fit,fittable_params):
         """
         Load a model into the wrapper, making the arguments into attributes.
         Fittable arguments are made into FitParameter instances.  Non-fittable
@@ -64,9 +58,18 @@ class ModelWrapper:
 
         Parameters
         ----------
+        model_to_fit : callable
+            a function or method to fit.
         fittable_params : list-like or None
             list of parameters to fit 
         """
+
+        # Make sure input model is callable
+        if not hasattr(model_to_fit,"__call__"):
+            err = f"'{model_to_fit}' should be callable\n"
+            raise ValueError(err)
+
+        self._model_to_fit = model_to_fit
 
         all_args, can_be_fit, cannot_be_fit, has_kwargs = \
             analyze_fcn_sig(fcn=self._model_to_fit)
@@ -86,11 +89,13 @@ class ModelWrapper:
 
         for p in fittable_params:
 
+            # if there are kwargs, p will be in fittable_params but not in
+            # can_be_fit.
             if p in can_be_fit:
-                guess = can_be_fit[p]
+                guess = can_be_fit[p]        
             else:
                 guess = None
-                
+
             self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
         
         for p in not_fittable_parameters:
@@ -120,7 +125,7 @@ class ModelWrapper:
 
         # Otherwise, just set it like normal
         else:
-            super(ModelWrapper, self).__setattr__(key, value)
+            super().__setattr__(key, value)
 
     def __getattr__(self,key):
         """
@@ -138,7 +143,13 @@ class ModelWrapper:
 
         # Otherwise, get like normal
         else:
-            super(ModelWrapper,self).__getattribute__(key)
+
+            # Look in dict for something set manually in instance
+            if key in self.__dict__:
+               return self.__dict__[key]
+
+            # if not there, fall back to base __getattribute__
+            return super().__getattribute__(key)
 
     def _update_parameter_map(self):
         """
@@ -182,7 +193,7 @@ class ModelWrapper:
             return self._model_to_fit(**self._mw_kwargs)
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
-            raise type(e)(err) from e
+            raise RuntimeError(err) from e
 
     def load_fit_result(self,fitter):
         """

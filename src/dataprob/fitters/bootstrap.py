@@ -33,7 +33,7 @@ class BootstrapFitter(Fitter):
             Give verbose output.
         """
 
-        super(BootstrapFitter,self).__init__()
+        super().__init__()
 
         self._num_bootstrap = num_bootstrap
         self._perturb_size = perturb_size

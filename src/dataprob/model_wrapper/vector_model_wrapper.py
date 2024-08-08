@@ -10,7 +10,7 @@ import numpy as np
 
 class VectorModelWrapper(ModelWrapper):
 
-    def _mw_load_model(self,fittable_params):
+    def _mw_load_model(self,model_to_fit,fittable_params):
         """
         Load a model into the wrapper, making the arguments into attributes.
         Fittable arguments are made into FitParameter instances.  Non-fittable
@@ -18,9 +18,18 @@ class VectorModelWrapper(ModelWrapper):
 
         Parameters
         ----------
+        model_to_fit : callable
+            a function or method to fit.
         fittable_params : list or dict
             dictionary of fit parameters with guesses
         """
+
+        # Make sure input model is callable
+        if not hasattr(model_to_fit,"__call__"):
+            err = f"'{model_to_fit}' should be callable\n"
+            raise ValueError(err)
+
+        self._model_to_fit = model_to_fit
 
         # Parse function
         param_arg, other_args = analyze_vector_input_fcn(self._model_to_fit)

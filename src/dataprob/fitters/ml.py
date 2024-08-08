@@ -30,7 +30,7 @@ class MLFitter(Fitter):
             number of samples for generating corner plot
         """
 
-        super(MLFitter,self).__init__()
+        super().__init__()
 
         self._fit_type = "maximum likelihood"
         self._num_samples = num_samples
