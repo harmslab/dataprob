@@ -125,3 +125,24 @@ class BootstrapFitter(Fitter):
         output["Use experimental error"] = self._exp_err
 
         return output
+    
+    def __repr__(self):
+        
+        out = ["BootstrapFitter\n---------------\n"]
+
+        out.append("Fit parameters:\n")
+        for k in self.fit_info:
+            out.append(f"  {k}: {self.fit_info[k]}")
+
+        out.append(f"\nfit has been run: {self._fit_has_been_run}\n")
+
+        if self._fit_has_been_run:
+            out.append(f"fit results:\n")
+            if self.success:
+                for dataframe_line in repr(self.fit_df).split("\n"):
+                    out.append(f"  {dataframe_line}")
+                out.append("\n")
+            else:
+                out.append("  fit failed\n")
+
+        return "\n".join(out)

@@ -452,19 +452,21 @@ class FitParameter:
 
     def __repr__(self):
         
-        msg = "FitParameter:\n"
-        msg += f"  Inputs:\n"
-        msg += f"          name: {self.name}\n"
-        msg += f"         guess: {self.guess}\n"
-        msg += f"         fixed: {self.fixed}\n"
-        msg += f"        bounds: {self.bounds}\n"
-        msg += f"         prior: {self.prior}\n"
-        msg += f"     is_result: {self.is_fit_result}\n\n"
+        out = ["FitParameter\n-----------\n"]
+
+        out.append("Inputs:")
+        out.append(f"  name: {self.name}")
+        out.append(f"  guess: {self.guess}")
+        out.append(f"  fixed: {self.fixed}")
+        out.append(f"  bounds: {self.bounds}")
+        out.append(f"  prior: {self.prior}")
+        out.append(f"  is_result: {self.is_fit_result}\n")
 
         if self.is_fit_result:
-            msg += "  Results:\n"
-            msg += "      estimate: {self.value}\n"
-            msg += "         stdev: {self.stdev}\n"
-            msg += "    ninetyfive: {self.stdev}\n\n"
+            out.append("Results:")
+            out.append(f"  estimate: {self.value:9.3e}")
+            out.append(f"  stdev: {self.stdev:8.3e}")
+            out.append(f"  lower_95: {self.ninetyfive[0]:8.3e}")
+            out.append(f"  upper_95: {self.ninetyfive[1]:8.3e}\n")
 
-        return msg
+        return "\n".join(out)

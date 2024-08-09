@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 
 
-
 def test_init():
 
     f = BootstrapFitter()
@@ -79,3 +78,30 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert np.array_equal(df["guess"],f.guesses)
         assert np.array_equal(df["lower_bound"],f.bounds[0,:])
         assert np.array_equal(df["upper_bound"],f.bounds[1,:])
+
+def test_BootstrapFitter___repr__():
+
+    # Stupidly simple fitting problem. find slope
+    def model_to_wrap(m=1,x=np.array([1,2,3])): return m*x
+    mw = ModelWrapper(model_to_fit=model_to_wrap)
+
+    # Run _fit_has_been_run, success branch
+    f = BootstrapFitter()
+    f.model = mw
+    f.fit(y_obs=np.array([2,4,6]))
+
+    out = f.__repr__().split("\n")
+    assert len(out) == 19
+
+    # hack, run _fit_has_been_run, _fit_failed branch
+    f._success = False
+
+    out = f.__repr__().split("\n")
+    assert len(out) == 15 
+
+    # Run not _fit_has_been_run
+    f = BootstrapFitter()
+    f.model = mw
+
+    out = f.__repr__().split("\n")
+    assert len(out) == 11

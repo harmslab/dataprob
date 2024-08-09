@@ -631,16 +631,40 @@ class ModelWrapper:
 
 
     def __repr__(self):
+        """
+        Useful summary of current model wrapper state.
+        """
         
         self._update_parameter_map()
 
-        msg = "ModelWrapper:\n"
-        msg += f"  FitParameters:\n"
-        for p in self._mw_fit_parameters:
-            msg += f"    {p}:\n"
-            p_lines = self._mw_fit_parameters[p].__repr__().split("\n")
-            p_lines = "\n".join([f"      {line}" for line in p_lines])
-            msg += f"{p_lines}\n"
+        out = ["ModelWrapper\n------------\n"]
 
+        # model name
+        out.append(f"wrapped_model: {self._model_to_fit.__name__}\n")
 
-        return msg
+        # Non fittable arguments
+        out.append(f"  non-fittable arguments:\n")
+        for p in self._mw_other_arguments:
+            out.append(f"    {p}:")
+
+            # See if there are multiple lines on this repr...
+            variable_lines = repr(self._mw_other_arguments[p]).split("\n")
+            if len(variable_lines) > 6:
+                to_add = variable_lines[:3]
+                to_add.append("...")
+                to_add.extend(variable_lines[-3:])
+            else:
+                to_add = variable_lines
+
+            for line in to_add:
+                out.append(f"      {line}")
+
+        out.append("\n")
+
+        # Fittable arguments
+        out.append(f"  fittable parameters:\n")
+        for dataframe_line in repr(self.dataframe).split("\n"):
+            out.append(f"    {dataframe_line}")
+        out.append("\n")
+
+        return "\n".join(out)

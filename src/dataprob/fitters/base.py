@@ -12,7 +12,6 @@ import inspect
 import pickle
 import os
 
-import dataprob
 from dataprob.check import check_array
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
@@ -831,7 +830,6 @@ class Fitter:
                 out_dict["prior_std"].append(self.priors[1,i])
 
         return pd.DataFrame(out_dict)
-
 
     def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
         """

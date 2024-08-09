@@ -538,7 +538,35 @@ class BayesianFitter(Fitter):
         output["Use ML guess"] = self._ml_guess
         output["Num steps"] = self._num_steps
         output["Burn in"] = self._burn_in
-        output["Final sample number"] = len(self._samples[:,0])
+
+        if self.samples is not None:
+            num_samples = len(self.samples[:,0])
+        else:
+            num_samples = None
+
+        output["Final sample number"] = num_samples
+        
         output["Num threads"] = self._num_threads
 
         return output
+    
+    def __repr__(self):
+
+        out = ["BayesianSampler\n---------------\n"]
+
+        out.append("Sampler parameters:\n")
+        for k in self.fit_info:
+            out.append(f"  {k}: {self.fit_info[k]}")
+
+        out.append(f"\nanalysis has been run: {self._fit_has_been_run}\n")
+
+        if self._fit_has_been_run:
+            out.append(f"analysis results:\n")
+            if self.success:
+                for dataframe_line in repr(self.fit_df).split("\n"):
+                    out.append(f"  {dataframe_line}")
+                out.append("\n")
+            else:
+                out.append("  analysis failed\n")
+
+        return "\n".join(out)

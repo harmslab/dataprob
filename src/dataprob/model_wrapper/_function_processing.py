@@ -56,6 +56,13 @@ def analyze_fcn_sig(fcn):
         # Get default for argument
         default = sig.parameters[p].default
 
+        # If this is iterable, assume it is not fittable. (Putting this here
+        # prevents a bad comparison to multiple values in the next comparison to
+        # EMPTY_DEFAULT)
+        if hasattr(default,"__iter__"):
+            cannot_be_fit[p] = default
+            continue
+
         # If empty, assume it is fittable
         if default == EMPTY_DEFAULT:
             can_be_fit[p] = None    

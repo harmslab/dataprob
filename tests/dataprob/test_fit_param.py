@@ -422,11 +422,11 @@ def test_FitParameter___repr__(fitter_object):
     assert np.array_equal(p.prior,[np.nan,np.nan],equal_nan=True)
     assert not p.is_fit_result
 
-    assert len(p.__repr__().split("\n")) == 10
+    assert len(p.__repr__().split("\n")) == 11
 
     p.load_fit_result(generic_fit,0)
 
-    assert len(p.__repr__().split("\n")) == 15
+    assert len(p.__repr__().split("\n")) == 17
 
 
 

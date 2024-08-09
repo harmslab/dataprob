@@ -139,3 +139,20 @@ class MLFitter(Fitter):
             self._samples = self._samples + self.estimate
 
             return self._samples
+
+
+    def __repr__(self):
+
+        out = ["MLFitter\n--------\n"]
+
+        out.append(f"fit has been run: {self._fit_has_been_run}\n")
+        if self._fit_has_been_run:
+            out.append(f"fit results:\n")
+            if self.success:
+                for dataframe_line in repr(self.fit_df).split("\n"):
+                    out.append(f"  {dataframe_line}")
+                out.append("\n")
+            else:
+                out.append("  fit failed\n")
+
+        return "\n".join(out)

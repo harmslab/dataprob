@@ -97,6 +97,27 @@ def test_analyze_fcn_sig():
     assert cannot_be_fit["a"] == "test"
     assert has_kwargs is False
 
+    # Send in a list
+    def test_fcn(a=[1,2,3]): pass
+    
+    all_args, can_be_fit, cannot_be_fit, has_kwargs = analyze_fcn_sig(test_fcn)
+    assert np.array_equal(all_args,["a"])
+    assert len(can_be_fit) == 0
+    assert len(cannot_be_fit) == 1
+    assert np.array_equal(cannot_be_fit["a"],[1,2,3])
+    assert has_kwargs is False
+
+    # Send in a float numpy array
+    def test_fcn(a=np.array([1,2,3])): pass
+
+    all_args, can_be_fit, cannot_be_fit, has_kwargs = analyze_fcn_sig(test_fcn)
+    assert np.array_equal(all_args,["a"])
+    assert len(can_be_fit) == 0
+    assert len(cannot_be_fit) == 1
+    assert np.array_equal(cannot_be_fit["a"],[1,2,3])
+    assert has_kwargs is False
+
+
 def test_reconcile_fittable():
 
     base_kwargs = {"fittable_params":None,

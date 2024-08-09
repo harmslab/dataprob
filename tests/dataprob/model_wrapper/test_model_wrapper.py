@@ -963,9 +963,6 @@ def test_ModelWrapper_dataframe():
     assert mw.c.guess == 30
     assert mw.d.guess == 40
 
-
-
-
 def test_ModelWrapper_position_to_param():
 
     def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
@@ -1002,3 +999,27 @@ def test_ModelWrapper_other_arguments():
     assert oa["c"] == "test"
     assert oa["d"] == 3
 
+
+def test_ModelWrapper___repr__():
+
+    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
+
+    mw = ModelWrapper(model_to_fit=model_to_test_wrap)
+    out = mw.__repr__().split("\n")
+    assert len(out) == 20
+
+    assert out[0] == "ModelWrapper"
+    assert out[1] == "------------"
+    assert out[3].split(":")[0].strip() == "wrapped_model" 
+    assert out[5].strip() == "non-fittable arguments:"
+    assert out[7].split(":")[0].strip() == "c"
+    assert out[-7].strip() == "fittable parameters:"
+
+    # This will force truncated variable lines to run by making super huge
+    # c fixed argument
+    mw.c = pd.DataFrame({"out":np.arange(1000)})
+    out = mw.__repr__().split("\n")
+    assert len(out) == 26
+
+    
+    
