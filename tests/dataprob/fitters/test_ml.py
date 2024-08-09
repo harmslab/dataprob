@@ -85,7 +85,8 @@ def test_MLFitter___repr__():
     # Run _fit_has_been_run, success branch
     f = MLFitter()
     f.model = mw
-    f.fit(y_obs=np.array([2,4,6]))
+    f.fit(y_obs=np.array([2,4,6]),
+          y_stdev=[0.1,0.1,0.1])
 
     out = f.__repr__().split("\n")
     assert len(out) == 13

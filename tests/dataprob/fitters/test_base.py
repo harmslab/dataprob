@@ -91,6 +91,26 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
     assert np.array_equal(f.names,["blah"])
     assert f._fit_has_been_run is True
 
+    # Send in a generic model with no y_stdev. Make sure it warns and sets
+    # value correctly. 
+    f = Fitter()
+    f._fit = dummy_fit
+    
+    test_kwargs = copy.deepcopy(kwargs)
+    test_kwargs["y_stdev"] = None
+    with pytest.warns():
+        f.fit(f=f,**test_kwargs)
+    
+    scalar = np.mean(np.abs(binding_curve_test_data["df"].Y))*0.1
+    stdev = scalar*np.ones(len(binding_curve_test_data["df"].Y))
+
+    assert np.array_equal(f.y_obs,binding_curve_test_data["df"].Y)
+    assert np.allclose(f.y_stdev,stdev)
+    assert np.array_equal(f.guesses,[5])
+    assert np.array_equal(f.priors,[[0],[10]])
+    assert np.array_equal(f.names,["blah"])
+    assert f._fit_has_been_run is True
+
     # Send in a generic model that will make us specify everything, but send in
     # badness for each and make sure it throws error.
     f = Fitter()
@@ -113,7 +133,7 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
     test_kwargs["y_stdev"] = "not_stdev"
     with pytest.raises(ValueError):
         f.fit(f=f,**test_kwargs)
-
+    
     f = Fitter()
     f._fit = dummy_fit
     test_kwargs = copy.deepcopy(kwargs)
@@ -141,7 +161,7 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
     test_kwargs["bounds"] = "not_bounds"
     with pytest.raises(ValueError):
         f.fit(f=f,**test_kwargs)
-
+    
     # Default run should fail because model is not specified
     f = Fitter()
     f._fit = dummy_fit
@@ -156,18 +176,21 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
         f.fit(f=f,N=N)
 
     # Default run will work with wrapped model because it will bring in all 
-    # values
+    # values but will throw a warning because stdev are made up
     f = Fitter()
     f._fit = dummy_fit
     mw = ModelWrapper(binding_curve_test_data["wrappable_model"])
     f.model = mw
     f.y_obs = binding_curve_test_data["df"].Y
-    f.fit(f=f,N=N)
+    with pytest.warns():
+        f.fit(f=f,N=N)
+
+    scalar = np.mean(np.abs(f.y_obs))*0.1
 
     assert np.array_equal(f.guesses,np.ones(N))
     assert np.array_equal(f.priors,np.nan*np.ones((2,N)),equal_nan=True)
     assert np.array_equal(f.names,["K"])
-    assert np.array_equal(f.y_stdev,np.ones(len(f.y_obs)))
+    assert np.allclose(f.y_stdev,scalar*np.ones(len(f.y_obs)))
     assert f._fit_has_been_run is True
 
     # Send in a generic model that will make us pre-specify many features 
@@ -175,6 +198,7 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
     f._fit = dummy_fit
     f.model = binding_curve_test_data["generic_model"]
     f.y_obs = binding_curve_test_data["df"].Y
+    f.y_stdev = binding_curve_test_data["df"].Y_stdev
     with pytest.raises(RuntimeError):
         f.fit(f=f,N=N)
 
@@ -186,7 +210,7 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
     assert np.array_equal(f.guesses,np.zeros(N))
     assert np.array_equal(f.priors,np.nan*np.ones((2,N)),equal_nan=True)
     assert np.array_equal(f.names,["p0"])
-    assert np.array_equal(f.y_stdev,np.ones(len(f.y_obs)))
+    assert np.array_equal(f.y_stdev,binding_curve_test_data["df"].Y_stdev)
     assert f._fit_has_been_run is True
 
     # fix all parameters. should now fail because nothing is floating
@@ -197,6 +221,7 @@ def test_Fitter_fit(fitter_object,binding_curve_test_data):
         mw.fit_parameters[p].fixed = True
     f.model = mw
     f.y_obs = binding_curve_test_data["df"].Y
+    f.y_stdev = binding_curve_test_data["df"].Y_stdev
     with pytest.raises(RuntimeError):
         f.fit(f=f,N=N)
 
@@ -1124,6 +1149,7 @@ def test_fit_completeness_sanity_checking(binding_curve_test_data):
         f.fit()
 
     f.y_obs = binding_curve_test_data["df"].Y
+    f.y_stdev = binding_curve_test_data["df"].Y
 
     # Should now work because we've set everything essential (model, gueses,
     # and y_obs).  But it will throw NotImplementedError because it's the base 

@@ -186,7 +186,8 @@ def fitter_object(binding_curve_test_data):
 
     generic_fit.fit(model=model,
                     guesses=guesses,
-                    y_obs=df.Y)
+                    y_obs=df.Y,
+                    y_stdev=df.Y_stdev)
 
     if not generic_fit.success:
         raise RuntimeError("generic test fit did not converge!")
@@ -207,7 +208,8 @@ def fitter_object(binding_curve_test_data):
 
     wrapped_fit.fit(model=model,
                     guesses=guesses,
-                    y_obs=df.Y)
+                    y_obs=df.Y,
+                    y_stdev=df.Y_stdev)
     
     if not wrapped_fit.success:
         raise RuntimeError("wrapped test fit did not converge!")

@@ -11,6 +11,7 @@ import re
 import inspect
 import pickle
 import os
+import warnings
 
 from dataprob.check import check_array
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
@@ -151,7 +152,16 @@ class Fitter:
             self.y_stdev = y_stdev
         else:
             if self.y_stdev is None:
-                self.y_stdev = np.ones(len(self.y_obs),dtype=float)
+
+                scalar = np.mean(np.abs(self.y_obs))*0.1
+                self.y_stdev = scalar*np.ones(len(self.y_obs),dtype=float)
+
+                w = "\ny_stdev must be sent in for proper residual/likelihood\n"
+                w += f"calculation. We have arbitrarily set it to {scalar:.2e}\n"
+                w += "(10% of mean y_obs magnitude). We highly recommend you\n"
+                w += "explicitly set your estimate for the uncertainty on each\n"
+                w += "observation.\n"
+                warnings.warn(w) 
 
         # No fit has been run
         self._success = None
