@@ -92,17 +92,17 @@ def test_BootstrapFitter___repr__():
           y_stdev=[0.1,0.1,0.1])
 
     out = f.__repr__().split("\n")
-    assert len(out) == 19
+    assert len(out) == 17
 
     # hack, run _fit_has_been_run, _fit_failed branch
     f._success = False
 
     out = f.__repr__().split("\n")
-    assert len(out) == 15 
+    assert len(out) == 13
 
     # Run not _fit_has_been_run
     f = BootstrapFitter()
     f.model = mw
 
     out = f.__repr__().split("\n")
-    assert len(out) == 11
+    assert len(out) == 9

@@ -836,6 +836,61 @@ class Fitter:
 
         return pd.DataFrame(out_dict)
 
+    @property
+    def data_df(self):
+
+        out = {}
+        
+        y_obs = self.y_obs
+        if y_obs is not None:
+            out["y_obs"] = y_obs
+
+        y_stdev = self.y_stdev
+        if y_stdev is not None:
+            out["y_stdev"] = y_stdev
+
+        estimate = self.estimate
+        if estimate is not None:
+            out["y_calc"] = self.model(estimate)
+            out["unweighted_residuals"] = self._unweighted_residuals(estimate)
+            out["weighted_residuals"] = self._weighted_residuals(estimate)
+
+        return pd.DataFrame(out)
+
+    
+    def get_sample_df(self,num_samples=100):
+
+        out = {}
+        
+        y_obs = self.y_obs
+        if y_obs is not None:
+            out["y_obs"] = y_obs
+
+        y_stdev = self.y_stdev
+        if y_stdev is not None:
+            out["y_stdev"] = y_stdev
+
+        estimate = self.estimate
+        if estimate is not None:
+            out["y_calc"] = self.model(estimate)
+
+        samples = self.samples
+        if samples is not None:
+            
+            N = samples.shape[0]
+            num_digits = len(f"{N}") + 1
+            fmt_string = "s{:0" + f"{num_digits}" + "d}"
+            for i in range(0,N,N//(num_samples-1)):
+                key = fmt_string.format(i)
+                out[key] = self.model(self.samples[i])
+    
+        return pd.DataFrame(out)
+
+            
+
+        
+
+
     def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
         """
         Create a "corner plot" that shows distributions of values for each

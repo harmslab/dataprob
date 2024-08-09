@@ -7,6 +7,8 @@ from .base import Fitter
 import numpy as np
 import scipy.optimize
 
+from tqdm.auto import tqdm
+
 import sys
 
 class BootstrapFitter(Fitter):
@@ -14,32 +16,20 @@ class BootstrapFitter(Fitter):
     Perform the fit many times, sampling from uncertainty in each measurement.
     """
 
-    def __init__(self,num_bootstrap=100,perturb_size=1.0,exp_err=False,verbose=False):
+    def __init__(self,num_bootstrap=100):
         """
-        Perform the fit many times, sampling from uncertainty in each measured
-        heat.
+        Perform the fit many times, sampling from uncertainty in each
+        measurement.
 
         Parameters
         ----------
         num_bootstrap : int
             Number of bootstrap samples to do
-        perturb_size : float
-            Standard deviation of random samples for heats.  Ignored if exp_err
-            is specified.
-        exp_err : bool
-            Use experimental estimates of heat uncertainty.  If specified, overrides
-            perturb_size.
-        verbose : bool
-            Give verbose output.
         """
 
         super().__init__()
 
         self._num_bootstrap = num_bootstrap
-        self._perturb_size = perturb_size
-        self._exp_err = exp_err
-        self._verbose = verbose
-
         self._fit_type = "bootstrap"
 
     def _fit(self,**kwargs):
@@ -59,11 +49,7 @@ class BootstrapFitter(Fitter):
         original_y_obs = np.copy(self._y_obs)
 
         # Go through bootstrap reps
-        for i in range(self._num_bootstrap):
-
-            if self._verbose and i != 0 and i % 100 == 0:
-                print("Bootstrap {} of {}".format(i,self._num_bootstrap))
-                sys.stdout.flush()
+        for i in tqdm(range(self._num_bootstrap)):
 
             # Add random error to each sample
             self.y_obs = original_y_obs + np.random.normal(0.0,self.y_stdev)
@@ -121,8 +107,6 @@ class BootstrapFitter(Fitter):
         output = {}
 
         output["Num bootstrap"] = self._num_bootstrap
-        output["Perturb size"] = self._perturb_size
-        output["Use experimental error"] = self._exp_err
 
         return output
     
