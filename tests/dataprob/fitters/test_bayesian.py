@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from dataprob.fitters.bayesian import BayesianFitter
+from dataprob.fitters.bayesian import BayesianSampler
 from dataprob.fitters.bayesian import _find_normalization
 from dataprob.fitters.bayesian import _reconcile_bounds_and_priors
 from dataprob.fitters.bayesian import _find_uniform_value
@@ -210,15 +210,15 @@ def test__find_uniform_value():
     assert np.isclose(value,expected_value)
 
 
-def test_BayesianFitter__init__():
+def test_BayesianSampler__init__():
 
     # default args work. check to make sure super().__init__ actually ran.
-    f = BayesianFitter()
+    f = BayesianSampler()
     assert f.fit_type == "bayesian"
     assert f._num_obs is None
 
     # args are being set
-    f = BayesianFitter(num_walkers=100,
+    f = BayesianSampler(num_walkers=100,
                        initial_walker_spread=1e-4,
                        ml_guess=True,
                        num_steps=100,
@@ -236,7 +236,7 @@ def test_BayesianFitter__init__():
 
     # check num threads passing
     with pytest.raises(NotImplementedError):
-        f = BayesianFitter(num_walkers=100,
+        f = BayesianSampler(num_walkers=100,
                         initial_walker_spread=1e-4,
                         ml_guess=True,
                         num_steps=100,
@@ -244,7 +244,7 @@ def test_BayesianFitter__init__():
                         num_threads=0)
         
     with pytest.raises(NotImplementedError):
-        f = BayesianFitter(num_walkers=100,
+        f = BayesianSampler(num_walkers=100,
                         initial_walker_spread=1e-4,
                         ml_guess=True,
                         num_steps=100,
@@ -253,22 +253,22 @@ def test_BayesianFitter__init__():
     
     # Pass bad value into each kwarg to make sure checker is running
     with pytest.raises(ValueError):
-        f = BayesianFitter(num_walkers=0)        
+        f = BayesianSampler(num_walkers=0)        
     with pytest.raises(ValueError):
-        f = BayesianFitter(initial_walker_spread="stupid")
+        f = BayesianSampler(initial_walker_spread="stupid")
     with pytest.raises(ValueError):
-        f = BayesianFitter(ml_guess="not a bool")
+        f = BayesianSampler(ml_guess="not a bool")
     with pytest.raises(ValueError):
-        f = BayesianFitter(num_steps=1.2)
+        f = BayesianSampler(num_steps=1.2)
     with pytest.raises(ValueError):
-        f = BayesianFitter(burn_in=0.0)
+        f = BayesianSampler(burn_in=0.0)
     with pytest.raises(ValueError):
-        f = BayesianFitter(num_threads=-2)
+        f = BayesianSampler(num_threads=-2)
 
 def test__setup_priors():
 
     # basic functionality with a uniform and gaussian prior
-    f = BayesianFitter()
+    f = BayesianSampler()
     assert not hasattr(f,"_prior_frozen_rv")
     assert not hasattr(f,"_uniform_priors")
     assert not hasattr(f,"_gauss_prior_means")
@@ -295,7 +295,7 @@ def test__setup_priors():
     assert np.array_equal(f._gauss_prior_mask,[True,False])
 
     # No gaussian priors
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.priors = np.array([[np.nan,np.nan],[np.nan,np.nan]])
     f.bounds = np.array([[-np.inf,-np.inf],[np.inf,np.inf]])
     f._setup_priors()
@@ -306,7 +306,7 @@ def test__setup_priors():
     assert np.array_equal(f._gauss_prior_mask,[False,False])
 
     # No uniform priors
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.priors = np.array([[1,2],[3,4]])
     f.bounds = np.array([[-np.inf,-np.inf],[np.inf,np.inf]])
     f._setup_priors()
@@ -319,7 +319,7 @@ def test__setup_priors():
     assert np.array_equal(f._gauss_prior_mask,[True,True])
 
     # check internal bounds calculation adjustment calculation
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.priors = np.array([[10],[5]])
     f.bounds = np.array([[0],[20]])
     f._setup_priors()
@@ -339,9 +339,9 @@ def test__setup_priors():
                                                  frozen_rv=stats.norm(loc=0,scale=1))
     assert np.isclose(base_offset + bounds_offset,f._gauss_prior_offsets[0])
 
-def test_BayesianFitter_ln_prior():
+def test_BayesianSampler_ln_prior():
 
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.priors = np.array([[0],[1]])
     f.bounds = np.array([[-1],[1]])
     f._setup_priors()
@@ -369,7 +369,7 @@ def test_BayesianFitter_ln_prior():
 
     # Now set up two priors, one gauss with one infinite bound, one uniform with
     # infinte bound
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.priors = np.array([[2,np.nan],[10,np.nan]])
     f.bounds = np.array([[-np.inf,-np.inf],[10,0]])
     f._setup_priors()
@@ -395,16 +395,16 @@ def test_BayesianFitter_ln_prior():
     value = f.ln_prior(np.array([-1,2]))
     assert np.isclose(-np.inf,value)
 
-def test_BayesianFitter__ln_prob(binding_curve_test_data):
+def test_BayesianSampler__ln_prob(binding_curve_test_data):
     pass
     
     
-def test_BayesianFitter_ln_prob(binding_curve_test_data):
+def test_BayesianSampler_ln_prob(binding_curve_test_data):
     """
     Test calculation ,looking for proper error checking.
     """
     
-    f = BayesianFitter()
+    f = BayesianSampler()
 
     input_params = binding_curve_test_data["input_params"]
 
@@ -437,13 +437,13 @@ def test_BayesianFitter_ln_prob(binding_curve_test_data):
 
     L = f.ln_prob(input_params)
 
-def xtest_BayesianFitter__fit():
+def xtest_BayesianSampler__fit():
     pass
 
-def xtest_BayesianFitter__update_estimates():
+def xtest_BayesianSampler__update_estimates():
     pass
 
-def xtest_BayesianFitter_fit_info():
+def xtest_BayesianSampler_fit_info():
     pass
 
 
@@ -458,7 +458,7 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
 
     for model_key in ["generic_model","wrappable_model"]:
 
-        f = BayesianFitter()
+        f = BayesianSampler()
         model = binding_curve_test_data[model_key]
         guesses = binding_curve_test_data["guesses"]
         df = binding_curve_test_data["df"]
@@ -521,7 +521,7 @@ def test_BayesianSampler___repr__():
     mw = ModelWrapper(model_to_fit=model_to_wrap)
 
     # Run _fit_has_been_run, success branch
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.model = mw
     f.fit(y_obs=np.array([2,4,6]))
 
@@ -535,7 +535,7 @@ def test_BayesianSampler___repr__():
     assert len(out) == 19    
 
     # Run not _fit_has_been_run
-    f = BayesianFitter()
+    f = BayesianSampler()
     f.model = mw
 
     out = f.__repr__().split("\n")

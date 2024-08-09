@@ -247,7 +247,7 @@ def _find_uniform_value(bounds):
     return np.log(finfo.resolution) - np.log((right - left))
 
 
-class BayesianFitter(Fitter):
+class BayesianSampler(Fitter):
     """
     Use Bayesian MCMC to sample parameter space. 
     """
