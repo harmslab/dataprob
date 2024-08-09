@@ -130,7 +130,7 @@ class ModelWrapper:
 
     def __getattr__(self,key):
         """
-        Define __getattr__ to we get fit parameters and other arguments
+        Define __getattr__ to get fit parameters and other arguments
         appropriately.
         """
 
@@ -235,14 +235,18 @@ class ModelWrapper:
         ----
         Allowed attributes: 
 
-        |----------+--------------------------------------------------------------------------|
-        | key      | value                                                                    |
-        |----------+--------------------------------------------------------------------------|
-        | 'guess'  | single float value (must be within bounds, if specified)                 |
-        | 'fixed'  | True of False                                                            | 
-        | 'bounds' | (lower,upper) as floats (-np.inf,np.inf) allowed                         | 
-        | 'prior'  | (mean,stdev) as floats (np.nan,np.nan) allowed, meaning uniform prior    |
-        |----------+--------------------------------------------------------------------------| 
+        +----------+----------------------------------------------------------+
+        | key      | value                                                    |
+        +==========+==========================================================+
+        | 'guess'  | single float value (must be within bounds, if specified) |
+        +----------+----------------------------------------------------------+
+        | 'fixed'  | True of False                                            |
+        +----------+----------------------------------------------------------+
+        | 'bounds' | (lower,upper) as floats (-np.inf,np.inf) allowed         |
+        +----------+----------------------------------------------------------+
+        | 'prior'  | (mean,stdev) as floats (np.nan,np.nan) allowed, meaning  |
+        |          | uniform prior                                            |
+        +----------+----------------------------------------------------------+
 
         """
 
@@ -283,17 +287,24 @@ class ModelWrapper:
 
         Allowable columns:
 
-        |---------------+---------------------------------------------------------------------|
-        | key           | value                                                               |
-        |---------------+---------------------------------------------------------------------|
-        | 'param'       | string name of the parameter                                        |
-        | 'guess'       | guess as single float value (must be within bounds, if specified)   |
-        | 'fixed'       | True of False                                                       | 
-        | 'lower_bound' | single float value; -np.inf allowed                                 | 
-        | 'upper_bound' | single float value; np.inf allowed                                  | 
-        | 'prior_mean'  | single float value; np.nan allowed                                  |
-        | 'prior_std'   | single float value; np.nan allowed                                  |
-        |---------------+---------------------------------------------------------------------| 
+        +---------------+-----------------------------------------------------+
+        | key           | value                                               |
+        +===============+=====================================================+
+        | 'param'       | string name of the parameter                        |
+        +---------------+-----------------------------------------------------+
+        | 'guess'       | guess as single float value (must be within bounds, |
+        |               | if specified)                                       |
+        +---------------+-----------------------------------------------------+
+        | 'fixed'       | True of False                                       |
+        +---------------+-----------------------------------------------------+
+        | 'lower_bound' | single float value; -np.inf allowed                 |
+        +---------------+-----------------------------------------------------+
+        | 'upper_bound' | single float value; np.inf allowed                  |
+        +---------------+-----------------------------------------------------+
+        | 'prior_mean'  | single float value; np.nan allowed                  |
+        +---------------+-----------------------------------------------------+
+        | 'prior_std'   | single float value; np.nan allowed                  |
+        +---------------+-----------------------------------------------------+
 
         + The 'param' column is required. All parameters in the spreadsheet must
           match parameters in the model; however, not all parameters in the
