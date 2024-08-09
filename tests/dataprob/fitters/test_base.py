@@ -455,6 +455,36 @@ def test_model_setter_getter(binding_curve_test_data):
     model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
     mw = ModelWrapper(model_to_test_wrap)
 
+
+    def to_wrap(a,b=1,c="test"): return a*b
+    mw = ModelWrapper(to_wrap)
+    f = Fitter()
+    f.model = mw
+    assert f._model_is_model_wrapper is True
+    assert f._model is mw
+
+    def to_wrap(a,b=1,c="test"): return a*b
+    mw = ModelWrapper(to_wrap)
+    f = Fitter()
+    f.model = mw.model
+    assert f._model_is_model_wrapper is True
+    assert f._model is mw
+
+    def yo(a,b): return a*b
+    f = Fitter()
+    f.model = yo
+    assert f._model_is_model_wrapper is False
+    assert f._model is yo
+
+    f = Fitter()
+    with pytest.raises(ValueError):
+        f.model = "test"
+
+    def yo(): return None
+    f = Fitter()
+    with pytest.raises(ValueError):
+        f.model = yo
+
     # Make sure that number of parameters validation works
     f = Fitter()
     f._num_params = 10 

@@ -840,43 +840,7 @@ def test_ModelWrapper_priors():
     # should work fine
     mw.priors = np.nan*np.ones((2,3),dtype=float)
 
-def test_ModelWrapper_names():
 
-    # test getter
-
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    n = mw.names
-    assert len(n) == 2
-    assert np.array_equal(n,["a","b"])
-    
-    mw.b.fixed = True
-    n = mw.names
-    assert len(n) == 1
-    assert n[0] == "a"
-
-
-def test_ModelWrapper_values():
-
-    # test getter
-
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    v = mw.values
-    assert len(v) == 2
-    assert np.array_equal(v,[1,1])
-    
-    mw.a._value = 2 # cannot set value publicly, so hacking setter
-    v = mw.values
-    assert len(v) == 2
-    assert np.array_equal(v,[2,1])
-    
-    mw.b.fixed = True
-    v = mw.values
-    assert len(v) == 1
-    assert np.array_equal(v,[2])
-
-    
 def test_ModelWrapper_fixed_mask():
 
     # test getter

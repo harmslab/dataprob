@@ -417,7 +417,6 @@ class FitParameter:
         self._ninetyfive = None
         self._is_fit_result = False
 
-
     def __repr__(self):
         
         out = ["FitParameter\n-----------\n"]

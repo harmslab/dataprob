@@ -472,24 +472,6 @@ class ModelWrapper:
         for i, p in enumerate(self._position_to_param):
             self._mw_fit_parameters[p].prior = priors[:,i]
 
-
-    @property
-    def values(self):
-        """
-        Return an array of the current parameter values (only including the 
-        unfixed parameters). Can only be set by fit results. 
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        values = []
-        for p in self._position_to_param:
-            values.append(self.fit_parameters[p].value)
-
-        return np.array(values,dtype=float)
-
     
     @property
     def fixed_mask(self):

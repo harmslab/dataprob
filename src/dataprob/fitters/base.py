@@ -15,6 +15,7 @@ import warnings
 
 from dataprob.check import check_array
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
+    
 
 class Fitter:
     """
@@ -124,7 +125,7 @@ class Fitter:
                 tmp = np.ones(len(self.guesses))
                 self.bounds = [-np.inf*tmp,np.inf*tmp]
 
-        # Record priors, grab from ModelWrapper model, or make infinite
+        # Record priors, grab from ModelWrapper model, or make nan (uniform)
         if priors is not None:
             self.priors = priors
         else:
@@ -357,51 +358,48 @@ class Fitter:
     @model.setter
     def model(self,model):
 
-        # If this is a ModelWrapper instance, grab the model method rather than
-        # the model instance for the check below.
-        if isinstance(model,ModelWrapper):
-            model = model.model
+        # User sent in ModelWrapper instance, not method. model_to_check should be
+        # the method; model should be the class. 
+        if issubclass(type(model),ModelWrapper):
+            model_is_model_wrapper = True
+            model = model
+            model_to_check = model.model
 
-        has_err = False
-        try:
-            if not inspect.isfunction(model) and not inspect.ismethod(model):
-                has_err = True
-            if len(inspect.signature(model).parameters) < 1:
-                has_err = True
+        # User set in ModelWrapper method, not instance. model_to_check should be 
+        # the method (model); model should be the class (model.__self__)
+        elif hasattr(model,"__self__") and issubclass(type(model.__self__),ModelWrapper):
+            model_is_model_wrapper = True
+            model_to_check = model
+            model = model.__self__
+            
+        # Not a model wrapper. Just treat as a class. model_to_check and model 
+        # should be the same. 
+        else:
+            model_is_model_wrapper = False
+            model = model
+            model_to_check = model
 
-        except TypeError:
-            has_err = True
-
-        if has_err:
+        # Make sure it's callable
+        if not hasattr(model_to_check,"__call__"):
             err = "model must be a function that takes at least one argument\n"
             raise ValueError(err)
 
-        # If the model is a method of a ModelWrapper instance, record this so
-        # the Fitter object knows it can get guesses, bounds, and names from
-        # the ModelWrapper if necessary.
-        self._model_is_model_wrapper = False
-        try:
-            if model.__qualname__.startswith("ModelWrapper"):
+        # Make sure it takes at least one parameter
+        if len(inspect.signature(model_to_check).parameters) < 1:
+            err = "model must be a function that takes at least one argument\n"
+            raise ValueError(err)
+        
+        # Make sure the number of parameters match between the model and the 
+        # fitter.
+        if model_is_model_wrapper and self._num_params is not None:
 
-                # If this is a model wrapper, we can check for consistency
-                # between the number of model parameters in the model vs.
-                # what has been pre-set in the model.
-                if self.num_params is not None:
-                    if len(model.__self__.guesses) != self.num_params:
-                        err = f"number of model parameters ({len(model.__self__.guesses)}) does\n"
-                        err += f"not match the number of parameters in the Fitter ({self.num_params})\n"
-                        raise ValueError(err)
+            if len(model.names) != self._num_params:
+                err = f"number of model parameters ({len(model.names)}) does\n"
+                err += f"not match the number of parameters in the Fitter ({self._num_params})\n"
+                raise ValueError(err)
 
-                self._model_is_model_wrapper = True
-
-                # We're going to store the ModelWrapper instance, not the
-                # method.
-                model = model.__self__
-
-        except AttributeError:
-            pass
-
-        # Record the model
+        # Set attributes -- we passed all tests
+        self._model_is_model_wrapper = model_is_model_wrapper
         self._model = model
         self._fit_has_been_run = False
 
@@ -427,7 +425,8 @@ class Fitter:
     def names(self,names):
 
         if self._model_is_model_wrapper:
-            err = "parameter names cannot be set when using a wrapped model\n"
+            err = "parameter names cannot be set when using a ModelWrapper.\n"
+            err += "These can only be set when doing the initial wrapping.\n"
             raise RuntimeError(err)
 
         # If the user sends in a naked string, make it into a list of strings
@@ -445,7 +444,8 @@ class Fitter:
         if self.num_params is not None:
             if names.shape[0] != self.num_params:
                 doc = inspect.getdoc(Fitter.names)
-                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
+                err = f"length of names ({names.shape[0]}) must match the\n"
+                err += f"number of parameters ({self.num_params}) \n\n{doc}\n\n"
                 raise ValueError(err)
         else:
             self._num_params = names.shape[0]
@@ -487,8 +487,7 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model._position_to_param):
-                self._model.fit_parameters[p].guess = guesses[i]
+            self._model.guesses = guesses
 
         self._fit_has_been_run = False
 
@@ -536,8 +535,7 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model._position_to_param):
-                self._model.fit_parameters[p].bounds = bounds[:,i]
+            self._model.bounds = bounds
 
         self._fit_has_been_run = False
 
@@ -590,12 +588,9 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model._position_to_param):
-                self._model.fit_parameters[p].prior = priors[:,i]
+            self._model.priors = priors
 
         self._fit_has_been_run = False
-
-    
 
     @property
     def y_obs(self):
@@ -661,7 +656,6 @@ class Fitter:
 
         self._fit_has_been_run = False
 
-
     @property
     def num_params(self):
         """
@@ -669,7 +663,7 @@ class Fitter:
         """
 
         if self._model_is_model_wrapper:
-            return len(self._model.guesses)
+            return len(self._model.names)
 
         try:
             return self._num_params
