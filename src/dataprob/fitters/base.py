@@ -396,6 +396,53 @@ class Fitter:
         self._fit_has_been_run = False
 
     @property
+    def names(self):
+        """
+        Parameter names for fit parameters.
+
+        Should be an array of unique strings the same length as the number of
+        parameters. 
+        """
+
+        # Grab the bounds from the model wrapper in case they changed
+        if self._model_is_model_wrapper:
+            self._names = self._model.names
+
+        try:
+            return self._names
+        except AttributeError:
+            return None
+
+    @names.setter
+    def names(self,names):
+
+        if self._model_is_model_wrapper:
+            err = "parameter names cannot be set when using a wrapped model\n"
+            raise RuntimeError(err)
+
+        # If the user sends in a naked string, make it into a list of strings
+        if issubclass(type(names),str):
+            names = [names]
+
+        # Force to be an array of strings
+        names = np.array(names,dtype=str)
+        
+        if len(names) != len(set(names)):
+            doc = inspect.getdoc(Fitter.names)
+            err = f"parameter names must all be unique. \n\n{doc}\n\n"
+            raise ValueError(err)
+
+        if self.num_params is not None:
+            if names.shape[0] != self.num_params:
+                doc = inspect.getdoc(Fitter.names)
+                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
+                raise ValueError(err)
+        else:
+            self._num_params = names.shape[0]
+
+        self._names = names
+
+    @property
     def guesses(self):
         """
         Guesses for fit parameters.
@@ -430,7 +477,7 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
+            for i, p in enumerate(self._model._position_to_param):
                 self._model.fit_parameters[p].guess = guesses[i]
 
         self._fit_has_been_run = False
@@ -479,7 +526,7 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
+            for i, p in enumerate(self._model._position_to_param):
                 self._model.fit_parameters[p].bounds = bounds[:,i]
 
         self._fit_has_been_run = False
@@ -533,58 +580,12 @@ class Fitter:
 
         # Update the underlying guesses in each FitParameter instance
         if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
+            for i, p in enumerate(self._model._position_to_param):
                 self._model.fit_parameters[p].prior = priors[:,i]
 
         self._fit_has_been_run = False
 
-    @property
-    def names(self):
-        """
-        Parameter names for fit parameters.
-
-        Should be an array of unique strings the same length as the number of
-        parameters. 
-        """
-
-        # Grab the bounds from the model wrapper in case they changed
-        if self._model_is_model_wrapper:
-            self._names = self._model.names
-
-        try:
-            return self._names
-        except AttributeError:
-            return None
-
-    @names.setter
-    def names(self,names):
-
-        # If the user sends in a naked string, make it into a list of strings
-        if issubclass(type(names),str):
-            names = [names]
-
-        # Force to be an array of strings
-        names = np.array(names,dtype=str)
-        
-        if len(names) != len(set(names)):
-            doc = inspect.getdoc(Fitter.names)
-            err = f"parameter names must all be unique. \n\n{doc}\n\n"
-            raise ValueError(err)
-
-        if self.num_params is not None:
-            if names.shape[0] != self.num_params:
-                doc = inspect.getdoc(Fitter.names)
-                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
-                raise ValueError(err)
-        else:
-            self._num_params = names.shape[0]
-
-        self._names = names
-
-        # Update the underlying guesses in each FitParameter instance
-        if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].name = names[i]
+    
 
     @property
     def y_obs(self):
@@ -783,7 +784,7 @@ class Fitter:
 
             out_dict["fixed"] = []
             for p in m.fit_parameters.keys():
-                out_dict["param"].append(m.fit_parameters[p].name)
+                out_dict["param"].append(p)
                 out_dict["estimate"].append(m.fit_parameters[p].value)
                 out_dict["fixed"].append(m.fit_parameters[p].fixed)
 

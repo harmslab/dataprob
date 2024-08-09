@@ -373,8 +373,6 @@ def test_ln_like(binding_curve_test_data):
     assert f.num_params == 1
 
 
-
-
 # ---------------------------------------------------------------------------- #
 # Test setters, getters, and internal sanity checks
 # ---------------------------------------------------------------------------- #
@@ -438,6 +436,61 @@ def test_model_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.model = mw.model
 
+
+
+def test_names_setter_getter(binding_curve_test_data):
+    """
+    Test the names getter.
+    """
+
+    f = Fitter()
+    assert f.names is None
+
+    names = ["p{}".format(i)
+                   for i in range(len(binding_curve_test_data["guesses"]))]
+    f.names = names
+    assert f.names is not None
+    assert np.array_equal(f.names,names)
+    assert f.num_params == len(names)
+
+    f = Fitter()
+    assert f.names is None
+    f.names = ["yo"]
+    assert np.array_equal(f.names,["yo"])
+    assert f.num_params == 1
+
+    f = Fitter()
+    assert f.names is None
+    f.names = "yo"
+    assert np.array_equal(f.names,["yo"])
+    assert f.num_params == 1
+
+    f = Fitter()
+    assert f.names is None
+    with pytest.raises(ValueError):
+        f.names = ["a","a"]
+
+    # mismatch in number of parameters and number of parameter names
+    f = Fitter()
+    assert f.names is None
+    assert f._num_params is None
+    f._num_params = 10
+    assert f.num_params == 10
+    with pytest.raises(ValueError):
+        f.names = ["a","b"]
+
+    # Test setting names with a model wrapper
+    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
+    mw = ModelWrapper(model_to_test_wrap)
+
+    f = Fitter()
+    f.model = mw.model
+    assert f.model == mw._mw_observable
+    assert np.array_equal(f.names,["K1","K2"])
+    
+    with pytest.raises(RuntimeError):
+        f.names = ["A","B"]
+    assert np.array_equal(f.names,["K1","K2"])
 
 def test_guesses_setter_getter(binding_curve_test_data):
     """
@@ -627,63 +680,6 @@ def test_priors_setter_getter(binding_curve_test_data):
         assert np.array_equal(mw.fit_parameters[p].prior,f.priors[:,i])
 
 
-
-def test_names_setter_getter(binding_curve_test_data):
-    """
-    Test the names setter.
-    """
-
-    f = Fitter()
-    assert f.names is None
-
-    names = ["p{}".format(i)
-                   for i in range(len(binding_curve_test_data["guesses"]))]
-    f.names = names
-    assert f.names is not None
-    assert np.array_equal(f.names,names)
-    assert f.num_params == len(names)
-
-    f = Fitter()
-    assert f.names is None
-    f.names = ["yo"]
-    assert np.array_equal(f.names,["yo"])
-    assert f.num_params == 1
-
-    f = Fitter()
-    assert f.names is None
-    f.names = "yo"
-    assert np.array_equal(f.names,["yo"])
-    assert f.num_params == 1
-
-    f = Fitter()
-    assert f.names is None
-    with pytest.raises(ValueError):
-        f.names = ["a","a"]
-
-    # mismatch in number of parameters and number of parameter names
-    f = Fitter()
-    assert f.names is None
-    assert f._num_params is None
-    f._num_params = 10
-    assert f.num_params == 10
-    with pytest.raises(ValueError):
-        f.names = ["a","b"]
-
-    # Test setting names with a model wrapper
-    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
-    mw = ModelWrapper(model_to_test_wrap)
-
-    f = Fitter()
-    f.model = mw.model
-    assert f.model == mw._mw_observable
-    assert np.array_equal(f.names,["K1","K2"])
-    assert mw.fit_parameters["K1"].name == "K1"
-    assert mw.fit_parameters["K2"].name == "K2"
-    
-    f.names = ["A","B"]
-    assert np.array_equal(f.names,["A","B"])
-    assert mw.fit_parameters["K1"].name == "A"
-    assert mw.fit_parameters["K2"].name == "B"
 
 def test_y_obs_setter_getter(binding_curve_test_data):
     """

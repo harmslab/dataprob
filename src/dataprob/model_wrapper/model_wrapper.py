@@ -97,7 +97,7 @@ class ModelWrapper:
             else:
                 guess = None
 
-            self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
+            self._mw_fit_parameters[p] = FitParameter(guess=guess)
         
         for p in not_fittable_parameters:
             
@@ -337,7 +337,8 @@ class ModelWrapper:
     @property
     def model(self):
         """
-        Model observable. This function takes a 
+        Model observable. This function takes a numpy array the number of 
+        unfixed parameters long. 
 
         Parameters
         ----------
@@ -354,6 +355,22 @@ class ModelWrapper:
         # This model, once returned, does not have to re-run update_parameter_map
         # and should thus be faster when run again and again in regression
         return self._mw_observable
+
+    @property
+    def names(self):
+        """
+        Names of unfixed parameters in the order they appear in the parameters
+        array passed to model(param). 
+        """
+
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value. (NOTE: this update happens in the public
+        # property. Most of the time, self._position_to_param should be accessed
+        # by internal methods to avoid triggering this update.)
+        self._update_parameter_map()
+
+        return self._position_to_param
+        
 
     @property
     def guesses(self):
@@ -383,7 +400,7 @@ class ModelWrapper:
         guesses = check_array(value=guesses,
                               variable_name="guesses",
                               expected_shape=(n,),
-                             expected_shape_names="(num_unfixed_param,)")
+                              expected_shape_names="(num_unfixed_param,)")
         for i, p in enumerate(self._position_to_param):
             self._mw_fit_parameters[p].guess = guesses[i]
 
@@ -456,42 +473,6 @@ class ModelWrapper:
             self._mw_fit_parameters[p].prior = priors[:,i]
 
 
-    @property
-    def names(self):
-        """
-        Array of the parameter names (only including unfixed parameters).
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        names = []
-        for p in self._position_to_param:
-            names.append(self.fit_parameters[p].name)
-
-        return np.array(names,dtype=str)
-    
-    @names.setter
-    def names(self,names):
-        
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        if not hasattr(names,'__iter__'):
-            err = "names should be an string array the same length as the\n"
-            err += "total number of unfixed parameters\n"
-            raise ValueError(err)
-        
-        if len(names) != len(self._position_to_param):
-            err = "names should be an string array the same length as the\n"
-            err += "total number of unfixed parameters\n"
-            raise ValueError(err)
-        
-        for i, p in enumerate(self._position_to_param):
-            self.fit_parameters[p].name = names[i]
-    
     @property
     def values(self):
         """
@@ -566,7 +547,6 @@ class ModelWrapper:
         self._update_parameter_map()
 
         out = {"param":[],
-               "name":[],
                "guess":[],
                "fixed":[],
                "lower_bound":[],
@@ -580,7 +560,6 @@ class ModelWrapper:
             
             fp = self._mw_fit_parameters[p]
 
-            out["name"].append(fp.name)
             out["guess"].append(fp.guess)
             out["fixed"].append(fp.fixed)
             out["lower_bound"].append(fp.bounds[0])
@@ -597,20 +576,6 @@ class ModelWrapper:
         # Setter is a convenience wrapper for load_param_spreadsheet.
         self.load_param_spreadsheet(dataframe)
 
-    @property
-    def position_to_param(self):
-        """
-        Names of unfixed parameters in the order they appear in the parameters
-        array passed to model(param). 
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value. (NOTE: this update happens in the public
-        # property. Most of the time, self._position_to_param should be accessed
-        # by internal methods to avoid triggering this update.)
-        self._update_parameter_map()
-
-        return self._position_to_param
 
     @property
     def fit_parameters(self):

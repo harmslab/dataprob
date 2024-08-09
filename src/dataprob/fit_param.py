@@ -93,24 +93,14 @@ class FitParameter:
                   Before the fit is run, this will be None.
         + .is_fit_result: (bool) whether or not the parameter contains the results
                           of a fit.
-
-    Metadata attributes
-    -------------------
-
-    This attribute can be set on __init__ or directly via instance.name = value.
-    The value is used for convenience only and is ignored by other methods.
-
-        + .name: (str) name of fit parameter
     """
 
-    def __init__(self,name,guess=None,fixed=False,bounds=None,prior=None):
+    def __init__(self,guess=None,fixed=False,bounds=None,prior=None):
         """
         Initialize class.  
 
         Parameters
         ----------
-        name : str
-            name of parameter
         guess : float, optional. 
             parameter guess. If None, the guess will be determined in the 
             following way.  1) If prior is given, the guess will be set to the
@@ -142,29 +132,7 @@ class FitParameter:
         self.prior = prior
         self.guess = guess
 
-        # Simple terms
-        self.name = name
         self.fixed = fixed
-
-
-    #--------------------------------------------------------------------------
-    # parameter name
-
-    @property
-    def name(self):
-        """
-        Name of the parameter.
-        """
-
-        try:
-            return self._name
-        except AttributeError:
-            return None
-
-    @name.setter
-    def name(self,name):
-        self._name = str(name)
-
 
     #--------------------------------------------------------------------------
     # parameter guess
@@ -455,7 +423,6 @@ class FitParameter:
         out = ["FitParameter\n-----------\n"]
 
         out.append("Inputs:")
-        out.append(f"  name: {self.name}")
         out.append(f"  guess: {self.guess}")
         out.append(f"  fixed: {self.fixed}")
         out.append(f"  bounds: {self.bounds}")

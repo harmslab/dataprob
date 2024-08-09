@@ -202,24 +202,6 @@ def test_setting_bounds(binding_curve_test_data):
     assert np.array_equal(mw.fit_parameters["K1"].bounds,np.array([0,500]))
     assert np.array_equal(mw.K1.bounds,np.array([0,500]))
 
-def test_setting_name(binding_curve_test_data):
-
-    model_to_test_wrap = binding_curve_test_data["model_to_test_wrap"]
-
-    mw = ModelWrapper(model_to_test_wrap)
-
-    # Test setting by mw.K
-    assert mw.K1.name == "K1"
-    mw.K1.name = "new_name"
-    assert mw.K1.name == "new_name"
-    assert mw.fit_parameters["K1"].name == "new_name"
-
-    # Test setting via mw.fit_parameters
-    assert mw.K2.name == "K2"
-    assert mw.fit_parameters["K2"].name == "K2"
-    mw.fit_parameters["K2"].name = "another name with spaces this time"
-    assert mw.K2.name == "another name with spaces this time"
-    assert mw.fit_parameters["K2"].name == "another name with spaces this time"
 
 def test_setting_fixed(binding_curve_test_data):
 

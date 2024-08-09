@@ -855,23 +855,6 @@ def test_ModelWrapper_names():
     assert len(n) == 1
     assert n[0] == "a"
 
-    # test setter
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.names,["a","b"])
-    mw.names = ["x","y"]
-    assert np.array_equal(mw.names,["x","y"])
-
-    # bad values
-    with pytest.raises(ValueError):
-        mw.names = 1
-
-    with pytest.raises(ValueError):
-        mw.names = [1,2,3]
-
-    # this should work, but coerce
-    mw.names = [1,2]
-    assert np.array_equal(mw.names,["1","2"])
-
 
 def test_ModelWrapper_values():
 
@@ -934,12 +917,11 @@ def test_ModelWrapper_dataframe():
     mw = ModelWrapper(model_to_test_wrap)
     df = mw.dataframe
     assert issubclass(type(df),pd.DataFrame)
-    assert(np.array_equal(df.columns,["param","name","guess","fixed",
+    assert(np.array_equal(df.columns,["param","guess","fixed",
                                       "lower_bound","upper_bound",
                                       "prior_mean","prior_std"]))
     assert len(df.index) == 2
     assert np.array_equal(df["param"],["a","b"])
-    assert np.array_equal(df["name"],["a","b"])
     assert np.array_equal(df["guess"],[1,1])
     assert np.array_equal(df["fixed"],[False,False])
     assert np.array_equal(df["lower_bound"],[-np.inf,-np.inf])
@@ -963,18 +945,18 @@ def test_ModelWrapper_dataframe():
     assert mw.c.guess == 30
     assert mw.d.guess == 40
 
-def test_ModelWrapper_position_to_param():
+def test_ModelWrapper_names():
 
     def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
     mw = ModelWrapper(model_to_test_wrap)
-    pp = mw.position_to_param
+    pp = mw.names
     assert pp is mw._position_to_param
     assert len(pp) == 2
     assert pp[0] == "a"
     assert pp[1] == "b"
     
     mw.a.fixed = True
-    pp = mw.position_to_param
+    pp = mw.names
     assert len(pp) == 1
     assert pp[0] == "b"
 

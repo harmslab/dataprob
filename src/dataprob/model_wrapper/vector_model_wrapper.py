@@ -78,7 +78,7 @@ class VectorModelWrapper(ModelWrapper):
                 guess = 0
         
             # Record fit parameter
-            self._mw_fit_parameters[p] = FitParameter(name=p,guess=guess)
+            self._mw_fit_parameters[p] = FitParameter(guess=guess)
         
         # Set other argument values
         for p in other_args:

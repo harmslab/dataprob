@@ -39,10 +39,7 @@ def test__guess_setter_from_bounds():
     
 def test_init():
 
-    with pytest.raises(TypeError):
-        p = FitParameter()
-
-    p = FitParameter(name="test")
+    p = FitParameter()
 
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
     assert p.guess == 0.0
@@ -51,39 +48,24 @@ def test_init():
     assert np.array_equal(p.prior,[np.nan,np.nan],equal_nan=True)
 
 
-def test_name_getter_setter():
-
-    # Default (must be set via __init__)
-    p = FitParameter(name="test")
-    assert p.name == "test"
-
-    # Set directly
-    p.name = 5
-    assert p.name == "5"
-
-    # Set directly
-    p.name = "junk"
-    assert p.name == "junk"
-
-
 def test_guess_getter_setter():
 
     # Default
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
     assert p.guess == 0.0
 
     # Set via __init__
-    p = FitParameter(name="test",guess=12)
+    p = FitParameter(guess=12)
     assert p.guess == 12
 
     # Set directly
-    p = FitParameter(name="test")
+    p = FitParameter()
     p.guess = 22
     assert p.guess == 22
 
     # --- bad value checks ---
-    p = FitParameter(name="test")
+    p = FitParameter()
 
     with pytest.raises(ValueError):
         p.guess = "test"
@@ -95,54 +77,54 @@ def test_guess_getter_setter():
         p.guess = np.arange(10)
 
     # Set by prior
-    p = FitParameter(name="test",prior=[10,1])
+    p = FitParameter(prior=[10,1])
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
     assert p.guess == 10.0
 
     # Set by bounds (geometric mean)
-    p = FitParameter(name="test",bounds=[1,3])
+    p = FitParameter(bounds=[1,3])
     assert np.array_equal(p.bounds,np.array((1,3)))
     predicted_guess = np.exp((np.log(1) + np.log(3))/2)
     assert np.isclose(p.guess,predicted_guess)
 
     # Set by bounds (arithmetic mean)
-    p = FitParameter(name="test",bounds=[-2,3])
+    p = FitParameter(bounds=[-2,3])
     assert np.array_equal(p.bounds,np.array((-2,3)))
     predicted_guess = (-2 + 3)/2
     assert np.isclose(p.guess,predicted_guess)
 
     # Prior overrides bounds
-    p = FitParameter(name="test",prior=[10,1],bounds=[0,11])
+    p = FitParameter(prior=[10,1],bounds=[0,11])
     assert np.array_equal(p.bounds,np.array((0,11)))
     assert p.guess == 10.0
 
     # Infinite left bound
     INFINITY_PROXY = 1e9
-    p = FitParameter(name="test",bounds=[-np.inf,11])
+    p = FitParameter(bounds=[-np.inf,11])
     assert np.array_equal(p.bounds,np.array((-np.inf,11)))
     predicted_guess = (-INFINITY_PROXY + 3)/2
     assert np.isclose(p.guess,predicted_guess)
 
     # Infinite right bound
-    p = FitParameter(name="test",bounds=[1,np.inf])
+    p = FitParameter(bounds=[1,np.inf])
     assert np.array_equal(p.bounds,np.array((1,np.inf)))
     predicted_guess = np.exp((np.log(1) + np.log(INFINITY_PROXY))/2)
     assert np.isclose(p.guess,predicted_guess)
 
     # --- bound check ---
     with pytest.raises(ValueError):
-        p = FitParameter(name="test")
+        p = FitParameter()
         p.bounds = [-10,10]
         p.guess = -20
 
     with pytest.raises(ValueError):
-        p = FitParameter(name="test")
+        p = FitParameter()
         p.bounds = [-10,10]
         p.guess = 20
 
 def test_fixed_setter_getter():
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.fixed is False
     p.fixed = True
     assert p.fixed is True
@@ -150,19 +132,19 @@ def test_fixed_setter_getter():
     assert p.fixed is False
 
     # send in a wacky value to make sure bool check is being run
-    p = FitParameter(name="test")
+    p = FitParameter()
     with pytest.raises(ValueError):
         p.fixed = "not_a_good_bool"
 
 def test_bounds_getter_setter():
 
     # Default
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert np.array_equal(p.bounds,np.array((-np.inf,np.inf)))
 
     # Set via __init__
     bounds = [1,2]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
 
     # Set directly
@@ -193,11 +175,11 @@ def test_bounds_getter_setter():
         p.bounds = ["a","b"]
 
     # Identical bounds
-    p = FitParameter(name="test")
+    p = FitParameter()
     with pytest.raises(ValueError):
         p.bounds = np.zeros(2,dtype=float)
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     with pytest.raises(ValueError):
         p.bounds = 10*np.ones(2,dtype=float)
 
@@ -205,19 +187,19 @@ def test_bounds_getter_setter():
     input_bounds = np.zeros(2,dtype=float)
     resolution = np.finfo(input_bounds.dtype).resolution
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     input_bounds[1] = resolution/10
     with pytest.raises(ValueError):
         p.bounds = input_bounds
 
     # But now far enough away that it is not zero
     input_bounds[1] = resolution*10
-    p = FitParameter(name="test")
+    p = FitParameter()
     p.bounds = input_bounds
     assert np.array_equal(p.bounds,input_bounds)
 
     # Shift guess down to within bounds
-    p = FitParameter(name="test",guess=2)
+    p = FitParameter(guess=2)
     p.bounds = [1,3]
     with pytest.raises(ValueError):
         p.guess = 10
@@ -232,7 +214,7 @@ def test_bounds_getter_setter():
     assert np.isclose(p.guess,1.5)
 
     # shfit guess up to within bounds
-    p = FitParameter(name="test",guess=2)
+    p = FitParameter(guess=2)
     p.bounds = [1,3]
     with pytest.warns():
         p.bounds = [2.5,3]
@@ -243,12 +225,12 @@ def test_bounds_getter_setter():
 def test_prior_setter_getter():
 
     # Default
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert np.array_equal(p.prior,[np.nan,np.nan],equal_nan=True)
 
     # Set via __init__
     prior = [1,2]
-    p = FitParameter(name="test",prior=prior)
+    p = FitParameter(prior=prior)
     assert np.array_equal(p.prior,np.array(prior))
 
     # Set directly
@@ -277,7 +259,7 @@ def test_prior_setter_getter():
         p.bounds = ["a","b"]
 
     # make sure guess gets set from prior if defined
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.guess == 0
     p.prior = [1,2]
     assert np.array_equal(p.prior,[1,2])
@@ -286,25 +268,25 @@ def test_prior_setter_getter():
 
 
 def test_value_getter():
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == 0.0 # guess
     p._value = 10
     assert p.value == 10
 
 def test_stdev_getter():
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.stdev is None
     p._stdev = 10
     assert p.stdev == 10
 
 def test_stdev_getter():
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.ninetyfive is None
     p._ninetyfive = [1,2]
     assert np.array_equal(p.ninetyfive,[1,2])
 
 def test_is_fit_result_getter():
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.is_fit_result is False
     p._is_fit_result = True
     assert p.is_fit_result is True
@@ -315,7 +297,7 @@ def test_load_clear_fit_results(fitter_object):
     generic_fit = fitter_object["generic_fit"]
 
     # --- Make sure we can load fit result into parameter ---
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -339,7 +321,7 @@ def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure setting bounds wipes out fit ---
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -364,7 +346,7 @@ def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure setting prior wipes out fit ---
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -389,7 +371,7 @@ def test_load_clear_fit_results(fitter_object):
 
     # --- Make sure setting fixed wipes out fit ---
 
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
@@ -415,18 +397,18 @@ def test_FitParameter___repr__(fitter_object):
     generic_fit = fitter_object["generic_fit"]
 
     # --- Make sure we can load fit result into parameter ---
-    p = FitParameter(name="test")
+    p = FitParameter()
     assert p.value == p.guess
     assert p.stdev is None
     assert p.ninetyfive is None
     assert np.array_equal(p.prior,[np.nan,np.nan],equal_nan=True)
     assert not p.is_fit_result
 
-    assert len(p.__repr__().split("\n")) == 11
+    assert len(p.__repr__().split("\n")) == 10
 
     p.load_fit_result(generic_fit,0)
 
-    assert len(p.__repr__().split("\n")) == 17
+    assert len(p.__repr__().split("\n")) == 16
 
 
 
@@ -438,19 +420,19 @@ def test_interaction_bounds_guesses():
 
     # Two positive bounds
     bounds = [10,20]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,np.exp(np.mean(np.log(bounds))))
 
     # Two negative bounds
     bounds = [-20,-10]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,-np.exp(np.mean(np.log(np.abs(bounds)))))
 
     # One negative, one positive
     bounds = [-10,10]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,np.sum(bounds)/2)
 
@@ -458,13 +440,13 @@ def test_interaction_bounds_guesses():
     bounds = [-np.inf,10]
     internal_bounds = [-_INFINITY_PROXY,bounds[1]]
     expected = np.sum(internal_bounds)/2
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert np.isclose(p.guess,expected)
 
     # negative real, positive infinity
     bounds = [-10,np.inf]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     internal_bounds = [bounds[0],_INFINITY_PROXY]
     expected = np.sum(internal_bounds)/2
     assert np.array_equal(p.bounds,np.array(bounds))
@@ -472,14 +454,14 @@ def test_interaction_bounds_guesses():
 
     # negative infinity, positive infinity
     bounds = [-np.inf,np.inf]
-    p = FitParameter(name="test",bounds=bounds)
+    p = FitParameter(bounds=bounds)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 0.0
 
     # --- Update bounds such that guess is outside the new bounds ---
 
     bounds = [-10,10]
-    p = FitParameter(name="test",bounds=bounds,guess=-5)
+    p = FitParameter(bounds=bounds,guess=-5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == -5.0
 
@@ -490,7 +472,7 @@ def test_interaction_bounds_guesses():
     assert p.guess == new_bounds[0]
 
     bounds = [-10,10]
-    p = FitParameter(name="test",bounds=bounds,guess=5)
+    p = FitParameter(bounds=bounds,guess=5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 5.0
 
@@ -502,7 +484,7 @@ def test_interaction_bounds_guesses():
 
     # --- Upddate bounds such that guess remains in the new bounds ---
     bounds = [-10,10]
-    p = FitParameter(name="test",bounds=bounds,guess=5)
+    p = FitParameter(bounds=bounds,guess=5)
     assert np.array_equal(p.bounds,np.array(bounds))
     assert p.guess == 5.0
 
