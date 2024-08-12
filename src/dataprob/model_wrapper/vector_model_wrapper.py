@@ -5,12 +5,16 @@ in likelihood calculations.
 """
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
-from dataprob.fit_param import FitParameter
+
 from dataprob.model_wrapper._function_processing import analyze_vector_input_fcn
 from dataprob.model_wrapper._function_processing import param_sanity_check
+from dataprob.model_wrapper._dataframe_processing import validate_dataframe
+
+
 from dataprob.check import check_float
 
 import numpy as np
+import pandas as pd
 
 class VectorModelWrapper(ModelWrapper):
     """
@@ -18,11 +22,12 @@ class VectorModelWrapper(ModelWrapper):
     likelihood calculations.
     """
 
-    def _mw_load_model(self,model_to_fit,fittable_params):
+    def _load_model(self,
+                    model_to_fit,
+                    fittable_params):
         """
-        Load a model into the wrapper, making the arguments into attributes.
-        Fittable arguments are made into FitParameter instances.  Non-fittable
-        arguments are set as generic attributes.
+        Load a model into the wrapper, putting all fittable parameters into the
+        param_df dataframe. Non-fittable arguments are set as attributes. 
 
         Parameters
         ----------
@@ -65,7 +70,9 @@ class VectorModelWrapper(ModelWrapper):
             err = "fittable_params must not include other arguments to the function\n"
             raise ValueError(err)
 
-        # Go through fittable params   
+        # Go through fittable params 
+        fit_params = []
+        guesses = []
         for p in fittable_params:
 
             # If a dictionary, grab the guess checking for float
@@ -73,16 +80,24 @@ class VectorModelWrapper(ModelWrapper):
                 guess = check_float(value=fittable_params[p],
                                     variable_name=f"fittable_params['{p}']")
             
-            # If a list, guess is 0.0
+            # If a list, set to default_guess
             else:
-                guess = 0
+                guess = self._default_guess
         
             # Record fit parameter
-            self._mw_fit_parameters[p] = FitParameter(guess=guess)
+            fit_params.append(p)
+            guesses.append(guess)
         
+        self._fit_params_in_order = fit_params[:]
+        param_df = pd.DataFrame({"name":fit_params,
+                                 "guess":guesses})
+        self._param_df = validate_dataframe(param_df,
+                                            param_in_order=self._fit_params_in_order,
+                                            default_guess=self._default_guess)
+
         # Set other argument values
         for p in other_args:
-            self._mw_other_arguments[p] = other_args[p]
+            self._other_arguments[p] = other_args[p]
 
         # Make sure these do not conflict with attributes already in the class
         reserved_params = dir(self.__class__)
@@ -91,59 +106,50 @@ class VectorModelWrapper(ModelWrapper):
         _ = param_sanity_check(fittable_params=other_args,
                                reserved_params=reserved_params)
 
-        self._update_parameter_map()
+        # Finalize -- read to run the model
+        self.finalize_params()
 
 
-    def _update_parameter_map(self):
+    def finalize_params(self):
         """
-        Update the map between the parameter vector that will be passed in to
-        the fitter and the parameters in this wrapper. 
+        Validate current state of param_df and build map between parameters
+        and the model arguments. This will be called by a Fitter instance 
+        before doing a fit. 
         """
-
-        param_vector_length = len(self._mw_fit_parameters)
-
-        num_unfixed = param_vector_length
-        unfixed_param_mask = np.ones(param_vector_length,dtype=bool)
-
-        current_parameter_values = []
-        self._position_to_param = []
-        for i, p in enumerate(self._mw_fit_parameters):
-
-            if self._mw_fit_parameters[p].fixed:
-                unfixed_param_mask[i] = False
-                num_unfixed -= 1
-
-            current_parameter_values.append(self._mw_fit_parameters[p].guess)
-            self._position_to_param.append(p)
-
-        self._param_vector_length = param_vector_length
-        self._num_unfixed = num_unfixed
-        self._unfixed_param_mask = unfixed_param_mask
-        self._current_parameter_values = np.array(current_parameter_values,
-                                                  dtype=float)
-
+    
+        # Make sure the parameter dataframe is sane. It could have problems 
+        # because we let the user edit it directly.
+        self._param_df = validate_dataframe(param_df=self._param_df,
+                                            param_in_order=self._fit_params_in_order,
+                                            default_guess=self._default_guess)
+        
+        # Get currently un-fixed parameters
+        self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
+        self._current_param_index = self._param_df.index[self._unfixed_mask]
 
     def _mw_observable(self,params=None):
         """
         Actual function called by the fitter.
         """
 
-        if params is None:
-            params = self._current_parameter_values
+        compiled_params = np.array(self._param_df["guess"])
 
-        if len(params) == self._param_vector_length:
+        if params is None:
+            params = compiled_params
+
+        if len(params) == len(compiled_params):
             compiled_params = params
-        elif len(params) == self._num_unfixed:
-            compiled_params = self._current_parameter_values.copy()
-            compiled_params[self._unfixed_param_mask] = params
+        elif len(params) == np.sum(self._unfixed_mask):
+            compiled_params[self._unfixed_mask] = params
         else:
             err = f"params length ({len(params)}) must either correspond to\n"
-            err += f"the total number of parameters ({self._param_vector_length})\n"
-            err += f"or the number of unfixed parameters ({self._num_unfixed}).\n"
+            err += f"the total number of parameters ({len(self._param_df)})\n"
+            err += f"or the number of unfixed parameters ({np.sum(self._unfixed_mask)}).\n"
             raise ValueError(err)
 
         try:
-            return self._model_to_fit(compiled_params,**self._mw_other_arguments)
+            return self._model_to_fit(compiled_params,
+                                      **self._other_arguments)
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
             raise RuntimeError(err) from e
@@ -156,7 +162,7 @@ class VectorModelWrapper(ModelWrapper):
 
         # Update mapping between parameters and model arguments in case
         # user has fixed value or made a change that has not propagated properly
-        self._update_parameter_map()
+        self.finalize_params()
 
         # This model, once returned, does not have to re-run update_parameter_map
         # and should thus be faster when run again and again in regression
