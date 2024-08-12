@@ -1,7 +1,6 @@
 import pytest
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
-from dataprob.fit_param import FitParameter
 
 import numpy as np
 import pandas as pd
@@ -13,48 +12,49 @@ def test_ModelWrapper___init__():
     # Test basic functionality
     mw = ModelWrapper(model_to_fit=model_to_test_wrap)
     assert mw._model_to_fit is model_to_test_wrap
-    assert len(mw._mw_fit_parameters) == 3
-    assert mw._mw_fit_parameters["a"].guess == 0
-    assert mw._mw_fit_parameters["b"].guess == 2
-    assert mw._mw_fit_parameters["c"].guess == 3
+    assert len(mw._param_df) == 3
+    assert mw._param_df.loc["a","guess"] == 0
+    assert mw._param_df.loc["b","guess"] == 2
+    assert mw._param_df.loc["c","guess"] == 3
     
-    assert len(mw._mw_other_arguments) == 2
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert len(mw._other_arguments) == 2
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
 
     # make sure fittable_params are being passed properly
     mw = ModelWrapper(model_to_test_wrap,fittable_params=["a"])
     assert mw._model_to_fit is model_to_test_wrap
 
-    assert len(mw._mw_fit_parameters) == 1
-    assert mw._mw_fit_parameters["a"].guess == 0
+    assert len(mw._param_df) == 1
+    assert mw._param_df.loc["a","guess"] == 0
     
-    assert len(mw._mw_other_arguments) == 4
-    assert mw._mw_other_arguments["b"] == 2
-    assert mw._mw_other_arguments["c"] == 3
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert len(mw._other_arguments) == 4
+    assert mw._other_arguments["b"] == 2
+    assert mw._other_arguments["c"] == 3
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
 
 
-def test_ModelWrapper__mw_load_model():
+def test_ModelWrapper__load_model():
 
     # Create a ModelWrapper that has just been initialized but has not
     # run load_model
     class TestModelWrapper(ModelWrapper):
         def __init__(self):
-            self._mw_fit_parameters = {}
-            self._mw_other_arguments = {}
+            self._param_df = pd.DataFrame({"name":[]})
+            self._other_arguments = {}
+            self._default_guess = 0.0
 
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
+    assert len(mw.__dict__) == 3
 
     def model_to_test_wrap(a,b=2,c=3,d="test",e=3): return a*b*c
     
     with pytest.raises(ValueError):
-        mw._mw_load_model(model_to_fit="not_callable",
+        mw._load_model(model_to_fit="not_callable",
                           fittable_params=None)
     
-    mw._mw_load_model(model_to_test_wrap,fittable_params=None)
+    mw._load_model(model_to_test_wrap,fittable_params=None)
     assert mw._model_to_fit is model_to_test_wrap
 
     # analyze_fcn_sig, reconcile_fittable, param_sanity check are all tested in
@@ -62,83 +62,83 @@ def test_ModelWrapper__mw_load_model():
     # model above covers almost the whole decision tree. Tests of complete 
     # decision tree follow. 
 
-    assert len(mw._mw_fit_parameters) == 3
-    assert mw._mw_fit_parameters["a"].guess == 0
-    assert mw._mw_fit_parameters["b"].guess == 2
-    assert mw._mw_fit_parameters["c"].guess == 3
+    assert len(mw._param_df) == 3
+    assert mw._param_df.loc["a","guess"] == 0
+    assert mw._param_df.loc["b","guess"] == 2
+    assert mw._param_df.loc["c","guess"] == 3
     
-    assert len(mw._mw_other_arguments) == 2
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert len(mw._other_arguments) == 2
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
 
-    # This makes sure that the _update_parameter_map() call is happening. only 
+    # This makes sure that the finalize_params() call is happening. only 
     # test here because the logic of that call is tested in its own method call. 
-    assert np.array_equal(mw._position_to_param,["a","b","c"])
+    assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
     assert len(mw._mw_kwargs) == 5
-    assert mw._mw_kwargs["a"] is None
-    assert mw._mw_kwargs["b"] is None
-    assert mw._mw_kwargs["c"] is None
+    assert mw._mw_kwargs["a"] == 0.0
+    assert mw._mw_kwargs["b"] == 2.0
+    assert mw._mw_kwargs["c"] == 3.0
     assert mw._mw_kwargs["d"] == "test"
     assert mw._mw_kwargs["e"] == 3
 
     # Now validate interaction with input function and fittable_params. Only
     # grab one argument. 
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
-    mw._mw_load_model(model_to_test_wrap,fittable_params=["a"])
-    assert len(mw._mw_fit_parameters) == 1
-    assert mw._mw_fit_parameters["a"].guess == 0
+    assert len(mw.__dict__) == 3
+    mw._load_model(model_to_test_wrap,fittable_params=["a"])
+    assert len(mw._param_df) == 1
+    assert mw._param_df.loc["a","guess"] == 0
     
-    assert len(mw._mw_other_arguments) == 4
-    assert mw._mw_other_arguments["b"] == 2
-    assert mw._mw_other_arguments["c"] == 3
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert len(mw._other_arguments) == 4
+    assert mw._other_arguments["b"] == 2
+    assert mw._other_arguments["c"] == 3
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
 
     # Now validate interaction with input function and fittable_params. Add 
     # argument that would not normally be grabbed. 
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
-    mw._mw_load_model(model_to_test_wrap,fittable_params=["a","e"])
-    assert len(mw._mw_fit_parameters) == 2
-    assert mw._mw_fit_parameters["a"].guess == 0
-    assert mw._mw_fit_parameters["e"].guess == 3
+    assert len(mw.__dict__) == 3
+    mw._load_model(model_to_test_wrap,fittable_params=["a","e"])
+    assert len(mw._param_df) == 2
+    assert mw._param_df.loc["a","guess"] == 0
+    assert mw._param_df.loc["e","guess"] == 3
     
-    assert len(mw._mw_other_arguments) == 3
-    assert mw._mw_other_arguments["b"] == 2
-    assert mw._mw_other_arguments["c"] == 3
-    assert mw._mw_other_arguments["d"] == "test"
+    assert len(mw._other_arguments) == 3
+    assert mw._other_arguments["b"] == 2
+    assert mw._other_arguments["c"] == 3
+    assert mw._other_arguments["d"] == "test"
 
     # Add argument not thought to be fittable by the parser.
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
+    assert len(mw.__dict__) == 3
     with pytest.raises(ValueError):
-        mw._mw_load_model(model_to_test_wrap,fittable_params=["a","d"])
+        mw._load_model(model_to_test_wrap,fittable_params=["a","d"])
 
     # fittable param that is not in arguments
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
+    assert len(mw.__dict__) == 3
     with pytest.raises(ValueError):
-        mw._mw_load_model(model_to_test_wrap,fittable_params=["w"])
+        mw._load_model(model_to_test_wrap,fittable_params=["w"])
 
     # not enough fittable params
     mw = TestModelWrapper()
-    assert len(mw.__dict__) == 2
+    assert len(mw.__dict__) == 3
     with pytest.raises(ValueError):
-        mw._mw_load_model(model_to_test_wrap,fittable_params=[])
+        mw._load_model(model_to_test_wrap,fittable_params=[])
     
     # send in a model that is only kwargs and make sure it still gets a fittable
     # param.
     def model_to_test_wrap(**kwargs): return kwargs["a"]
     mw = TestModelWrapper()
     with pytest.raises(ValueError):
-        mw._mw_load_model(model_to_test_wrap,fittable_params=None)
+        mw._load_model(model_to_test_wrap,fittable_params=None)
         
     mw = TestModelWrapper()
-    mw._mw_load_model(model_to_test_wrap,fittable_params=["a"])
-    assert len(mw._mw_fit_parameters) == 1
-    assert mw._mw_fit_parameters["a"].guess == 0
-    assert len(mw._mw_other_arguments) == 0
+    mw._load_model(model_to_test_wrap,fittable_params=["a"])
+    assert len(mw._param_df) == 1
+    assert mw._param_df.loc["a","guess"] == 0
+    assert len(mw._other_arguments) == 0
 
 
 def test_ModelWrapper__setattr__():
@@ -147,14 +147,14 @@ def test_ModelWrapper__setattr__():
     mw = ModelWrapper(model_to_test_wrap)
     
     # test setting fit parameter
-    assert mw._mw_fit_parameters["a"].guess == 1
+    assert mw._param_df.loc["a","guess"] == 1
     mw.__setattr__("a",10)
-    assert mw._mw_fit_parameters["a"].guess == 10
+    assert mw._param_df.loc["a","guess"] == 10
 
     # test setting other parameter
-    assert mw._mw_other_arguments["d"] == "test"
+    assert mw._other_arguments["d"] == "test"
     mw.__setattr__("d", 4)
-    assert mw._mw_other_arguments["d"] == 4
+    assert mw._other_arguments["d"] == 4
 
     # test setting __dict__ parameter
     assert "something_else" not in mw.__dict__
@@ -169,14 +169,14 @@ def test_ModelWrapper___getattr__():
     mw.blah = "non_fit_attribute"
 
     # test getting on fit and other  parameters
-    assert mw.__getattr__("a") is mw._mw_fit_parameters["a"]
-    assert mw.__getattr__("e") is mw._mw_other_arguments["e"]
+    assert mw.__getattr__("a") == mw._param_df.loc["a","guess"]
+    assert mw.__getattr__("e") == mw._other_arguments["e"]
 
     # test __dict__ get
     assert mw.__getattr__("blah") == "non_fit_attribute"
 
     # test __getattribute__ fallback got @property getter
-    assert mw.__getattr__("fit_parameters") is mw._mw_fit_parameters
+    assert mw.__getattr__("param_df") is mw._param_df
     
     # test __getattribute__ fallback for built in method
     assert mw.__getattr__("__init__") == mw.__init__
@@ -187,55 +187,58 @@ def test_ModelWrapper___getattr__():
 
     
 
-def test_ModelWrapper__update_parameter_map():
+def test_ModelWrapper__finalize_params():
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
     
     # Check initial configuration after __init__
-    assert np.array_equal(mw._position_to_param,["a","b","c"])
-    assert len(mw._mw_other_arguments) == 2
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
+    assert len(mw._other_arguments) == 2
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
     assert len(mw._mw_kwargs) == 5
-    assert mw._mw_kwargs["a"] is None
-    assert mw._mw_kwargs["b"] is None
-    assert mw._mw_kwargs["c"] is None
+    assert mw._mw_kwargs["a"] == 1
+    assert mw._mw_kwargs["b"] == 2
+    assert mw._mw_kwargs["c"] == 3
     assert mw._mw_kwargs["d"] == "test"
     assert mw._mw_kwargs["e"] == 3
 
     # Edit parameters
-    mw.a.guess = 10
-    mw.a.fixed = True
+    mw.a = 10
+    mw.param_df.loc["a","fixed"] = True
 
     # Make sure no change
-    assert np.array_equal(mw._position_to_param,["a","b","c"])
-    assert len(mw._mw_other_arguments) == 2
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
+    assert len(mw._other_arguments) == 2
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
     assert len(mw._mw_kwargs) == 5
-    assert mw._mw_kwargs["a"] is None
-    assert mw._mw_kwargs["b"] is None
-    assert mw._mw_kwargs["c"] is None
+    assert mw._mw_kwargs["a"] == 1
+    assert mw._mw_kwargs["b"] == 2
+    assert mw._mw_kwargs["c"] == 3
     assert mw._mw_kwargs["d"] == "test"
     assert mw._mw_kwargs["e"] == 3
+    assert np.array_equal(mw._unfixed_mask,[True,True,True])
+    assert np.array_equal(mw._current_param_index,["a","b","c"])
 
     # Run function
-    mw._update_parameter_map()
+    mw.finalize_params()
 
     # Check for expected output
-    assert np.array_equal(mw._position_to_param,["b","c"])
-    assert len(mw._mw_other_arguments) == 2
-    assert mw._mw_other_arguments["d"] == "test"
-    assert mw._mw_other_arguments["e"] == 3
+    assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
+    assert len(mw._other_arguments) == 2
+    assert mw._other_arguments["d"] == "test"
+    assert mw._other_arguments["e"] == 3
     assert len(mw._mw_kwargs) == 5
     assert mw._mw_kwargs["a"] == 10
-    assert mw._mw_kwargs["b"] is None
-    assert mw._mw_kwargs["c"] is None
+    assert mw._mw_kwargs["b"] == 2
+    assert mw._mw_kwargs["c"] == 3
     assert mw._mw_kwargs["d"] == "test"
     assert mw._mw_kwargs["e"] == 3
+    assert np.array_equal(mw._unfixed_mask,[False,True,True])
+    assert np.array_equal(mw._current_param_index,["b","c"])
     
-
 
 def test_ModelWrapper__mw_observable():
 
@@ -257,8 +260,8 @@ def test_ModelWrapper__mw_observable():
     assert mw._mw_observable([3,4,5]) == 3*4*5
 
     # fix parameter
-    mw.b.fixed = True
-    mw._update_parameter_map()
+    mw.param_df.loc["b","fixed"] = True
+    mw.finalize_params()
     assert mw._mw_observable([3,4]) == 3*2*4 #(a*fixed(b)*c)
 
     # now fail because too many params
@@ -270,680 +273,142 @@ def test_ModelWrapper__mw_observable():
     with pytest.raises(RuntimeError):
         mw._mw_observable()
 
+def test_ModelWrapper_update_params(spreadsheets):
 
+    # method calls three other functions that are tested extensively elsewhere.
+    # make sure they run, but do not test extensively. 
 
-def test_ModelWrapper_load_fit_result(binding_curve_test_data,fitter_object):
+    # read from spreadsheet
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw.K1 == 1
+    assert mw.K2 == 2
+    assert mw.K3 == 3
 
-    model_to_fit = binding_curve_test_data["wrappable_model"]
-    previous_fit = fitter_object["wrapped_fit"]
+    xlsx = spreadsheets["basic-spreadsheet.xlsx"]
+    mw.update_params(xlsx)
+    assert np.isclose(mw.K1,1.00E+07)
+    assert np.isclose(mw.K2,1.00E-06)
+    assert np.isclose(mw.K3,1.00E+00)
 
-    mw = ModelWrapper(model_to_fit)
-    assert mw.K.value == mw.K.guess
-    assert mw.K.stdev is None
-    assert mw.K.is_fit_result is False
+    # read from df
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw.K1 == 1
+    assert mw.K2 == 2
+    assert mw.K3 == 3
 
-    mw.load_fit_result(previous_fit)
-    assert mw.K.value != mw.K.guess
-    assert mw.K.value == previous_fit.estimate[0]
-    assert mw.K.stdev == previous_fit.stdev[0]
-    assert mw.K.is_fit_result is True
+    input_df = pd.read_excel(xlsx)
+    mw.update_params(input_df)
+    assert np.isclose(mw.K1,1.00E+07)
+    assert np.isclose(mw.K2,1.00E-06)
+    assert np.isclose(mw.K3,1.00E+00)
 
-    # Parameter mismatch -- should throw error
-    def test_model(K=20,a=3): return K*a
-    mw = ModelWrapper(test_model)
+    # read from dict
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw.K1 == 1
+    assert mw.K2 == 2
+    assert mw.K3 == 3
+
+    input_dict = {"K1":{"guess":20}}
+    mw.update_params(input_dict)
+    assert mw.K1 == 20
+    assert mw.K2 == 2
+    assert mw.K3 == 3
+
+    # bad input
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw.K1 == 1
+    assert mw.K2 == 2
+    assert mw.K3 == 3
+
+    input_dict = {"K1":20}
     with pytest.raises(ValueError):
-        mw.load_fit_result(previous_fit)
+        mw.update_params(input_dict)
 
+    # bad input
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    input_dict = {"K4":20}
+    with pytest.raises(ValueError):
+        mw.update_params(input_dict)
 
-def test_ModelWrapper_load_param_dict():
-
-    # Simple model
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    # inconsistent input
+    def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
+    mw = ModelWrapper(model_to_test_wrap)
+    input_dict = {"K1":{"guess":5,
+                        "lower_bound":20}}
+    with pytest.raises(ValueError):
+        mw.update_params(input_dict)
     
-    # ---------------------------------------------------------------
-    # not dict
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    assert mw.model() == 1*2*3
-
-    # Load value from spreadsheet
-    params_to_load = "not_a_dict"
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-    # ---------------------------------------------------------------
-    # guesses
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    assert mw.model() == 1*2*3
-
-    # Load value from spreadsheet
-    params_to_load = {"a":{"guess":10},
-                      "b":{"guess":20},
-                      "c":{"guess":30},}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.guesses,[10,20,30])
-    assert mw.model() == 10*20*30
-
-    # bad value
-    params_to_load = {"a":{"guess":10},
-                      "b":{"guess":20},
-                      "c":{"guess":"x"},}
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-    
-    # ---------------------------------------------------------------
-    # fixed
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-
-    # Load value from spreadsheet
-    params_to_load = {"a":{"fixed":True},
-                      "b":{"fixed":False},
-                      "c":{"fixed":True},}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.fixed_mask,[True,False,True])
-
-    # bad value
-    params_to_load = {"a":{"fixed":"a"},
-                      "b":{"fixed":False},
-                      "c":{"fixed":True},}
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-
-    # ---------------------------------------------------------------
-    # bounds
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.bounds[0],[-np.inf,-np.inf,-np.inf])
-
-    # Load value from spreadsheet
-    params_to_load = {"a":{"bounds":(-10,10)},
-                      "b":{"bounds":(-20,20)},
-                      "c":{"bounds":(-30,30)}}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.bounds[0],[-10,-20,-30])
-    assert np.array_equal(mw.bounds[1],[ 10, 20, 30])
-
-    # bad value
-    params_to_load = {"a":{"bounds":(-10,10)},
-                      "b":{"bounds":(-20,20)},
-                      "c":{"bounds":(-30,"test")}}
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-    # ---------------------------------------------------------------
-    # prior
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    # Load value from spreadsheet
-    params_to_load = {"a":{"prior":(-1,1)},
-                      "b":{"prior":(-2,2)},
-                      "c":{"prior":(-3,3)}}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.priors[0],[-1,-2,-3])
-    assert np.array_equal(mw.priors[1],[1,2,3])
-
-    # bad value
-    params_to_load = {"a":{"prior":(-1,1)},
-                      "b":{"prior":(-2,-2)},
-                      "c":{"prior":(-3,3)}}
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-    # both missing; okay
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    params_to_load = {"a":{"prior":(-1,1)},
-                      "b":{"prior":(-2,2)},
-                      "c":{"prior":(np.nan,np.nan)}}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(np.isnan(mw.priors[0]),[False,False,True])
-    assert np.array_equal(np.isnan(mw.priors[1]),[False,False,True])
-    assert np.array_equal(mw.priors[0,:2],[-1,-2])
-    assert np.array_equal(mw.priors[1,:2],[1,2])
-
-    # ---------------------------------------------------------------
-    # Set all for one parameter
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-    assert np.array_equal(mw.bounds[0],[-np.inf,-np.inf,-np.inf])
-    assert np.array_equal(mw.bounds[1],[np.inf,np.inf,np.inf])
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    params_to_load = {"a":{"guess":5,
-                           "bounds":[-10,10],
-                           "prior":[-1,1]}}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.guesses,[5,2,3])
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-    assert np.array_equal(mw.bounds[0],[-10,-np.inf,-np.inf])
-    assert np.array_equal(mw.bounds[1],[10,np.inf,np.inf])
-    assert np.array_equal(mw.priors[0],[-1,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[1,np.nan,np.nan],equal_nan=True)
-    
-    # ---------------------------------------------------------------
-    # Fix single parameter (continued from last)
-
-    params_to_load = {"b":{"fixed":True}}
-    mw.load_param_dict(params_to_load=params_to_load)
-    assert np.array_equal(mw.guesses,[5,3])
-    assert np.array_equal(mw.fixed_mask,[False,True,False])
-    assert np.array_equal(mw.bounds[0],[-10,-np.inf])
-    assert np.array_equal(mw.bounds[1],[10,np.inf])
-    assert np.array_equal(mw.priors[0],[-1,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[1,np.nan],equal_nan=True)
-
-    # ---------------------------------------------------------------
-    # Send in parameter that is not part of the fit
-    mw = ModelWrapper(model_to_test_wrap)
-    params_to_load = {"not_a_param":{"fixed":True}}
-    with pytest.raises(ValueError):
-        mw.load_param_dict(params_to_load=params_to_load)
-
-
-
-def test_ModelWrapper_load_param_spreadsheet():
-
-    # Simple model
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    
-    # ---------------------------------------------------------------
-    # guesses
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    assert mw.model() == 1*2*3
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "guess":[10,20,30]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.guesses,[10,20,30])
-    assert mw.model() == 10*20*30
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "guess":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    # ---------------------------------------------------------------
-    # fixed
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "fixed":[True,False,True]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.fixed_mask,[True,False,True])
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "fixed":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
-    # ---------------------------------------------------------------
-    # lower_bound
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.bounds[0],[-np.inf,-np.inf,-np.inf])
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "lower_bound":[1,2,3]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.bounds[0],[1,2,3])
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "lower_bound":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    # ---------------------------------------------------------------
-    # upper_bound
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.bounds[1],[np.inf,np.inf,np.inf])
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "upper_bound":[1,2,3]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.bounds[1],[1,2,3])
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "upper_bound":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
-    # ---------------------------------------------------------------
-    # lower and upper_bound
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.bounds[0],[-np.inf,-np.inf,-np.inf])
-    assert np.array_equal(mw.bounds[1],[np.inf,np.inf,np.inf])
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "lower_bound":[-1,-2,-3],
-                       "upper_bound":[1,2,3]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.bounds[0],[-1,-2,-3])
-    assert np.array_equal(mw.bounds[1],[1,2,3])
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "lower_bound":[-1,-2,-3],
-                       "upper_bound":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    # more interesting bad value where the bounds are flipped
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "upper_bound":[-1,-2,-3],
-                       "lower_bound":[1,2,3]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
-    # ---------------------------------------------------------------
-    # prior
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    # Load value from spreadsheet
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[-1,-2,-3],
-                       "prior_std":[1,2,3]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.priors[0],[-1,-2,-3])
-    assert np.array_equal(mw.priors[1],[1,2,3])
-
-    # bad value
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[-1,-2,-3],
-                       "prior_std":["x","y","z"]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    # missing std
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[-1,-2,-3]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
-    # missing mean
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_std":[1,2,3]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[1,2,np.nan],
-                       "prior_std":[1,2,3]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-    
-    # invalid std (negative)
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[-1,-2,-3],
-                       "prior_std":[1,2,-3]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
-    # both missing; okay
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    df = pd.DataFrame({"param":["a","b","c"],
-                       "prior_mean":[-1,-2,None],
-                       "prior_std":[1,2,None]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(np.isnan(mw.priors[0]),[False,False,True])
-    assert np.array_equal(np.isnan(mw.priors[1]),[False,False,True])
-    assert np.array_equal(mw.priors[0,:2],[-1,-2])
-    assert np.array_equal(mw.priors[1,:2],[1,2])
-
-    # ---------------------------------------------------------------
-    # Set all for one parameter
-
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-    assert np.array_equal(mw.bounds[0],[-np.inf,-np.inf,-np.inf])
-    assert np.array_equal(mw.bounds[1],[np.inf,np.inf,np.inf])
-    assert np.array_equal(mw.priors[0],[np.nan,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[np.nan,np.nan,np.nan],equal_nan=True)
-
-    df = pd.DataFrame({"param":["a"],
-                       "guess":[5],
-                       "lower_bound":[-10],
-                       "upper_bound":[10],
-                       "prior_mean":[-1],
-                       "prior_std":[1]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.guesses,[5,2,3])
-    assert np.array_equal(mw.fixed_mask,[False,False,False])
-    assert np.array_equal(mw.bounds[0],[-10,-np.inf,-np.inf])
-    assert np.array_equal(mw.bounds[1],[10,np.inf,np.inf])
-    assert np.array_equal(mw.priors[0],[-1,np.nan,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[1,np.nan,np.nan],equal_nan=True)
-    
-    # ---------------------------------------------------------------
-    # Fix single parameter (continued from last)
-
-    df = pd.DataFrame({"param":["b"],
-                       "fixed":[True]})
-    mw.load_param_spreadsheet(spreadsheet=df)
-    assert np.array_equal(mw.guesses,[5,3])
-    assert np.array_equal(mw.fixed_mask,[False,True,False])
-    assert np.array_equal(mw.bounds[0],[-10,-np.inf])
-    assert np.array_equal(mw.bounds[1],[10,np.inf])
-    assert np.array_equal(mw.priors[0],[-1,np.nan],equal_nan=True)
-    assert np.array_equal(mw.priors[1],[1,np.nan],equal_nan=True)
-
-    # ---------------------------------------------------------------
-    # Send in parameter that is not part of the fit
-    mw = ModelWrapper(model_to_test_wrap)
-    df = pd.DataFrame({"param":["not_a_param"],
-                       "fixed":[True]})
-    with pytest.raises(ValueError):
-        mw.load_param_spreadsheet(spreadsheet=df)
-
 def test_ModelWrapper_model():
+
+    # light wrapper for _mw_observable (tested elsewhere). Make sure finalize
+    # runs and that it works as advertised but do not test deeply
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
     m = mw.model
     
+    # Make sure it is callable and takes arguments
     assert hasattr(m,"__call__")
     assert m() == 1*2*3
     assert m([10,20,30]) == 10*20*30
 
-    mw.a.guess = 20
-    mw.a.fixed = True
-    m = mw.model
-    
-    assert m() == 20*2*3
-    assert m([20,30]) == 20*20*30
+    # Make sure it calls finalize. 
+    # Run model and _mw_observable
+    assert mw.model([1,2,3]) == 1*2*3
+    assert mw._mw_observable([1,2,3]) == 1*2*3
+
+    # fix and change "a"
+    mw.param_df.loc["a","fixed"] = True
+    mw.param_df.loc["a","guess"] = 10
+
+    # mw_observable is not aware of this 
+    assert mw._mw_observable([1,2,3]) == 1*2*3
+
+    # but model is because it calls finalize
     with pytest.raises(ValueError):
-        m([10,20,30]) # fixed parameter; can only take three args
+        assert mw.model([1,2,3])
+    assert mw.model([2,3]) == 10*2*3
 
-def test_ModelWrapper_guesses():
+    # and now mw_observable should be too
+    assert mw._mw_observable([2,3]) == 10*2*3
+    
+def test_ModelWrapper_param_df():
 
-    # test getter
+    # test setter/getter
+    
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
-    g = mw.guesses
-    assert np.array_equal(g,[1,2,3])
     
-    mw.c.guess = 20
-    g = mw.guesses
-    assert np.array_equal(g,[1,2,20])
-
-    mw.b.fixed = True
-    g = mw.guesses
-    assert np.array_equal(g,[1,20])
-
-    # test setter
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.guesses,[1,2,3])
-    mw.guesses = [3,4,5]
-    assert np.array_equal(mw.guesses,[3,4,5])
-
-    # send in some stupid values
-    with pytest.raises(ValueError):
-        mw.guesses = 1
-
-    with pytest.raises(ValueError):
-        mw.guesses = [1,2,3,4]
-
-    with pytest.raises(ValueError):
-        mw.guesses = [1,2]
-
-    with pytest.raises(ValueError):
-        mw.guesses = ["a","b","c"]
-
-    # out of bounds set
-    mw.guesses = [0.5,0.5,0.5]
-    mw.bounds = [[0,0,0],[1,1,1]]
-    with pytest.raises(ValueError):
-        mw.guesses = [10,10,10]
-
-
-def test_ModelWrapper_bounds():
-
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    mw = ModelWrapper(model_to_test_wrap)
-    b = mw.bounds
-    assert np.array_equal(b.shape,[2,3])
-    assert np.sum(np.isinf(b)) == 6
-    assert b[0,1] == -np.inf
-    assert b[1,1] == np.inf
-
-    mw.b.bounds = (-10,10)
-    b = mw.bounds
-    assert np.array_equal(b.shape,[2,3])
-    assert np.sum(np.isinf(b)) == 4
-    assert b[0,1] == -10
-    assert b[1,1] == 10
-
-    mw.c.fixed = True
-    b = mw.bounds
-    assert np.array_equal(b.shape,[2,2])
-    assert np.sum(np.isinf(b)) == 2
-    assert b[0,1] == -10
-    assert b[1,1] == 10
-
-    # test setter
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.bounds.shape,[2,3])
-    assert np.sum(np.isinf(mw.bounds)) == 6
-    mw.bounds = [[-1,-1,-1],[100,100,100]]
-    assert np.array_equal(mw.bounds[0,:],[-1,-1,-1])
-    assert np.array_equal(mw.bounds[1,:],[100,100,100])
-
-    # send in some stupid values
-    with pytest.raises(ValueError):
-        mw.bounds = 1
-
-    with pytest.raises(ValueError):
-        mw.bounds = np.ones((2,4),dtype=float)
-
-    with pytest.raises(ValueError):
-        mw.bounds = np.ones((3,2),dtype=float)
-
-    with pytest.raises(ValueError):
-        mw.bounds = [["a","b","c"],["e","f","g"]]
-
-    with pytest.raises(ValueError):
-        mw.bounds = np.nan*np.ones((2,3),dtype=float)
-
-    # Same upper and lower bounds -- bad
-    with pytest.raises(ValueError):
-        mw.bounds = np.ones((2,3),dtype=float)
-
-    # should work fine
-    bounds = np.ones((2,3),dtype=float)
-    bounds[0,:] = bounds[0,:]*-np.inf
-    bounds[1,:] = bounds[1,:]*np.inf
-    mw.bounds = bounds
-
-def test_ModelWrapper_priors():
-
-    # test gette
-
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    mw = ModelWrapper(model_to_test_wrap)
-    p = mw.priors
-    assert np.array_equal(p.shape,[2,3])
-    assert np.sum(np.isnan(p)) == 6
-
-    mw.a.prior = (10,1)
-    p = mw.priors
-    assert np.array_equal(p.shape,[2,3])
-    assert np.sum(np.isnan(p)) == 4
-    assert p[0,0] == 10
-    assert p[1,0] == 1
-
-    mw.b.fixed = True
-    p = mw.priors
-    assert np.array_equal(p.shape,[2,2])
-    assert np.sum(np.isnan(p)) == 2
-    assert p[0,0] == 10
-    assert p[1,0] == 1
-
-    # test setter
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.priors.shape,[2,3])
-    assert np.sum(np.isnan(mw.priors)) == 6
-    mw.priors = np.ones((2,3),dtype=float)
-    assert np.sum(mw.priors) == 6
-
-    # send in some stupid values
-    with pytest.raises(ValueError):
-        mw.priors = 1
-
-    with pytest.raises(ValueError):
-        mw.priors = np.ones((2,4),dtype=float)
-
-    with pytest.raises(ValueError):
-        mw.priors = np.ones((3,2),dtype=float)
-
-    with pytest.raises(ValueError):
-        mw.priors = [["a","b","c"],["e","f","g"]]
-
-    with pytest.raises(ValueError):
-        mw.priors = np.inf*np.ones((2,3),dtype=float)
-
-    # should work fine
-    mw.priors = np.nan*np.ones((2,3),dtype=float)
-
-
-def test_ModelWrapper_fixed_mask():
-
-    # test getter
-
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    fm = mw.fixed_mask
-    assert len(fm) == 2
-    assert np.array_equal(fm,[False,False])
+    assert mw._param_df is mw.param_df
+    assert np.array_equal(mw.param_df["name"],["a","b","c"])
     
-    mw.a.fixed = True
-    fm = mw.fixed_mask
-    assert len(fm) == 2
-    assert np.array_equal(fm,[True,False])
+    to_change = mw.param_df.copy()
+    to_change["guess"] = [10,20,30]
+    mw.param_df = to_change
+    assert np.array_equal(mw.param_df["guess"],[10,20,30])
+    assert mw.param_df is not to_change
 
-    # test setter
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    assert np.array_equal(mw.fixed_mask,[False,False])
-    mw.fixed_mask = [True,False]
-    assert np.array_equal(mw.fixed_mask,[True,False])
-
-    # some stupid values
+    # should fail vaildation because parameter name changed
+    to_change["name"] = ["x","b","c"]
     with pytest.raises(ValueError):
-        mw.fixed_mask = 1
+        mw.param_df = to_change
 
-    with pytest.raises(ValueError):
-        mw.fixed_mask = [True,False,False]
-
-    with pytest.raises(ValueError):
-        mw.fixed_mask = ["not",1]
-
-def test_ModelWrapper_dataframe():
-
-    # set setter
-
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    df = mw.dataframe
-    assert issubclass(type(df),pd.DataFrame)
-    assert(np.array_equal(df.columns,["param","guess","fixed",
-                                      "lower_bound","upper_bound",
-                                      "prior_mean","prior_std"]))
-    assert len(df.index) == 2
-    assert np.array_equal(df["param"],["a","b"])
-    assert np.array_equal(df["guess"],[1,1])
-    assert np.array_equal(df["fixed"],[False,False])
-    assert np.array_equal(df["lower_bound"],[-np.inf,-np.inf])
-    assert np.array_equal(df["upper_bound"],[np.inf,np.inf])
-    assert np.sum(np.isnan(df["prior_mean"])) == 2
-    assert np.sum(np.isnan(df["prior_std"])) == 2
-
-    def model_to_test_wrap(a=1,b=1,c=5,d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    df = mw.dataframe
-    assert np.array_equal(df["param"],["a","b","c","d"])
-
-    # test getter. this tests load_param_spreadsheet, which is extensively
-    # tested. So just make sure it is running here. 
-
-    df["guess"] = [10,20,30,40]
-    mw.dataframe = df
-
-    assert mw.a.guess == 10
-    assert mw.b.guess == 20
-    assert mw.c.guess == 30
-    assert mw.d.guess == 40
-
-def test_ModelWrapper_names():
-
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    pp = mw.names
-    assert pp is mw._position_to_param
-    assert len(pp) == 2
-    assert pp[0] == "a"
-    assert pp[1] == "b"
-    
-    mw.a.fixed = True
-    pp = mw.names
-    assert len(pp) == 1
-    assert pp[0] == "b"
-
-
-def test_ModelWrapper_fit_parameters():
-    
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
-    mw = ModelWrapper(model_to_test_wrap)
-    fp = mw.fit_parameters
-    assert fp is mw._mw_fit_parameters
-    assert len(fp) == 2
-    assert fp["a"].guess == 1
-    assert fp["b"].guess == 1
+    # Make sure it didn't change anything on failure
+    assert np.array_equal(mw.param_df["name"],["a","b","c"])    
+    assert np.array_equal(mw.param_df["guess"],[10,20,30])
 
 def test_ModelWrapper_other_arguments():
 
-    def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
-    oa = mw.other_arguments
-    assert oa is mw._mw_other_arguments
-    assert len(oa) == 2
-    assert oa["c"] == "test"
-    assert oa["d"] == 3
+    assert mw._other_arguments is mw.other_arguments
+    assert mw.other_arguments["d"] == "test"
+    assert mw.other_arguments["e"] == 3
 
 
 def test_ModelWrapper___repr__():
@@ -951,21 +416,18 @@ def test_ModelWrapper___repr__():
     def model_to_test_wrap(a=1,b=1,c="test",d=3): return a*b
 
     mw = ModelWrapper(model_to_fit=model_to_test_wrap)
+
     out = mw.__repr__().split("\n")
-    assert len(out) == 20
+    assert len(out) == 21
 
     assert out[0] == "ModelWrapper"
     assert out[1] == "------------"
-    assert out[3].split(":")[0].strip() == "wrapped_model" 
-    assert out[5].strip() == "non-fittable arguments:"
-    assert out[7].split(":")[0].strip() == "c"
-    assert out[-7].strip() == "fittable parameters:"
 
     # This will force truncated variable lines to run by making super huge
     # c fixed argument
     mw.c = pd.DataFrame({"out":np.arange(1000)})
     out = mw.__repr__().split("\n")
-    assert len(out) == 26
+    assert len(out) == 27
 
     
     
