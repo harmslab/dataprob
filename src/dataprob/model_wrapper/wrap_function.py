@@ -1,7 +1,7 @@
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
-from dataprob.model_wrapper.read_spreadsheet import read_spreadsheet
+from dataprob.model_wrapper._dataframe_processing import read_spreadsheet
 
 from dataprob.check import check_bool
 
@@ -118,17 +118,24 @@ def wrap_function(some_function,
     If `fit_parameters` comes in as a dataframe, the dataframe can have the
     following columns. 
 
-    |---------------+---------------------------------------------------------------------|
-    | key           | value                                                               |
-    |---------------+---------------------------------------------------------------------|
-    | 'param'       | string name of the parameter                                        |
-    | 'guess'       | guess as single float value (must be within bounds, if specified)   |
-    | 'fixed'       | True of False                                                       | 
-    | 'lower_bound' | single float value; -np.inf allowed                                 | 
-    | 'upper_bound' | single float value; np.inf allowed                                  | 
-    | 'prior_mean'  | single float value; np.nan allowed                                  |
-    | 'prior_std'   | single float value; np.nan allowed                                  |
-    |---------------+---------------------------------------------------------------------| 
+        +---------------+-----------------------------------------------------+
+        | key           | value                                               |
+        +===============+=====================================================+
+        | 'param'       | string name of the parameter                        |
+        +---------------+-----------------------------------------------------+
+        | 'guess'       | guess as single float value (must be within bounds, |
+        |               | if specified)                                       |
+        +---------------+-----------------------------------------------------+
+        | 'fixed'       | True of False                                       |
+        +---------------+-----------------------------------------------------+
+        | 'lower_bound' | single float value; -np.inf allowed                 |
+        +---------------+-----------------------------------------------------+
+        | 'upper_bound' | single float value; np.inf allowed                  |
+        +---------------+-----------------------------------------------------+
+        | 'prior_mean'  | single float value; np.nan allowed                  |
+        +---------------+-----------------------------------------------------+
+        | 'prior_std'   | single float value; np.nan allowed                  |
+        +---------------+-----------------------------------------------------+
 
     If `fit_parameters` comes in as a string, this function will treat it as 
     the name of a spreadsheet file to read into a dataframe.
@@ -162,13 +169,13 @@ def wrap_function(some_function,
                       fittable_params=fit_param_list)
 
     # dict --> send in keys as a list of fit parameters, then load the parameter
-    # values in via the load_param_dict method. 
+    # values in via the update_params method. 
     elif issubclass(fit_param_type,dict):
 
         fit_param_list = list(fit_parameters.keys())
         mw = mw_class(model_to_fit=some_function,
                       fittable_params=fit_param_list)
-        mw.load_param_dict(fit_parameters)
+        mw.update_params(fit_parameters)
 
     # pd.DataFrame or str: treat as a spreadsheet. 
     elif issubclass(fit_param_type,pd.DataFrame) or issubclass(fit_param_type,str):
@@ -177,15 +184,15 @@ def wrap_function(some_function,
         fit_parameters = read_spreadsheet(fit_parameters)
     
         # Get list of fit parameters
-        if "param" not in fit_parameters.columns:
-            err = "fit_parameters DataFrame must have a 'param' column\n"
+        if "name" not in fit_parameters.columns:
+            err = "fit_parameters DataFrame must have a 'name' column\n"
             raise ValueError(err)
-        fit_param_list = list(fit_parameters["param"])
+        fit_param_list = list(fit_parameters["name"])
 
         # Initialize class, then load fit parameter data from the spreadsheet
         mw = mw_class(model_to_fit=some_function,
                       fittable_params=fit_param_list)
-        mw.load_param_spreadsheet(fit_parameters)
+        mw.update_params(fit_parameters)
 
     else:
     

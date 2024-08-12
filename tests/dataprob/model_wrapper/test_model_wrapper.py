@@ -239,6 +239,12 @@ def test_ModelWrapper__finalize_params():
     assert np.array_equal(mw._unfixed_mask,[False,True,True])
     assert np.array_equal(mw._current_param_index,["b","c"])
     
+    # send in bad edit -- finalize should catch
+    mw.param_df.loc["not_a_param","guess"] = 5
+    assert np.array_equal(mw.param_df.index,["a","b","c","not_a_param"])
+    with pytest.raises(ValueError):
+        mw.finalize_params()
+
 
 def test_ModelWrapper__mw_observable():
 
