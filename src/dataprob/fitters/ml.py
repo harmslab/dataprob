@@ -46,23 +46,27 @@ class MLFitter(Fitter):
             scipy.optimize.least_squares
         """
 
+        guesses = np.array(self._model.param_df["guess"])
+        bounds = np.array([self._model.param_df["lower_bound"],
+                           self._model.param_df["upper_bound"]])
+
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
-                                                  x0=self.guesses,
-                                                  bounds=self.bounds,
+                                                  x0=guesses,
+                                                  bounds=bounds,
                                                   **kwargs)
 
         self._success = self._fit_result.success
 
-        self._update_estimates()
+        self._update_fit_df()
 
-    def _update_estimates(self):
+    def _update_fit_df(self):
         """
         Recalculate the parameter estimates from any new samples.
         """
         
-        self._estimate = self._fit_result.x
+        estimate = self._fit_result.x
 
         # Extract standard error on the fit parameter from the covariance
         N = len(self._y_obs)
@@ -72,18 +76,18 @@ class MLFitter(Fitter):
             J = self._fit_result.jac
             cov = np.linalg.inv(2*np.dot(J.T,J))
 
-            self._stdev = np.sqrt(np.diagonal(cov)) #variance)
+            stdev = np.sqrt(np.diagonal(cov)) #variance)
 
             # 95% confidence intervals from standard error
             z = scipy.stats.t(N-P-1).ppf(0.975)
-            c1 = self._estimate - z*self._stdev
-            c2 = self._estimate + z*self._stdev
+            c1 = estimate - z*stdev
+            c2 = estimate + z*stdev
 
-            self._ninetyfive = [[],[]]
+            low_95 = []
+            high_95 = []
             for i in range(P):
-                self._ninetyfive[0].append(c1[i])
-                self._ninetyfive[1].append(c2[i])
-            self._ninetyfive = np.array(self._ninetyfive)
+                low_95.append(c1[i])
+                high_95.append(c2[i])
 
         except np.linalg.LinAlgError:
             warning = "\n\nJacobian matrix was singular.\n"
@@ -91,8 +95,14 @@ class MLFitter(Fitter):
             warning += "Consider using the Bayesian sampler.\n"
             warnings.warn(warning)
 
-            self._stdev = np.nan*np.ones(len(self._estimate),dtype=float)
-            self._ninety_five = np.nan*np.ones((2,len(self._estimate)),dtype=float)
+            stdev = np.nan*np.ones(len(estimate),dtype=float)
+            low_95 = np.nan*np.ones(len(estimate),dtype=float)
+            high_95 = np.nan*np.ones(len(estimate),dtype=float)
+        
+        self._fit_df["estimate"] = estimate
+        self._fit_df["std"] = stdev
+        self._fit_df["low_95"] = low_95
+        self._fit_df["high_95"] = high_95
 
 
     @property
@@ -133,10 +143,13 @@ class MLFitter(Fitter):
                 # Return empty array
                 return np.array([])
 
+            estimate = np.array(self.fit_df["estimate"])
             self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                           chol_cov.shape[0])),
                                                     chol_cov)
-            self._samples = self._samples + self.estimate
+            
+
+            self._samples = self._samples + estimate
 
             return self._samples
 

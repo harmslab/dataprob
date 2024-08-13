@@ -278,7 +278,8 @@ def check_int(value,
 def check_array(value,
                 variable_name=None,
                 expected_shape=None,
-                expected_shape_names=None):
+                expected_shape_names=None,
+                nan_allowed=True):
 
     """
     Do a sanity check on arguments that send in parameters (ln_like, etc.).
@@ -294,6 +295,8 @@ def check_array(value,
         present but does not have a specified length
     expected_shape_names : str
         name of dimensions (string, for error message)
+    name_allowed : bool, default=True
+        if True, allow nan. If False, throw an error on nan
         
     Returns
     -------
@@ -317,11 +320,22 @@ def check_array(value,
     if not hasattr(value,"__iter__"):
         raise ValueError(err)
 
+    # Initial conversion to an object array, then filter pd.NA into np.nan
+    try:
+        value = np.array(value,dtype=object)
+        value[pd.isna(value)] = np.nan
+    except Exception as e:
+        err = f"{err}. Could not coerce to a numpy array\n"
+        raise ValueError(err) from e
+
+    # Coerce to float (could have np.nan)
     try:
         value = np.array(value,dtype=float)
     except Exception as e:
+        err = f"{err} Could not coerce to a float numpy array\n"
         raise ValueError(err) from e
     
+    # Check final shape
     if expected_shape is not None:
 
         if len(value.shape) != len(expected_shape):
@@ -332,6 +346,12 @@ def check_array(value,
                 if value.shape[i] != expected_shape[i]:
                     raise ValueError(err)
     
+    if not nan_allowed:
+        num_nan = np.sum(np.isnan(value))
+        if num_nan > 0:
+            err = f"{err} without nan values. Array has {num_nan} nan entries.\n"
+            raise ValueError(err)
+
     return value
 
 

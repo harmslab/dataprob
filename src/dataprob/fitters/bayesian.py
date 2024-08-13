@@ -336,20 +336,25 @@ class BayesianSampler(Fitter):
         gauss_prior_stds = []
         gauss_prior_offsets = []
         gauss_prior_mask = []
-        for i in range(self.num_params):
 
-            priors = self.priors[:,i]
-            bounds = self.bounds[:,i]
+        for param in self.param_df.index:
 
-            if np.isnan(priors[0]) or np.isnan(priors[1]):
+            prior_mean = self.param_df.loc[param,"prior_mean"]
+            prior_std = self.param_df.loc[param,"prior_std"]
+
+            lower_bound = self.param_df.loc[param,"lower_bound"]
+            upper_bound = self.param_df.loc[param,"upper_bound"]
+            bounds = np.array([lower_bound,upper_bound])
+
+            if np.isnan(prior_mean) or np.isnan(prior_std):
                 uniform_priors.append(_find_uniform_value(bounds))
                 gauss_prior_mask.append(False)
 
             else:
-                gauss_prior_means.append(priors[0])
-                gauss_prior_stds.append(priors[1])
+                gauss_prior_means.append(prior_mean)
+                gauss_prior_stds.append(prior_std)
 
-                z_bounds = (bounds - priors[0])/priors[1]
+                z_bounds = (bounds - prior_mean)/prior_std
                 bounds_offset = _reconcile_bounds_and_priors(bounds=z_bounds,
                                                              frozen_rv=self._prior_frozen_rv)
                 gauss_prior_offsets.append(base_offset + bounds_offset)
@@ -362,13 +367,20 @@ class BayesianSampler(Fitter):
         self._gauss_prior_offsets = np.array(gauss_prior_offsets,dtype=float)
         self._gauss_prior_mask = np.array(gauss_prior_mask,dtype=bool)
 
+        # Grab lower and upper bounds
+        self._lower_bounds = np.array(self.param_df["lower_bound"])
+        self._upper_bounds = np.array(self.param_df["upper_bound"])
+
     def _ln_prior(self,param):
         """
         Private function that gets the log prior without error checking. 
         """
 
         # If any parameter falls outside of the bounds, make the prior -infinity
-        if np.sum(param < self.bounds[0,:]) > 0 or np.sum(param > self.bounds[1,:]) > 0:
+        if np.sum(param < self._lower_bounds) > 0:
+            return -np.inf
+        
+        if np.sum(param > self._upper_bounds) > 0:
             return -np.inf
 
         # Get priors for parameters we're treating with gaussian priors
@@ -463,20 +475,24 @@ class BayesianSampler(Fitter):
         # Set up the priors
         self._setup_priors()
 
+        guesses = np.array(self.param_df["guess"])            
+        bounds = np.array([self._model.param_df["lower_bound"],
+                            self._model.param_df["upper_bound"]])
+
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
             fn = lambda *args: -self.weighted_residuals(*args)
-            ml_fit = optimize.least_squares(fn,x0=self.guesses,bounds=self.bounds)
+            ml_fit = optimize.least_squares(fn,x0=guesses,bounds=bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
-            self._initial_guess = np.copy(self.guesses)
+            self._initial_guess = np.copy(guesses)
 
         # Create walker positions
 
         # Size of perturbation in parameter depends on the scale of the parameter
         perturb_size = self._initial_guess*self._initial_walker_spread
 
-        ndim = len(self.guesses)
+        ndim = len(guesses)
         pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
                for i in range(self._num_walkers)]
 
@@ -501,28 +517,31 @@ class BayesianSampler(Fitter):
 
         self._lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
 
-        self._update_estimates()
+        self._update_fit_df()
 
-    def _update_estimates(self):
+    def _update_fit_df(self):
         """
         Update samples based on the samples array.
         """
 
         # Get mean and standard deviation
-        self._estimate = np.mean(self._samples,axis=0)
-        self._stdev = np.std(self._samples,axis=0)
+        estimate = np.mean(self._samples,axis=0)
+        std = np.std(self._samples,axis=0)
 
         # Calculate 95% confidence intervals
-        self._ninetyfive = []
         lower = int(round(0.025*self._samples.shape[0],0))
         upper = int(round(0.975*self._samples.shape[0],0))
-        self._ninetyfive = [[],[]]
+        low_95 = []
+        high_95 = []
         for i in range(self._samples.shape[1]):
             nf = np.sort(self._samples[:,i])
-            self._ninetyfive[0].append(nf[lower])
-            self._ninetyfive[1].append(nf[upper])
+            low_95.append(nf[lower])
+            high_95.append(nf[upper])
 
-        self._ninetyfive = np.array(self._ninetyfive)
+        self._fit_df["estimate"] = estimate
+        self._fit_df["std"] = std
+        self._fit_df["low_95"] = low_95
+        self._fit_df["high_95"] = high_95
 
         self._success = True
 

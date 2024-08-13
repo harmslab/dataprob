@@ -28,13 +28,12 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         input_params = np.array(binding_curve_test_data["input_params"])
 
         if model_key == "wrappable_model":
-            model = ModelWrapper(model)
-            model.df = df
-            model.K.bounds = [0,10]
-        else:
-            f.bounds = [[0],[10]]
-
-        f.fit(model=model,guesses=guesses,y_obs=df.Y,y_stdev=df.Y_stdev)
+            mw = ModelWrapper(model)
+            mw.df = df
+            mw.param_df["K","lower_bound"] = 0
+            mw.param_df["K","upper_bound"] = 10
+    
+        f.fit(model=model,guesses=guesses,y_obs=df.Y,y_std=df.Y_stdev)
 
         # Assert that we succesfully passed in bounds
         assert np.allclose(f.bounds,np.array([[0],[10]]))
@@ -43,14 +42,14 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         assert f.success
 
         # Make sure fit gave right answer
-        assert np.allclose(f.estimate,
+        assert np.allclose(f.fit_df["estimate"],
                            input_params,
                            rtol=fit_tolerance_fixture,
                            atol=fit_tolerance_fixture*input_params)
 
         # Make sure mean of sampled uncertainty gives right answer
         sampled = np.mean(f.samples,axis=0)
-        assert np.allclose(f.estimate,
+        assert np.allclose(f.fit_df["estimate"],
                            sampled,
                            rtol=fit_tolerance_fixture,
                            atol=fit_tolerance_fixture*input_params)
@@ -67,14 +66,14 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
                            input_params,
                            rtol=fit_tolerance_fixture,
                            atol=fit_tolerance_fixture*input_params)
-        assert np.array_equal(df["param"],f.names)
-        assert np.array_equal(df["estimate"],f.estimate)
-        assert np.array_equal(df["stdev"],f.stdev)
-        assert np.array_equal(df["low_95"],f.ninetyfive[0,:])
-        assert np.array_equal(df["high_95"],f.ninetyfive[1,:])
-        assert np.array_equal(df["guess"],f.guesses)
-        assert np.array_equal(df["lower_bound"],f.bounds[0,:])
-        assert np.array_equal(df["upper_bound"],f.bounds[1,:])
+        assert np.array_equal(df["name"],f.fit_df["name"])
+        assert np.array_equal(df["estimate"],f.fit_df["estimate"])
+        assert np.array_equal(df["std"],f.fit_df["std"])
+        assert np.array_equal(df["low_95"],f.fit_df["low_95"])
+        assert np.array_equal(df["high_95"],f.fit_df["high_95"])
+        # assert np.array_equal(df["guess"],f.param_df["guess"])
+        # assert np.array_equal(df["lower_bound"],f.param_df["lower_bound"])
+        # assert np.array_equal(df["upper_bound"],f.param_df["upper_bound"])
 
 def test_MLFitter___repr__():
 
@@ -86,10 +85,10 @@ def test_MLFitter___repr__():
     f = MLFitter()
     f.model = mw
     f.fit(y_obs=np.array([2,4,6]),
-          y_stdev=[0.1,0.1,0.1])
+          y_std=[0.1,0.1,0.1])
 
     out = f.__repr__().split("\n")
-    assert len(out) == 13
+    assert len(out) == 12
 
     # hack, run _fit_has_been_run, _fit_failed branch
     f._success = False

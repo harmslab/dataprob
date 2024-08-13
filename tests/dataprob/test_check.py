@@ -230,6 +230,22 @@ def test_check_array():
                                     expected_shape=s,
                                     expected_shape_names=expected_shape_name)
 
+            # nans
+            has_nan = np.array([1,2,np.nan])
+            v = check_array(has_nan,nan_allowed=True)
+            with pytest.raises(ValueError):
+                check_array(has_nan,nan_allowed=False)
+
+            # check a couple of other possible nan inputs...
+            v = check_array([None,1],nan_allowed=True)
+            with pytest.raises(ValueError):
+                check_array([None,1],nan_allowed=False)
+            
+            v = check_array([pd.NA,1],nan_allowed=True)
+            with pytest.raises(ValueError):
+                check_array([pd.NA,1],nan_allowed=False)
+
+
 
 
 

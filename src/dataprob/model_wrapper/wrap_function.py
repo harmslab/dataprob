@@ -16,9 +16,9 @@ def wrap_function(some_function,
     Parameters
     ----------
     some_function : callable
-        A function that takes at least one argument and returns a float value 
-        or float numpy array. Fitter objects will compare the outputs of this 
-        function against y_obs. 
+        A function that takes at least one argument and returns a float numpy
+        array. Fitter objects will compare the outputs of this function against
+        y_obs. 
     fit_parameters : list, dict, str, pandas.DataFrame; optional
         fit_parameters lets the user specify information about the parameters 
         in the fit. See Note below for details.
@@ -39,106 +39,106 @@ def wrap_function(some_function,
     There are two classes of parameters to each model. Fittable parameters are
     visible to Fitter instances (such as the ML fitter or Bayesian sampler) and
     are thus regressed/sampled. Non-fittable parameters are fixed and passed
-    into `some_function` whenever it is called, but are invisible to the Fitter. 
+    into ``some_function`` whenever it is called, but are invisible to the Fitter. 
 
-    The software uses the signature of `some_function`, `fit_parameters`, and
-    `vector_first_arg` to figure out what fit parameters to use. 
+    The software uses the signature of ``some_function`, ``fit_parameters`, and
+    ``vector_first_arg`` to figure out what fit parameters to use. 
     
-    In the simplest case (`fit_parameters is None`, `vector_first_arg is False`),
+    In the simplest case (`fit_parameters is None`, ``vector_first_arg is False`),
     the software will infer the fittable and non-fittable parameters from the
-    `some_function` signature. It will grab the first N arguments with no
+    ``some_function`` signature. It will grab the first N arguments with no
     default or whose default can be coerced to a float. The remaining arguments
     are treated as non-fittable parameters. Consider the example:
 
-        `some_function == my_func(a,b=1,c="test",d=1)`
+        ``some_function == my_func(a,b=1,c="test",d=1)`
 
-    The software will find the fittable parameters `a` and `b`, setting the
-    guesses to `a = 0` and `b = 1`. The `c` and `d` parameters will be set as
+    The software will find the fittable parameters ``a`` and ``b`, setting the
+    guesses to ``a = 0`` and ``b = 1`. The ``c`` and ``d`` parameters will be set as
     non-fittable.  
     
     If fittable_parameters is defined, it can override this default. For 
-    example, if `fit_parameters = ['a','d']`, `a` and `d` will be fittable
-    parameters and `b` and `c` will be non-fittable parameters. Except for two
-    special cases described below, the parameters in `fit_parameters` must match
-    the parameters in the function signature. The parameters `a`, `b`, and `d` 
-    can be specified as fittable; the parameter `c` cannot because its default
+    example, if ``fit_parameters = ['a','d']`, ``a`` and ``d`` will be fittable
+    parameters and ``b`` and ``c`` will be non-fittable parameters. Except for two
+    special cases described below, the parameters in ``fit_parameters`` must match
+    the parameters in the function signature. The parameters ``a`, ``b`, and ``d`` 
+    can be specified as fittable; the parameter ``c`` cannot because its default
     argument is a string. 
 
-    NOTE: `fit_parameters` is treated as an exhaustive list of fittable 
+    NOTE: ``fit_parameters`` is treated as an exhaustive list of fittable 
     parameters. If specified, *only* the parameters in the list will be
     fittable.
 
-    `fit_parameters` can differ from the parameters in the signature of 
-    `some_function` in two cases: 
+    ``fit_parameters`` can differ from the parameters in the signature of 
+    ``some_function`` in two cases: 
     
-    1)  If the signature of `some_function` contains `**kwargs`, `fit_parameters`
+    1)  If the signature of ``some_function`` contains ``**kwargs`, ``fit_parameters`
         can be used to specify parameters to pass into some_function that are
-        note explicitly delineated in the function signature. For example:
+        not explicitly delineated in the function signature. For example:
 
-            `some_function == my_func(a,**kwargs)`
+            ``some_function == my_func(a,**kwargs)`
     
-        would allow `fit_parameters = ['a','b','c']`. The `b` and `c` parameters 
+        would allow ``fit_parameters = ['a','b','c']`. The ``b`` and ``c`` parameters 
         would be passed in as keyword arguments. (The code does not check 
-        whether `my_func` can take those keyword arguments; that is the user's
+        whether ``my_func`` can take those keyword arguments; that is the user's
         responsibility) 
 
-    2)  If `vector_first_arg` is `True`, `fit_parameters` defines the parameters
+    2)  If ``vector_first_arg`` is ``True`, ``fit_parameters`` defines the parameters
         to pass in as a numpy.ndarray as the first function argument. If
-        `vector_first_arg` is `True`, `fit_parameters` is required. All 
+        ``vector_first_arg`` is ``True`, ``fit_parameters`` is required. All 
         function arguments besides this vector are treated as non-fittable 
         parameters. 
     
-    Finally, `fit_parameters` can be used to pass in other information about 
+    Finally, ``fit_parameters`` can be used to pass in other information about 
     the fit parameters. This includes the parameter guess, whether or not it is
     fixed during the regression, its bounds, and the mean and standard deviation
     of a gaussian prior to apply to that fit parameter (Bayesian sampling only).
     This information can either be passed in via a dictionary or dataframe. 
+
+    If ``fit_parameters`` comes in as a dataframe, the dataframe must have a 
+    ``name`` column with parameter names (just like the entries to a
+    ``fit_parameters`` list). It may have entries as described in the table below.
         
-    If `fit_parameters` comes in as a dictionary, the keys should be the
-    parameter names (just like the entries to a `fit_parameters` list). The
+    If ``fit_parameters`` comes in as a dictionary, the keys should be the
+    parameter names (just like the entries to a ``fit_parameters`` list). The
     values should be dictionaries keying parameter attributes to their values.
     For example:
 
-        `fit_parameters = {"K":{"guess":1,"bounds":(-np.inf,0)}}`
+        ``fit_parameters = {"K":{"guess":1,"lower_bound":0}}`
     
-    would indicate that parameter "K" should have a guess of 1 and bounds from
-    negative infinity to zero. 
+    would indicate that parameter "K" should have a guess of 1 and a lower bound
+    of zero. 
+
+    If ``fit_parameters`` comes in as a string, the software will treat this as 
+    a filename and will attempt to load it in as a dataframe.    
     
-    The allowed keys are: 
-
-    |----------+--------------------------------------------------------------------------|
-    | key      | value                                                                    |
-    |----------+--------------------------------------------------------------------------|
-    | 'guess'  | single float value (must be within bounds, if specified)                 |
-    | 'fixed'  | True of False                                                            | 
-    | 'bounds' | (lower,upper) as floats (-np.inf,np.inf) allowed                         | 
-    | 'prior'  | (mean,stdev) as floats (np.nan,np.nan) allowed, meaning uniform prior    |
-    |----------+--------------------------------------------------------------------------| 
-
-    If `fit_parameters` comes in as a dataframe, the dataframe can have the
-    following columns. 
+    The allowed columns (for the dataframe) or keys (for the dictionary) are: 
 
         +---------------+-----------------------------------------------------+
         | key           | value                                               |
         +===============+=====================================================+
-        | 'param'       | string name of the parameter                        |
+        | 'guess'       | guess as single float value (must be non-nan and    |
+        |               | within bounds if specified)                         |
         +---------------+-----------------------------------------------------+
-        | 'guess'       | guess as single float value (must be within bounds, |
-        |               | if specified)                                       |
+        | 'fixed'       | whether or not parameter can vary. True of False    |
         +---------------+-----------------------------------------------------+
-        | 'fixed'       | True of False                                       |
+        | 'lower_bound' | single float value; -np.inf allowed; None, nan or   |
+        |               | pd.NA interpreted as -np.inf.                       |
         +---------------+-----------------------------------------------------+
-        | 'lower_bound' | single float value; -np.inf allowed                 |
+        | 'upper_bound' | single float value; -np.inf allowed; None, nan or   |
+        |               | pd.NA interpreted as np.inf.                        |
         +---------------+-----------------------------------------------------+
-        | 'upper_bound' | single float value; np.inf allowed                  |
+        | 'prior_mean'  | single float value; np.nan allowed (see below)      |
         +---------------+-----------------------------------------------------+
-        | 'prior_mean'  | single float value; np.nan allowed                  |
-        +---------------+-----------------------------------------------------+
-        | 'prior_std'   | single float value; np.nan allowed                  |
+        | 'prior_std'   | single float value; np.nan allowed (see below)      |
         +---------------+-----------------------------------------------------+
 
-    If `fit_parameters` comes in as a string, this function will treat it as 
-    the name of a spreadsheet file to read into a dataframe.
+        Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
+        fields, declaring the prior mean and standard deviation. If both are
+        set to nan for a parameter, the prior is set to uniform between the
+        parameter bounds. If either 'prior_mean' or 'prior_std' is set to a
+        non-nan value, both must be non-nan to define the prior. When set, 
+        'prior_std' must be greater than zero. Neither can be np.inf. 
+
     """
     
     vector_first_arg = check_bool(value=vector_first_arg,
