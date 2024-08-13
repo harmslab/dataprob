@@ -82,11 +82,15 @@ def _build_columns(param_df,default_guess):
 
     for fc in float_columns:
 
+        # start with the pandas caster as this is smart and robust
         try:
             param_df[fc] = pd.to_numeric(param_df[fc])
         except Exception as e:
             err = f"Could not coerce all entries in the '{fc}' column to float\n"
             raise ValueError(err) from e
+        
+        # then do a direct cast to float
+        param_df[fc] = param_df[fc].astype(float)
     
     bool_columns = ["fixed"]
 

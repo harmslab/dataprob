@@ -110,10 +110,16 @@ def test__build_columns():
     assert np.array_equal(out_df["name"],["a","b"])
     assert np.array_equal(out_df["guess"],[20,20])
     assert np.array_equal(out_df["fixed"],[False,True])
-    assert np.array_equal(out_df["lower_bound"],[-200,-200])
+    assert np.array_equal(out_df["lower_bound"],[-200.0,-200.0])
     assert np.array_equal(out_df["upper_bound"],[200,200])
     assert np.array_equal(out_df["prior_mean"],[np.nan,20],equal_nan=True)
     assert np.array_equal(out_df["prior_std"],[np.nan,10],equal_nan=True)
+    
+    # We sent in guess above as an integer. Make sure it's being properly
+    # coerced to a float. We sent in lower_bound as a float. It should also
+    # be a float. 
+    assert np.issubdtype(out_df["guess"].dtype, np.floating)
+    assert np.issubdtype(out_df["lower_bound"].dtype, np.floating)
     
     # bad float coercion check
     for bad_key in ["guess","lower_bound","upper_bound","prior_mean","prior_std"]:

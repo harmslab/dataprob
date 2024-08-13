@@ -341,10 +341,12 @@ def test__setup_priors():
                                                  frozen_rv=stats.norm(loc=0,scale=1))
     assert np.isclose(base_offset + bounds_offset,f._gauss_prior_offsets[0])
 
+    # Make sure the code is really pulling the bounds from the param_df (needed
+    # for fast prior calcs).
     assert np.array_equal(f._lower_bounds,f.param_df["lower_bound"])
     assert np.array_equal(f._upper_bounds,f.param_df["upper_bound"])
 
-def test_BayesianSampler_ln_prior():
+def test_BayesianSampler__ln_prior():
 
     f = BayesianSampler()
     f.priors = np.array([[0],[1]])
@@ -358,18 +360,17 @@ def test_BayesianSampler_ln_prior():
     bounds_offset = _reconcile_bounds_and_priors(bounds=(bounds-0)/1,
                                                  frozen_rv=frozen_rv)
     
-
     # Try a set of values
     for v in [-0.9,-0.1,0.0,0.1,0.9]:
 
         print("testing",v)
         expected = frozen_rv.logpdf(v) + base_offset + bounds_offset
-        value = f.ln_prior(param=np.array([v]))
+        value = f._ln_prior(param=np.array([v]))
         assert np.isclose(expected,value)
 
     # Go outside of bounds
     expected = -np.inf
-    value = f.ln_prior(param=np.array([2]))
+    value = f._ln_prior(param=np.array([2]))
     assert np.isclose(expected,value)
 
     # Now set up two priors, one gauss with one infinite bound, one uniform with
@@ -396,21 +397,23 @@ def test_BayesianSampler_ln_prior():
         print("testing",v)
         z = (v - 2)/10
         expected = frozen_rv.logpdf(z) + total_gauss_offset + uniform_prior
-        value = f.ln_prior(np.array([v,-5]))
+        value = f._ln_prior(np.array([v,-5]))
         assert np.isclose(expected,value)
 
     # Outside of bounds
-    value = f.ln_prior(np.array([-1,2]))
+    value = f._ln_prior(np.array([-1,2]))
     assert np.isclose(-np.inf,value)
 
-def test_BayesianSampler__ln_prob(binding_curve_test_data):
+def xtest_BayesianSampler_ln_prior():
+    pass
+
+def xtest_BayesianSampler__ln_prob(binding_curve_test_data):
     pass
     
-    
 def test_BayesianSampler_ln_prob(binding_curve_test_data):
-    """
-    Test calculation ,looking for proper error checking.
-    """
+    
+    # Test calculation ,looking for proper error checking.
+    
     
     f = BayesianSampler()
 
@@ -453,7 +456,6 @@ def xtest_BayesianSampler__update_estimates():
 
 def xtest_BayesianSampler_fit_info():
     pass
-
 
 @pytest.mark.slow
 def test_fit(binding_curve_test_data,fit_tolerance_fixture):
