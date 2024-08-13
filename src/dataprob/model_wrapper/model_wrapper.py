@@ -52,8 +52,9 @@ class ModelWrapper:
         self._default_guess = check_float(value=default_guess,
                                           variable_name="default_guess")
 
-        # Define these here so __setattr__ and __getattr__ end up looking at
-        # instance-level attributes rather than class-level attributes.
+        # Re-define these here so __setattr__ and __getattr__ end up looking at
+        # instance-level (__dict__) attributes rather than class-level
+        # attributes.
         self._param_df = pd.DataFrame({"name":[]})
         self._other_arguments = {}
 
@@ -255,7 +256,9 @@ class ModelWrapper:
             csv, tsv, and txt are recognized). If param_input is a dataframe,
             values will be read directly from the dataframe. If param_input is a
             dict, it will be treated as a nested dictionary keying parameter
-            names to columns to values (param_input[parameter][column] -> value). 
+            names to columns to values (param_input[parameter][column] -> value).
+            (Example: ``param_input={"K":{"guess":1.0}}`` would set the guess
+            for parameter "K" to 1.0).
 
         Notes
         -----
@@ -264,9 +267,9 @@ class ModelWrapper:
         Parameter features specified in param_input will overwrite features in
         param_df. Features *not* set in param_input will *not* alter existing
         features in param_df. For example, you can safely specify a spreadsheet
-        with a 'guess' column without altering priors already set. You could 
-        also send in a dictionary setting the lower_bound for a single parameter
-        without altering any other parameters. 
+        with a 'guess' column without altering priors already set in param_df. 
+        Or, you could send in a dictionary setting the lower_bound for a single
+        parameter without altering any other parameters. 
         """
 
         # If a string, read as a spreadsheet
@@ -362,8 +365,15 @@ class ModelWrapper:
         """
 
         return self._other_arguments
+    
+    @property
+    def unfixed_mask(self):
+        """
+        Mask for param_df that returns only floating (unfixed) parameters.
+        """
 
-
+        return self._unfixed_mask
+        
     def __repr__(self):
         """
         Useful summary of current model wrapper state.

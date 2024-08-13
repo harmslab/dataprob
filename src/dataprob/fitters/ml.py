@@ -46,9 +46,11 @@ class MLFitter(Fitter):
             scipy.optimize.least_squares
         """
 
-        guesses = np.array(self._model.param_df["guess"])
-        bounds = np.array([self._model.param_df["lower_bound"],
-                           self._model.param_df["upper_bound"]])
+        to_fit = self._model.unfixed_mask
+
+        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
+        bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
+                           self._model.param_df.loc[to_fit,"upper_bound"]])
 
         # Do the actual fit
         fn = lambda *args: -self.weighted_residuals(*args)

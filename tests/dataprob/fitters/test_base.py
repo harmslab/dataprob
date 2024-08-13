@@ -41,7 +41,7 @@ def test_Fitter__sanity_check():
     with pytest.raises(RuntimeError):
         f._sanity_check("some error",["test_attribute"])
 
-def test_Fitter_reconcile_model_args():
+def test_Fitter__process_model_args():
 
     # Create a fitter that already has a model
     f = Fitter()
@@ -50,20 +50,20 @@ def test_Fitter_reconcile_model_args():
     f.model = mw
 
     # Should run. 
-    f._reconcile_model_args(model=None,guesses=None,names=None)
+    f._process_model_args(model=None,guesses=None,names=None)
     assert f._model is mw
 
     # Die. Cannot specify a new model or names
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=[1,2],names=["a","b"])
+        f._process_model_args(model=test_fcn,guesses=[1,2],names=["a","b"])
 
     # Die. Cannot specify a new model
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=None,names=None)
+        f._process_model_args(model=test_fcn,guesses=None,names=None)
 
     # Die. Cannot specify a new names
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=None,guesses=None,names=["a","b"])
+        f._process_model_args(model=None,guesses=None,names=["a","b"])
 
     # Create an empty fitter
     f = Fitter()
@@ -72,21 +72,21 @@ def test_Fitter_reconcile_model_args():
 
     # No model sent in, die.
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=None,guesses=[1,2],names=["a","b"])
+        f._process_model_args(model=None,guesses=[1,2],names=["a","b"])
 
     # Extra names sent in. Die
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=mw,guesses=[1,2],names=["a","b"])
+        f._process_model_args(model=mw,guesses=[1,2],names=["a","b"])
     
     # model and guesses -- fine
-    f._reconcile_model_args(model=mw,guesses=[1,2],names=None)    
+    f._process_model_args(model=mw,guesses=[1,2],names=None)    
     assert f._model is mw
 
     # Model and no guesses, fine. 
     f = Fitter()
     with pytest.raises(AttributeError):
         f._model
-    f._reconcile_model_args(model=mw,guesses=None,names=None)    
+    f._process_model_args(model=mw,guesses=None,names=None)    
     assert f._model is mw
 
     # Send in naked function, a is a length-two list
@@ -97,215 +97,394 @@ def test_Fitter_reconcile_model_args():
     
     # Naked function. Die because no guesses or names specified. 
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=None,names=None)
+        f._process_model_args(model=test_fcn,guesses=None,names=None)
     
     # Naked function. Die because no guesses or names specified. 
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=None,names=None)
+        f._process_model_args(model=test_fcn,guesses=None,names=None)
     
     # Naked function. Die because no guesses  specified. 
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=None,names=["x","y"])
+        f._process_model_args(model=test_fcn,guesses=None,names=["x","y"])
 
     # Naked function. Work. 
-    f._reconcile_model_args(model=test_fcn,guesses=[5,6],names=["x","y"])
+    f._process_model_args(model=test_fcn,guesses=[5,6],names=["x","y"])
     np.array_equal(f._model.param_df["name"],["x","y"])
 
     # Naked function. Work and create default parameter names
     f = Fitter()
-    f._reconcile_model_args(model=test_fcn,guesses=[5,6],names=None)
+    f._process_model_args(model=test_fcn,guesses=[5,6],names=None)
     np.array_equal(f._model.param_df["name"],["p0","p1"])
 
     # Naked function. die because guesses and names have different lengths
     f = Fitter()
     with pytest.raises(ValueError):
-        f._reconcile_model_args(model=test_fcn,guesses=[5,6],names=["x","y","z"])
+        f._process_model_args(model=test_fcn,guesses=[5,6],names=["x","y","z"])
 
+def test_Fitter__process_fit_args():
 
-def xtest_Fitter_fit(fitter_object,binding_curve_test_data):
+    f_base = Fitter()
+    def test_fcn(a=5,b=6): return a*b
+    mw = ModelWrapper(test_fcn)
+    f_base.model = mw
     
-    def dummy_fit(f,N,*args,**kwargs):
-        """
-        This function takes f and N and uses that to set fit results without
-        actually doing anything. It should be invoked by
+    base_kwargs = {"guesses":[1,2],
+                   "lower_bounds":[-10,-20],
+                   "upper_bounds":[10,20],
+                   "prior_means":[1,np.nan],
+                   "prior_stds":[1,np.nan],
+                   "fixed":[False,False]}
+
+    # basic check that it runs
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+    assert np.array_equal(f.param_df["guess"],[5,6])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["guess"],[1,2])
+    
+    # --------------------------------------------------------------------
+    # guesses
+
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+
+    # no argument -- do nothing
+    kwargs["guesses"] = None
+    assert np.array_equal(f.param_df["guess"],[5,6])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["guess"],[5,6])
+
+    # good argument
+    kwargs["guesses"] = [1,2]
+    assert np.array_equal(f.param_df["guess"],[5,6])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["guess"],[1,2])
+    
+    # too long
+    kwargs["guesses"] = [1,2,3]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+    
+    # --------------------------------------------------------------------
+    # lower_bounds
+
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+
+    # no argument -- do nothing
+    kwargs["lower_bounds"] = None
+    assert np.array_equal(f.param_df["lower_bound"],[-np.inf,-np.inf])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["lower_bound"],[-np.inf,-np.inf])
+
+    # good argument
+    kwargs["lower_bounds"] = [-10,-20]
+    assert np.array_equal(f.param_df["lower_bound"],[-np.inf,-np.inf])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["lower_bound"],[-10,-20])
+
+    # too long
+    kwargs["lower_bounds"] = [-10,-20,-30]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    # --------------------------------------------------------------------
+    # upper_bounds
+
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+
+    # no argument -- do nothing
+    kwargs["upper_bounds"] = None
+    assert np.array_equal(f.param_df["upper_bound"],[np.inf,np.inf])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["upper_bound"],[np.inf,np.inf])
+
+    # good argument
+    kwargs["upper_bounds"] = [10,20]
+    assert np.array_equal(f.param_df["upper_bound"],[np.inf,np.inf])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["upper_bound"],[10,20])
+
+    # too long
+    kwargs["upper_bounds"] = [10,20,30]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    # --------------------------------------------------------------------
+    # prior_means and prior_stds (both must be set together)
+
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+
+    # no arguments -- do nothing
+    kwargs["prior_means"] = None
+    kwargs["prior_stds"] = None
+    assert np.array_equal(f.param_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.param_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.param_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+
+    # good arguments
+    kwargs["prior_means"] = [1,np.nan]
+    kwargs["prior_stds"] = [2,np.nan]
+    assert np.array_equal(f.param_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.param_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["prior_mean"],[1,np.nan],equal_nan=True)
+    assert np.array_equal(f.param_df["prior_std"],[2,np.nan],equal_nan=True)
+
+    # This won't work unless we also set prior_stds
+    kwargs["prior_means"] = [np.nan,np.nan]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+    kwargs["prior_stds"] = [np.nan,np.nan]
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.param_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+
+    # bad arguments (too long). Make sure checks are happening on both
+    kwargs["prior_means"] = [1,1,1]
+    kwargs["prior_stds"] = [2,2]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    kwargs["prior_means"] = [1,1]
+    kwargs["prior_stds"] = [2,2,2]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    kwargs["prior_means"] = [1,1,1]
+    kwargs["prior_stds"] = [2,2,2]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    # --------------------------------------------------------------------
+    # fixed
+
+    f = copy.deepcopy(f_base)
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fixed"] = None
+    assert np.array_equal(f.param_df["fixed"],[False,False])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["fixed"],[False,False])
+
+    kwargs["fixed"] = [True,False]
+    assert np.array_equal(f.param_df["fixed"],[False,False])
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["fixed"],[True,False])
+
+    # too long
+    kwargs["fixed"] = [True,True,True]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+
+    # --------------------------------------------------------------------
+    # verify param_df sanity checking is occuring by sending in some 
+    # incompatible bounds
+
+    f = copy.deepcopy(f_base)
+    print(f.param_df)
+    kwargs = copy.deepcopy(base_kwargs)
+    
+    assert np.array_equal(f.param_df["guess"],[5,6])
+    assert np.array_equal(f.param_df["lower_bound"],[-np.inf,-np.inf])
+
+    # Send in incompatible values and make sure it does not set
+    kwargs["guesses"] = [0,0]
+    kwargs["lower_bounds"] = [5,5]
+    with pytest.raises(ValueError):
+        f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["guess"],[5,6])
+    assert np.array_equal(f.param_df["lower_bound"],[-np.inf,-np.inf])
+
+    # Relieve incompatibility
+    kwargs["guesses"] = [6,7]
+    kwargs["lower_bounds"] = [5,5]
+    f._process_fit_args(**kwargs)
+    assert np.array_equal(f.param_df["guess"],[6,7])
+    assert np.array_equal(f.param_df["lower_bound"],[5,5])
+
+def test_Fitter__process_obs_args():
+
+    f_base = Fitter()
+    def test_fcn(a=5,b=6): return a*b
+    mw = ModelWrapper(test_fcn)
+    f_base.model = mw
+    
+    # ----------------------------------------------------------------------
+    # basic check that it runs
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+
+    f._process_obs_args(y_obs=[1,2,3],
+                        y_std=[1,1,1])
+    
+    assert np.array_equal(f.y_obs,[1,2,3])
+    assert np.array_equal(f.y_std,[1,1,1])
+ 
+    # ----------------------------------------------------------------------
+    # No y_obs, fail
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+
+    # Fail and make sure nothing changed
+    with pytest.raises(ValueError):
+        f._process_obs_args(y_obs=None,
+                            y_std=[1,1,1])
+    assert f.y_obs is None
+    assert f.y_std is None
+
+    # now set y_obs with setter
+    f.y_obs = [1,2,3]
+    f._process_obs_args(y_obs=None,
+                        y_std=[1,1,1])
+    assert np.array_equal(f.y_obs,[1,2,3])
+    assert np.array_equal(f.y_std,[1,1,1])
+
+    # ----------------------------------------------------------------------
+    # No y_std, warn
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+
+    # Fail and make sure nothing changed
+    with pytest.warns():
+        f._process_obs_args(y_obs=[1,2,3],
+                            y_std=None)
+    assert np.array_equal(f.y_obs,[1,2,3])
+    expected_y_std = np.mean([1,2,3])*0.1*np.ones(3)
+    assert np.array_equal(f.y_std,expected_y_std)
+
+    # ----------------------------------------------------------------------
+    # y_std via setter, warn
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+    f.y_obs = [4,5,6] # have to define y_obs before y_std
+    f.y_std = [1,1,1]
+
+    # Should work fine, no warning because y_std defined previously
+    f._process_obs_args(y_obs=[1,2,3],y_std=None)
+    assert np.array_equal(f.y_obs,[1,2,3])
+    assert np.array_equal(f.y_std,[1,1,1])
+
+    # ----------------------------------------------------------------------
+    # setters do sanity checking; don't test exhaustively but make sure the
+    # checks are running
+
+    # nan in y_obs
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+    with pytest.raises(ValueError):
+        f._process_obs_args(y_obs=[np.nan,2,3],
+                            y_std=[1,1,1])
         
+    # negative value in y_std
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+    with pytest.raises(ValueError):
+        f._process_obs_args(y_obs=[1,2,3],
+                            y_std=[-1,1,1])
+
+    # ----------------------------------------------------------------------
+    # make sure y_std expands appropriately (done by setter, so quick check)
+
+    f = copy.deepcopy(f_base)
+    assert f.y_obs is None
+    assert f.y_std is None
+    f._process_obs_args(y_obs=[1,2,3],
+                        y_std=1)
+    assert np.array_equal(f.y_obs,[1,2,3])
+    assert np.array_equal(f.y_std,[1,1,1])
+
+
+
+def test_Fitter_fit(linear_fit):
+
+    df = linear_fit["df"]
+    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+
+    base_kwargs = {"model":linear_mw,
+                   "guesses":[1,2],
+                   "names":["m","b"],
+                   "lower_bounds":[-10,-20],
+                   "upper_bounds":[10,20],
+                   "prior_means":[1,np.nan],
+                   "prior_stds":[1,np.nan],
+                   "fixed":[False,False],
+                   "y_obs":df.y_obs,
+                   "y_std":df.y_std,
+                   "fit_kwarg":5}
+
+    def new_fitter():
+
+        # Create a fitter with a model, then hacked _fit, _fit_result, 
+        # and _update_fit_df
         f = Fitter()
-        f._fit = dummy_fit
-        
-        then 
-        
-        f.fit(f=f,N=N)
-
-        f and N are passed to dummy fit, which updates the fitter attributes 
-        appropriately fro the test. 
-        """
+        f._fit = lambda **kwargs: None
         f._fit_result = {}
-        f._success = True
-        
-        f._estimate = np.zeros(N,dtype=float)
-        f._stdev = 0.5*np.ones(N,dtype=float)
-        f._ninetyfive = 1.0*np.ones((2,N),dtype=float)
+        f._update_fit_df = lambda *args: None
 
-    N = len(binding_curve_test_data["guesses"])
-    kwargs = {"N":N,
-              "model":binding_curve_test_data["generic_model"],
-              "y_obs":binding_curve_test_data["df"].Y,
-              "y_std":binding_curve_test_data["df"].y_std,
-              "guesses":[5],
-              "names":["blah"],
-              "priors":[[0],[10]],
-              "bounds":[[-100],[100]]}
-
-    # Send in a generic model that will make us specify everything, and make 
-    # sure specifications are working
-    f = Fitter()
-    f._fit = dummy_fit
+        return f
     
-    test_kwargs = copy.deepcopy(kwargs)
-
-    f.fit(f=f,**test_kwargs)
+    f = new_fitter()
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["names"] = None
     
-    assert np.array_equal(f.y_obs,binding_curve_test_data["df"].Y)
-    assert np.array_equal(f.y_std,binding_curve_test_data["df"].y_std)
-    assert np.array_equal(f.guesses,[5])
-    assert np.array_equal(f.priors,[[0],[10]])
-    assert np.array_equal(f.names,["blah"])
+    assert not hasattr(f,"_success")
+    assert f._fit_has_been_run is False
+
+    f.fit(**kwargs)
+
+    assert f._success is None
     assert f._fit_has_been_run is True
 
-    # Send in a generic model with no y_std. Make sure it warns and sets
-    # value correctly. 
-    f = Fitter()
-    f._fit = dummy_fit
-    
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["y_std"] = None
-    with pytest.warns():
-        f.fit(f=f,**test_kwargs)
-    
-    scalar = np.mean(np.abs(binding_curve_test_data["df"].Y))*0.1
-    stdev = scalar*np.ones(len(binding_curve_test_data["df"].Y))
+    # ----------------------------------------------------------------------
+    # make sure _process_model_args is running with incompatible name argument
 
-    assert np.array_equal(f.y_obs,binding_curve_test_data["df"].Y)
-    assert np.allclose(f.y_std,stdev)
-    assert np.array_equal(f.guesses,[5])
-    assert np.array_equal(f.priors,[[0],[10]])
-    assert np.array_equal(f.names,["blah"])
-    assert f._fit_has_been_run is True
-
-    # Send in a generic model that will make us specify everything, but send in
-    # badness for each and make sure it throws error.
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["model"] = "not_callable"
+    f = new_fitter()
+    kwargs = copy.deepcopy(base_kwargs)
     with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
+        f.fit(**kwargs)
+    kwargs["names"] = None
+    f.fit(**kwargs)
     
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["y_obs"] = "not_yobs"
-    with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
+    # ----------------------------------------------------------------------
+    # make sure _process_fit_args is running with incompatible guesses argument
     
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["y_std"] = "not_stdev"
+    f = new_fitter()
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["names"] = None
+    kwargs["guesses"] = [1,2,3]
     with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
+        f.fit(**kwargs)
     
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["guesses"] = [1,2,3]
-    with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
+    f = new_fitter() # have to reset fitter b/c model set above
+    kwargs["guesses"] = [5,6]
+    f.fit(**kwargs)
 
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["names"] = ["a","b"]
-    with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
-
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["priors"] = "not_prior"
-    with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
-
-    f = Fitter()
-    f._fit = dummy_fit
-    test_kwargs = copy.deepcopy(kwargs)
-    test_kwargs["bounds"] = "not_bounds"
-    with pytest.raises(ValueError):
-        f.fit(f=f,**test_kwargs)
+    # ----------------------------------------------------------------------
+    # make sure _process_obs_args is running with incompatible y_obs argument
     
-    # Default run should fail because model is not specified
-    f = Fitter()
-    f._fit = dummy_fit
-    with pytest.raises(RuntimeError):
-        f.fit(f=f,N=N)
-
-    # Send in an unwrapped model. Should fail because no guesses. 
-    f = Fitter()
-    f._fit = dummy_fit
-    f.model = binding_curve_test_data["generic_model"]
-    with pytest.raises(RuntimeError):
-        f.fit(f=f,N=N)
-
-    # Default run will work with wrapped model because it will bring in all 
-    # values but will throw a warning because stdev are made up
-    f = Fitter()
-    f._fit = dummy_fit
-    mw = ModelWrapper(binding_curve_test_data["wrappable_model"])
-    f.model = mw
-    f.y_obs = binding_curve_test_data["df"].Y
-    with pytest.warns():
-        f.fit(f=f,N=N)
-
-    scalar = np.mean(np.abs(f.y_obs))*0.1
-
-    assert np.array_equal(f.guesses,np.ones(N))
-    assert np.array_equal(f.priors,np.nan*np.ones((2,N)),equal_nan=True)
-    assert np.array_equal(f.names,["K"])
-    assert np.allclose(f.y_std,scalar*np.ones(len(f.y_obs)))
-    assert f._fit_has_been_run is True
-
-    # Send in a generic model that will make us pre-specify many features 
-    f = Fitter()
-    f._fit = dummy_fit
-    f.model = binding_curve_test_data["generic_model"]
-    f.y_obs = binding_curve_test_data["df"].Y
-    f.y_std = binding_curve_test_data["df"].y_std
-    with pytest.raises(RuntimeError):
-        f.fit(f=f,N=N)
-
-    # works with guesses sent in
-    f.fit(f=f,
-          N=N,
-          guesses=[0])
+    f = new_fitter()
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["names"] = None
+    kwargs["y_obs"] = [1,2,3,4]
+    with pytest.raises(ValueError):
+        f.fit(**kwargs)
     
-    assert np.array_equal(f.guesses,np.zeros(N))
-    assert np.array_equal(f.priors,np.nan*np.ones((2,N)),equal_nan=True)
-    assert np.array_equal(f.names,["p0"])
-    assert np.array_equal(f.y_std,binding_curve_test_data["df"].y_std)
-    assert f._fit_has_been_run is True
-
-    # fix all parameters. should now fail because nothing is floating
-    f = Fitter()
-    f._fit = dummy_fit
-    mw = ModelWrapper(binding_curve_test_data["wrappable_model"])
-    for p in mw.fit_parameters:
-        mw.fit_parameters[p].fixed = True
-    f.model = mw
-    f.y_obs = binding_curve_test_data["df"].Y
-    f.y_std = binding_curve_test_data["df"].y_std
-    with pytest.raises(RuntimeError):
-        f.fit(f=f,N=N)
-
+    f = new_fitter() # have to reset fitter b/c model set above
+    kwargs["y_obs"] = df["y_obs"]
+    f.fit(**kwargs)
+    
 def test_Fitness__fit():
     f = Fitter()
     with pytest.raises(NotImplementedError):
@@ -549,9 +728,11 @@ def test_Fitness_y_obs_setter_getter(binding_curve_test_data):
 
     f = Fitter()
  
-    f.y_obs = binding_curve_test_data["df"].Y
+    y_obs_input = np.array(binding_curve_test_data["df"].Y)
+
+    f.y_obs = y_obs_input
     assert f.y_obs is not None
-    assert np.array_equal(f.y_obs,binding_curve_test_data["df"].Y)
+    assert np.array_equal(f.y_obs,y_obs_input)
     assert f._fit_has_been_run is False
 
     f = Fitter()
@@ -560,11 +741,16 @@ def test_Fitness_y_obs_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.y_obs = ["a","b"]
 
+    # nan
+    tmp_input = y_obs_input.copy()
+    tmp_input[0] = np.nan
+    with pytest.raises(ValueError):
+        f.y_std = tmp_input
+
     f = Fitter()
-    input_data = np.array(binding_curve_test_data["df"].Y)
-    f.y_obs = input_data
-    assert np.array_equal(f.y_obs,input_data)
-    assert f.num_obs == input_data.shape[0]
+    f.y_obs = y_obs_input
+    assert np.array_equal(f.y_obs,y_obs_input)
+    assert f.num_obs == y_obs_input.shape[0]
 
   
 def test_Fitness_y_std_setter_getter(binding_curve_test_data):
@@ -601,6 +787,18 @@ def test_Fitness_y_std_setter_getter(binding_curve_test_data):
         f.y_std = ["a","b"]
     with pytest.raises(ValueError):
         f.y_std = y_std_input[:-1]
+    
+    # nan
+    tmp_input = y_std_input.copy()
+    tmp_input[0] = np.nan
+    with pytest.raises(ValueError):
+        f.y_std = tmp_input
+    
+    # negative
+    tmp_input = y_std_input.copy()
+    tmp_input[0] = -1
+    with pytest.raises(ValueError):
+        f.y_std = tmp_input
     
     f.y_std = y_std_input
     assert np.array_equal(y_std_input,f.y_std)
@@ -774,30 +972,47 @@ def test_Fitness_append_samples(tmpdir):
     cwd = os.getcwd()
     os.chdir(tmpdir)
 
+    # -----------------------------------------------------------------------
     # make some files and arrays for testing
+
     sample_array = np.ones((100,3),dtype=float)
     with open("test.pickle","wb") as p:
         pickle.dump(sample_array,p)
     with open("bad_file.txt","w") as g:
         g.write("yo")
 
+    # -----------------------------------------------------------------------
     # Build a hacked Fitter object that has existing samples, three params, 
-    # and an overwritten _update_estimates call that does nothing.
-    base_f = Fitter()
-    base_f._samples = sample_array.copy()
-    base_f._num_params = 3
-    assert np.array_equal(base_f.samples.shape,(100,3))
-    def dummy(*args,**kwargs): pass
-    base_f._update_estimates = dummy
+    # and an overwritten _update_fit_df call that does nothing.
 
-    f = Fitter()
+    # Create a three parameter model to assign to the fitter (setting the 
+    # number of parameters)
+    def test_fcn(a,b,c): return a*b*c
+    mw = ModelWrapper(test_fcn)
+
+    # Create fitter and assign model
+    base_f = Fitter()
+    base_f.model = mw
+
+    # Assign samples
+    base_f._samples = sample_array.copy()
+    assert np.array_equal(base_f.samples.shape,(100,3))
+
+    # add dummy function
+    def dummy(*args,**kwargs): pass
+    base_f._update_fit_df = dummy
+
+    # -----------------------------------------------------------------------
+    # Run tests
 
     # Nothing happens
+    f = Fitter()
     f.append_samples(sample_file=None,
                      sample_array=None)
     
     # Check for existing samples (should fail without samples)
     f = Fitter()
+    f.model = mw
     assert f.samples is None
     with pytest.raises(ValueError):
         f.append_samples(sample_array=sample_array)
@@ -855,7 +1070,7 @@ def test_Fitness_append_samples(tmpdir):
     
     def dummy(*args,**kwargs):
         raise RuntimeError
-    f._update_estimates = dummy
+    f._update_fit_df = dummy
     
     with pytest.raises(RuntimeError):
         f.append_samples(sample_array=sample_array)

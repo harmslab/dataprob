@@ -36,8 +36,9 @@ def test_fit(binding_curve_test_data,fit_tolerance_fixture):
         f.fit(model=model,guesses=guesses,y_obs=df.Y,y_std=df.Y_stdev)
 
         # Assert that we succesfully passed in bounds
-        assert np.allclose(f.bounds,np.array([[0],[10]]))
-
+        assert np.allclose(f.param_df["lower_bound"],[0])
+        assert np.allclose(f.param_df["upper_bound"],[0])
+        
         # Make sure fit worked
         assert f.success
 

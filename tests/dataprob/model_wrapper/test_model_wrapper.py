@@ -416,6 +416,18 @@ def test_ModelWrapper_other_arguments():
     assert mw.other_arguments["d"] == "test"
     assert mw.other_arguments["e"] == 3
 
+def test_ModelWrapper_unfixed_mask():
+    
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    mw = ModelWrapper(model_to_test_wrap)
+    assert np.array_equal(mw.unfixed_mask,[True,True,True])
+    
+    # set to fixed -- should not update until finalized
+    mw.param_df.loc["a","fixed"] = True
+    assert np.array_equal(mw.unfixed_mask,[True,True,True])
+    mw.finalize_params()
+    assert np.array_equal(mw.unfixed_mask,[False,True,True])
+
 
 def test_ModelWrapper___repr__():
 

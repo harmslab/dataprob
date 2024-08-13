@@ -55,7 +55,13 @@ class Fitter:
                 err = f"'{a}' must be set before {call_string}\n"
                 raise RuntimeError(err)
 
-    def _reconcile_model_args(self,model,guesses,names):
+    def _process_model_args(self,model,guesses,names):
+        """
+        Process the arguments from .fit that define the model. Figure out 
+        whether to simply store the model as passed in or to wrap the model 
+        in a ModelWrapper instance. Validates consistency of model, guesses,
+        and names. 
+        """
 
         # Sanity check. If model is already defined, do not let the user send
         # in model or names arguments. Guesses are fine -- these will be 
@@ -74,8 +80,7 @@ class Fitter:
             
             return
         
-        # If self._model is not defined, make sure the user at least specifies
-        # model. 
+        # If self.model is not defined, make sure the user specifies a model. 
         if model is None:
             err = "model must be specified prior to fit\n"
             raise ValueError(err)
@@ -98,7 +103,7 @@ class Fitter:
         # parameters based on the user input. 
         if guesses is None:
             err = "guesses must be specified when passing in an unwrapped\n"
-            err += "function\n"
+            err += "function as a model.\n"
             raise ValueError(err)
         
         # Make sure the guesses are sane for figuring out the number of 
@@ -109,19 +114,128 @@ class Fitter:
                               expected_shape=(None,),
                               expected_shape_names="(num_params,)")
 
-        # If no names are specified, make up parameter names as p0, p1, 
-        # etc.
+        # If no names are specified, make up parameter names p0, p1, etc.
         if names is None:
             names = ["p{}".format(i) for i in range(len(guesses))]
 
         if len(names) != len(guesses):
-            err = "names and guesses should be the same length\n"
+            err = "If both are specified, names and guesses should be the same\n"
+            err += "length.\n"
             raise ValueError(err)
 
-        self.model = VectorModelWrapper(model_to_fit=model,
-                                        fittable_params=names)
+        # This wil create model, checking it for sanity
+        mw = VectorModelWrapper(model_to_fit=model,
+                                fittable_params=names)
+        
+        # Final assignment.
+        self.model = mw
 
 
+    def _process_fit_args(self,
+                          guesses,
+                          lower_bounds,
+                          upper_bounds,
+                          prior_means,
+                          prior_stds,
+                          fixed):
+        """
+        Process the arguments the user sends in setting the fit parameters. 
+        Updates self.param_df with the new values, only setting if the values
+        are consistent with each other (guesses between bounds, etc.)
+        """
+        
+        # Create a copy of the ModelWrapper parameter dataframe. Populate this
+        # with guesses, lower_bounds, upper_bounds, prior_means, prior_stds, 
+        # and fixedness, then drop it back in fully populated with the inputs.
+        # Doing it this way allows temporary inconsistent states while being set
+        # (guesses outside bounds, for example), but makes sure the final
+        # dataframe is consistent by passing it through the ModelWrapper.param_df
+        # setter. 
+        param_df = self._model.param_df.copy()
+
+        num_params = len(param_df)
+
+        if guesses is not None:
+            guesses = check_array(value=guesses,
+                                  variable_name="guesses",
+                                  expected_shape=(num_params,),
+                                  expected_shape_names=f"({num_params},)")
+            param_df.loc[:,"guess"] = guesses
+        
+        if lower_bounds is not None:
+            lower_bounds = check_array(value=lower_bounds,
+                                       variable_name="lower_bounds",
+                                       expected_shape=(num_params,),
+                                       expected_shape_names=f"({num_params},)")
+            param_df.loc[:,"lower_bound"] = lower_bounds
+
+        if upper_bounds is not None:
+            upper_bounds = check_array(value=upper_bounds,
+                                       variable_name="upper_bounds",
+                                       expected_shape=(num_params,),
+                                       expected_shape_names=f"({num_params},)")
+            param_df.loc[:,"upper_bound"] = upper_bounds
+
+        if prior_means is not None:
+            prior_means = check_array(value=prior_means,
+                                      variable_name="prior_means",
+                                      expected_shape=(num_params,),
+                                      expected_shape_names=f"({num_params},)")
+            param_df.loc[:,"prior_mean"] = prior_means
+
+        if prior_stds is not None:
+            prior_stds = check_array(value=prior_stds,
+                                     variable_name="prior_stds",
+                                     expected_shape=(num_params,),
+                                     expected_shape_names=f"({num_params},)")
+            param_df.loc[:,"prior_std"] = prior_stds
+
+        if fixed is not None:
+            fixed = check_array(value=fixed,
+                                variable_name="fixed",
+                                expected_shape=(num_params,),
+                                expected_shape_names=f"({num_params},)")
+            fixed = np.array(fixed,dtype=bool)
+            param_df.loc[:,"fixed"] = fixed
+
+        # Record guesses, etc. with the param_df setter. It will check for 
+        # argument sanity. 
+        self._model.param_df = param_df
+        
+    def _process_obs_args(self,
+                          y_obs,
+                          y_std):
+        """
+        Process the arguments the user sends in defining the observable (y_obs
+        and y_std). Make sure they are consistent with each other.
+        """
+
+        # Record y_obs if specified. The setter does sanity checking. 
+        if y_obs is not None:
+            self.y_obs = y_obs
+        
+        # Make sure y_obs was specified
+        if self.y_obs is None:
+            err = "y_obs must be specified prior to doing a fit\n"
+            raise ValueError(err)
+        
+        # Record y_std if specified. The setter does sanity checking. 
+        if y_std is not None:
+            self.y_std = y_std
+
+        # Make fake y_std if not specified, warning. 
+        if self.y_std is None:
+
+            scalar = np.mean(np.abs(self._y_obs))*0.1
+            self.y_std = scalar*np.ones(len(self.y_obs),dtype=float)
+
+            w = "\ny_std must be sent in for proper residual/likelihood\n"
+            w += f"calculation. We have arbitrarily set it to {scalar:.2e}\n"
+            w += "(10% of mean y_obs magnitude). We highly recommend you\n"
+            w += "explicitly set your estimate for the uncertainty on each\n"
+            w += "observation.\n"
+            warnings.warn(w) 
+        
     def fit(self,
             model=None,
             guesses=None,
@@ -167,105 +281,32 @@ class Fitter:
 
         # Make sure model already exists or create one based on existing 
         # self.model and model, guesses, names arguments. 
-        self._reconcile_model_args(model=model,
-                                   guesses=guesses,
-                                   names=names)
+        self._process_model_args(model=model,
+                                 guesses=guesses,
+                                 names=names)
 
-        # Create a copy of the ModelWrapper parameter dataframe. Populate this
-        # with guesses, lower_bounds, upper_bounds, prior_means, prior_stds, 
-        # and fixedness, then drop it back in fully populated with the inputs.
-        # Doing it this way allows temporary inconsistent states while being set
-        # (guesses outside bounds, for example), but makes sure the final
-        # dataframe is consistent by passing it through the ModelWrapper.param_df
-        # setter. 
-        param_df = self._model.param_df
-        num_params = len(param_df)
-
-        if guesses is not None:
-            guesses = check_array(value=guesses,
-                                  variable_name="guesses",
-                                  expected_shape=(num_params,),
-                                  expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"guess"] = guesses
+        # load guesses etc. into param_df
+        self._process_fit_args(guesses=guesses,
+                               lower_bounds=lower_bounds,
+                               upper_bounds=upper_bounds,
+                               prior_means=prior_means,
+                               prior_stds=prior_stds,
+                               fixed=fixed)
         
-        if lower_bounds is not None:
-            lower_bounds = check_array(value=lower_bounds,
-                                       variable_name="lower_bounds",
-                                       expected_shape=(num_params,),
-                                       expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"lower_bound"] = lower_bounds
+        # Load y_obs and y_std into attributes
+        self._process_obs_args(y_obs=y_obs,
+                               y_std=y_std)
 
-        if upper_bounds is not None:
-            upper_bounds = check_array(value=upper_bounds,
-                                       variable_name="upper_bounds",
-                                       expected_shape=(num_params,),
-                                       expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"upper_bound"] = upper_bounds
-
-        if prior_means is not None:
-            prior_means = check_array(value=prior_means,
-                                      variable_name="prior_means",
-                                      expected_shape=(num_params,),
-                                      expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"prior_mean"] = prior_means
-
-        if prior_stds is not None:
-            prior_stds = check_array(value=prior_stds,
-                                     variable_name="prior_stds",
-                                     expected_shape=(num_params,),
-                                     expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"prior_std"] = prior_stds
-
-        if fixed is not None:
-            fixed = check_array(value=fixed,
-                                variable_name="fixed",
-                                expected_shape=(num_params,),
-                                expected_shape_names=f"({num_params},)")
-            param_df.loc[:,"fixed"] = fixed
-
-        # Record guesses, etc. with the param_df setter. It will check for 
-        # argument sanity. 
-        self._model.param_df = param_df
-
-        # Record y_obs if specified. The setter does sanity checking. 
-        if y_obs is not None:
-            self.y_obs = y_obs
+        # Final check that everything is loaded 
+        self._sanity_check("fit can be done",["model","y_obs","y_std"])
         
-        # Make sure y_obs was specified
-        if self._y_obs is None:
-            err = "y_obs must be specified prior to doing a fit\n"
-            raise ValueError(err)
-        
-        # Record y_std if specified. The setter does sanity checking. 
-        if y_std is not None:
-            self.y_std = y_std
-
-        # Make fake y_std if not specified, warning. 
-        if self.y_std is None:
-
-            scalar = np.mean(np.abs(self._y_obs))*0.1
-            self.y_std = scalar*np.ones(len(self.y_obs),dtype=float)
-
-            w = "\ny_std must be sent in for proper residual/likelihood\n"
-            w += f"calculation. We have arbitrarily set it to {scalar:.2e}\n"
-            w += "(10% of mean y_obs magnitude). We highly recommend you\n"
-            w += "explicitly set your estimate for the uncertainty on each\n"
-            w += "observation.\n"
-            warnings.warn(w) 
-
         # No fit has been run
         self._success = None
 
-        self._sanity_check("fit can be done",["model","y_obs","y_std"])
+        # Finalize model
+        self._model.finalize_params()
 
-        # Try to finalize the model parameters. 
-        try:
-            self._model.finalize_params()
-        except ValueError as e:
-            err = "param_df has a problem. Please update it and run again. See\n"
-            err += "the error trace above for more information.\n"
-            raise ValueError(err) from e
-        
+        # Run the fit
         self._fit(**kwargs)
 
         self._fit_has_been_run = True
@@ -461,7 +502,8 @@ class Fitter:
         y_obs = check_array(value=y_obs,
                             variable_name="y_obs",
                             expected_shape=(None,),
-                            expected_shape_names="(num_obs,)")
+                            expected_shape_names="(num_obs,)",
+                            nan_allowed=False)
         self._y_obs = y_obs
         self._fit_has_been_run = False
 
@@ -500,7 +542,13 @@ class Fitter:
         y_std = check_array(value=y_std,
                             variable_name="y_std",
                             expected_shape=(self.num_obs,),
-                            expected_shape_names=f"({self.num_obs},)")
+                            expected_shape_names=f"({self.num_obs},)",
+                            nan_allowed=False)
+        
+        # no values < 0 allowed
+        if np.sum(y_std < 0) > 0:
+            err = "all entries in y_std must be greater than zero\n"
+            raise ValueError(err)
         
         self._y_std = y_std
         self._fit_has_been_run = False

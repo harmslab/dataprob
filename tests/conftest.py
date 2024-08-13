@@ -216,27 +216,30 @@ def fitter_object(binding_curve_test_data):
 
     out_dict["wrapped_fit"] = wrapped_fit
 
-    # Stupidly simply 
+    return out_dict
+
+@pytest.fixture(scope="module")
+def linear_fit():
+    
+    out = {}
+
+    out["coeff"] = {"m":2,"b":1}
+
     x = np.arange(10)
-    y_obs = 2*x + 1
+    y_obs = out["coeff"]["m"]*x + out["coeff"]["b"]
     y_std = 0.1*np.ones(10)
 
-    def simple_linear(m,b,x): return m*x + b
-    mw = ModelWrapper(simple_linear,
-                      fittable_params=["m","b"])
-    mw.x = x
+    out["df"] = pd.DataFrame({"x":x,
+                              "y_obs":y_obs,
+                              "y_std":y_std})
 
-    f = MLFitter()
-    f.model = mw
-    f.fit(y_obs=y_obs,
-          y_std=y_std)
+    def simple_linear(m,b,x):
+        return m*x + b
     
-    if not f.success:
-        raise RuntimeError("simple linear fit did not converge")
-    
-    out_dict["simple_linear"] = f
+    out["fcn"] = simple_linear
 
-    return out_dict
+    return out
+
 
 ## Code for skipping slow tests.
 def pytest_addoption(parser):
