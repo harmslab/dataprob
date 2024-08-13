@@ -14,10 +14,16 @@ import warnings
 
 from dataprob.check import check_array
 from dataprob.check import check_float
+from dataprob.check import check_int
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
-    
+
+def _pretty_zeropad_str(N):
+
+    num_digits = len(f"{N}") + 1
+    fmt_string = "s{:0" + f"{num_digits}" + "d}"
+    return fmt_string
 
 class Fitter:
     """
@@ -619,98 +625,15 @@ class Fitter:
     @property
     def samples(self):
         """
-        Samples of fit parameters.
+        Samples of fit parameters. If fit has been run and generated samples, 
+        this will be a float numpy array with a shape (num_samples,num_param). 
+        Otherwise, is None. 
         """
 
         try:
             return self._samples
         except AttributeError:
             return None
-    
-    def get_sample_df(self,num_samples=100):
-
-        out = {}
-        
-        y_obs = self.y_obs
-        if y_obs is not None:
-            out["y_obs"] = y_obs
-
-        y_std = self.y_std
-        if y_std is not None:
-            out["y_std"] = y_std
-
-        if self.success:
-            out["y_calc"] = self.model(self.fit_df["estimate"])
-
-        samples = self.samples
-        if samples is not None:
-            
-            N = samples.shape[0]
-            num_digits = len(f"{N}") + 1
-            fmt_string = "s{:0" + f"{num_digits}" + "d}"
-            for i in range(0,N,N//(num_samples-1)):
-                key = fmt_string.format(i)
-                out[key] = self.model(self.samples[i])
-    
-        return pd.DataFrame(out)
-
-    def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
-        """
-        Create a "corner plot" that shows distributions of values for each
-        parameter, as well as cross-correlations between parameters.
-
-        Parameters
-        ----------
-        filter_params : list-like
-            strings used to search parameter names.  if the string matches,
-            the parameter is *excluded* from the plot.
-        """
-
-        # Don't return anything if this is the base class
-        if self.fit_type == "":
-            return None
-
-        # If the user passes a string (instead of a list or tuple of patterns),
-        # convert it to a list up front.
-        if type(filter_params) is str:
-            filter_params = (filter_params,)
-
-        skip_pattern = re.compile("|".join(filter_params))
-
-        s = self.samples
-
-        # Make sure that fit actually returned samples. (Will fail, for example
-        # if Jacobian misbehaves in ML fit)
-        if len(s) == 0:
-            err = "\n\nFit did not produce samples for generation of a corner plot.\nCheck warnings.\n"
-            raise RuntimeError(err)
-
-        keep_indexes = []
-        corner_range = []
-        names = []
-        est_values = []
-        for i in range(s.shape[1]):
-
-            name = self.fit_df["name"][i]
-            estimate = self.fit_df["estimate"][i]
-
-            # look for patterns to skip
-            if skip_pattern.search(name):
-                print("not doing corner plot for parameter ",name)
-                continue
-
-            names.append(name)
-            keep_indexes.append(i)
-            corner_range.append(tuple([np.min(s[:,i])-0.5,np.max(s[:,i])+0.5]))
-
-            est_values.append(estimate)
-
-        to_plot = s[:,np.array(keep_indexes,dtype=int)]
-
-        fig = corner.corner(to_plot,labels=names,range=corner_range,
-                            truths=est_values,*args,**kwargs)
-
-        return fig
 
     def write_samples(self,output_file):
         """
@@ -793,10 +716,160 @@ class Fitter:
 
         self._update_fit_df()
 
+    def get_sample_df(self,num_samples=100):
+        """
+        Create a dataframe with y_calc for samples from parameter uncertainty as
+        columns. The output dataframe will have the columns 'y_obs', 'y_std',
+        'y_calc', 's0', 's1', ... 'sn', where 'y_calc' is the calculated value
+        using the ``self.fit_df["estimate"]`` parameters and s0 through sn are
+        calculated values using parameters sampled from the estimated 
+        likelihood surface. If no samples have been generated, the dataframe
+        will omit the s0-sn columns. 
+
+        Parameters
+        ----------
+        num_samples : int
+            number of samples to take. 
+
+        Returns
+        -------
+        sample_df : pandas.DataFrame
+            dataframe with y_obs, y_calc, and values sampled from likelihood
+            surface. 
+        """
+
+        num_samples = check_int(value=num_samples,
+                                variable_name="num_samples",
+                                minimum_allowed=0)
+
+        # Out dictionary
+        out = {}
+        
+        # Get y_obs if defined
+        y_obs = self.y_obs
+        if y_obs is not None:
+            out["y_obs"] = y_obs
+
+        # get y_std if defined
+        y_std = self.y_std
+        if y_std is not None:
+            out["y_std"] = y_std
+
+        # get y_calc if fit was successful
+        if self.success:
+            out["y_calc"] = self.model(self.fit_df["estimate"])
+
+        samples = self.samples
+        if samples is not None:
+            
+            N = samples.shape[0]
+            fmt_string = _pretty_zeropad_str(N)
+
+            for i in range(0,N,N//(num_samples-1)):
+                key = fmt_string.format(i)
+                out[key] = self.model(self.samples[i])
+    
+        return pd.DataFrame(out)
+
+    def corner_plot(self,filter_params=None,**kwargs):
+        """
+        Create a "corner plot" that shows distributions and correlations of 
+        values for all fit parameters. This can only be run if the analysis 
+        has generated samples. 
+
+        Parameters
+        ----------
+        filter_params : list-like, optional
+            strings used to search parameter names.  If a parameter name matches
+            one of the patterns, it is *not* plotted. 
+        **kwargs : 
+            any extra keyword arguments are passed directly to corner.corner 
+            to tune formatting, etc. To learn more, ``import corner`` then
+            ``help(corner.corner)``. 
+
+        Returns
+        -------
+        fig : matplotlib.Figure
+            matplotlib figure instance generated by calling corner.corner
+        """
+
+        # Don't return anything if this is the base class
+        if self.fit_type == "":
+            return None
+
+        # if filter parameters are not specified, no skip_pattern
+        if filter_params is None:
+            skip_pattern = None
+
+        # otherwise
+        else:
+
+            # If the user passes a string (instead of a list or tuple of patterns),
+            # convert it to a list up front.
+            if type(filter_params) is str:
+                filter_params = (filter_params,)
+
+            # Make sure it's strings
+            filter_params = [str(p) for p in filter_params]
+
+            # compile a pattern to look for
+            skip_pattern = re.compile("|".join(filter_params))
+
+        # Check for samples
+        if self.samples is None:
+            err = "Fit does not have samples. Could not generate a corner plot.\n"
+            raise RuntimeError(err)
+        
+        # Go through samples
+        keep_indexes = []
+        corner_range = []
+        names = []
+        est_values = []
+        for i in range(self.samples.shape[1]):
+
+            # Get name and estimate
+            name = self.fit_df["name"][i]
+            estimate = self.fit_df["estimate"][i]
+
+            # look for patterns to skip
+            if skip_pattern is not None and skip_pattern.search(name):
+                print("not doing corner plot for parameter ",name)
+                continue
+
+            names.append(name)
+            keep_indexes.append(i)
+            corner_range.append(tuple([np.min(self.samples[:,i])-0.5,
+                                       np.max(self.samples[:,i])+0.5]))
+            est_values.append(estimate)
+
+        # make sure we kept at least one parameter
+        if len(keep_indexes) == 0:
+            err = "filter_params removed all parameters. Could not generate\n"
+            err += "corner plot\n"
+            raise ValueError(err)
+
+        # Create array to plot samples
+        to_plot = self.samples[:,np.array(keep_indexes,dtype=int)]
+
+        # Load labels, range, and truths into kwargs only if the user has not
+        # defined them as explicit kwargs. User corner.corner to check sanity 
+        # of their inputs. 
+        if "labels" not in kwargs:
+            kwargs["labels"] = names
+        if "range" not in kwargs:
+            kwargs["range"] = corner_range
+        if "truths" not in kwargs:
+            kwargs["truths"] = est_values
+
+        # Call corner 
+        fig = corner.corner(to_plot,**kwargs)
+
+        return fig
+
     @property
     def num_params(self):
         """
-        Number of fit parameters.
+        Number of fit parameters. If model has not been defined, will be None. 
         """
 
         try:
@@ -807,7 +880,7 @@ class Fitter:
     @property
     def num_obs(self):
         """
-        Number of observations.
+        Number of observations. If y_obs has not been defined, will be None. 
         """
 
         try:
@@ -818,14 +891,15 @@ class Fitter:
     @property
     def fit_type(self):
         """
-        Fit type. 
+        Fit type as a string. 
         """
         return self._fit_type
 
     @property
     def success(self):
         """
-        Whether the fit was successful.
+        Whether the fit was successful when run (True or False). If no fit has
+        been attempted, will be None.
         """
 
         try:
@@ -836,10 +910,11 @@ class Fitter:
     @property
     def fit_info(self):
         """
-        Information about fit run.
+        Should be implemented in subclass. Information about fit run as a 
+        dictionary. 
         """
 
-        return None
+        raise NotImplementedError("should be implemented in subclass\n")
     
     @property
     def fit_result(self):

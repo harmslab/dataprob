@@ -4,17 +4,35 @@ import pytest
 from dataprob.fitters.base import Fitter
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
+from dataprob.fitters.base import _pretty_zeropad_str
 
 import numpy as np
 import pandas as pd
+import matplotlib
 
 import os
 import pickle
 import copy
 
-# ---------------------------------------------------------------------------- #
-# Test __init__ 
-# ---------------------------------------------------------------------------- #
+def test__pretty_zeropad_str():
+
+    x = _pretty_zeropad_str(0)
+    assert x == "s{:02d}"
+
+    x = _pretty_zeropad_str(1)
+    assert x == "s{:02d}"
+
+    x = _pretty_zeropad_str(9)
+    assert x == "s{:02d}"
+
+    x = _pretty_zeropad_str(10)
+    assert x == "s{:03d}"
+
+    x = _pretty_zeropad_str(99)
+    assert x == "s{:03d}"
+
+    x = _pretty_zeropad_str(100)
+    assert x == "s{:04d}"
 
 def test_Fitter__init__():
     """
@@ -920,17 +938,178 @@ def test_Fitness_fit_df():
     f.y_std = 0.1
 
 
-def xtest_Fitness_samples():
-    pass
+def test_Fitness_samples():
+    
+    f = Fitter()
+    assert f.samples is None
+    f._samples = "something"
+    assert f.samples == "something"
 
 
-def xtest_Fitness_get_sample_df():
-    pass
+def test_Fitness_get_sample_df():
+    
+    # some test data
+    y_obs = np.arange(10)
+    y_std = np.ones(10)
+    def test_fcn(a=1,b=2): return a*b*np.ones(10)
+    mw = ModelWrapper(test_fcn)
+    fake_samples = np.ones((1000,2),dtype=float)
+
+    # Error checking on num_samples
+    f = Fitter()
+    with pytest.raises(ValueError):
+        f.get_sample_df(num_samples=-1)
+    with pytest.raises(ValueError):
+        f.get_sample_df(num_samples="a")
+        
+    # empty class - return empty dataframe
+    f = Fitter()
+    sample_df = f.get_sample_df()
+    assert issubclass(type(sample_df),pd.DataFrame)
+    assert len(sample_df) == 0
+
+    # add y_obs, should be in dataframe by itself
+    f.y_obs = y_obs
+    sample_df = f.get_sample_df()
+    assert issubclass(type(sample_df),pd.DataFrame)
+    assert len(sample_df) == 10
+    assert np.array_equal(sample_df["y_obs"],y_obs)
+    assert np.array_equal(sample_df.columns,["y_obs"])
+
+    # add y_std, should now be in dataframe
+    f.y_std = y_std
+    sample_df = f.get_sample_df()
+    assert issubclass(type(sample_df),pd.DataFrame)
+    assert len(sample_df) == 10
+    assert np.array_equal(sample_df["y_obs"],y_obs)
+    assert np.array_equal(sample_df["y_std"],y_std)
+    assert np.array_equal(sample_df.columns,["y_obs","y_std"])
+
+    # Create a fitter that has apparently been run, but has no samples
+    f = Fitter()
+    f.y_obs = y_obs
+    f.y_std = y_std
+    f.model = mw
+    f._fit_df = pd.DataFrame({"estimate":[10,20]})
+    f._success = True
+
+    sample_df = f.get_sample_df()
+    assert issubclass(type(sample_df),pd.DataFrame)
+    assert len(sample_df) == 10
+    assert np.array_equal(sample_df["y_obs"],y_obs)
+    assert np.array_equal(sample_df["y_std"],y_std)
+    expected_y_calc = 10*20*np.ones(10)
+    assert np.array_equal(sample_df["y_calc"],expected_y_calc)
+    assert np.array_equal(sample_df.columns,["y_obs","y_std","y_calc"])
+
+    # Add some fake samples
+    f._samples = fake_samples
+    sample_df = f.get_sample_df()
+    assert len(sample_df) == 10
+    assert np.array_equal(sample_df["y_obs"],y_obs)
+    assert np.array_equal(sample_df["y_std"],y_std)
+    expected_y_calc = 10*20*np.ones(10)
+    assert np.array_equal(sample_df["y_calc"],expected_y_calc)
+    assert np.array_equal(sample_df.columns[:4],["y_obs","y_std","y_calc","s00000"])
+    assert sample_df.columns[-1] == "s00990"
+    assert len(sample_df.columns) == 103
+
+    # Get fewer samples
+    sample_df = f.get_sample_df(num_samples=10)
+    assert len(sample_df) == 10
+    assert np.array_equal(sample_df["y_obs"],y_obs)
+    assert np.array_equal(sample_df["y_std"],y_std)
+    expected_y_calc = 10*20*np.ones(10)
+    assert np.array_equal(sample_df["y_calc"],expected_y_calc)
+    assert np.array_equal(sample_df.columns[:4],["y_obs","y_std","y_calc","s00000"])
+    assert sample_df.columns[-1] == "s00999"
+    assert len(sample_df.columns) == 13
 
 
-def xtest_corner_plot():
-    ## MOVE THIS FUNCTION
-    pass
+def test_corner_plot():
+
+    # tests run the whole decision tree of the function to identify major 
+    # errors, but I'm not checking output here because it's graphical. 
+    
+    # some test data
+    y_obs = np.arange(10)
+    y_std = np.ones(10)
+    def test_fcn(a=1,b=2): return a*b*np.ones(10)
+    mw = ModelWrapper(test_fcn)
+    fake_samples = np.random.normal(loc=0,scale=1,size=(1000,2))
+
+    # Create a fitter that has apparently been run and has some samples
+    f = Fitter()
+    f.y_obs = y_obs
+    f.y_std = y_std
+    f.model = mw
+    f._fit_df = pd.DataFrame({"name":["a","b"],"estimate":[10,20]})
+    f._success = True
+    f._samples = fake_samples
+
+    # no fit_type specified
+    fig = f.corner_plot()
+    assert fig is None
+
+    # set fit type, should now run
+    f._fit_type = "fake"
+    fig = f.corner_plot()
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # Send in filter parameter possibilities. It should gracefully handle all
+    # of these cases. 
+    fig = f.corner_plot(filter_params=None)
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    
+    fig = f.corner_plot(filter_params="blah")
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    fig = f.corner_plot(filter_params=["blah"])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    fig = f.corner_plot(filter_params=[1])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    
+    # filter all parameters
+    with pytest.raises(ValueError):
+        fig = f.corner_plot(filter_params=["a","b"])
+    
+    # filter one
+    fig = f.corner_plot(filter_params=["a"])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # filter other
+    fig = f.corner_plot(filter_params=["b"])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # Get rid of samples attribute. Should now fail 
+    f._samples = None
+    with pytest.raises(RuntimeError):
+        fig = f.corner_plot()
+
+    # put samples back in
+    f._samples = fake_samples
+    fig = f.corner_plot(filter_params=None)
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # pass in labels
+    fig = f.corner_plot(filter_params=None,labels=["x","y"])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # pass in range
+    fig = f.corner_plot(filter_params=None,range=[(-10,10),(-100,100)])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+    # pass in truths
+    fig = f.corner_plot(filter_params=None,truths=[1,2])
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+
+
+
+
+
+
+
 
 def test_Fitness_write_samples(tmpdir):
     
@@ -1116,14 +1295,29 @@ def test_Fitness_num_obs():
     f.y_obs = np.array([])
     assert f.num_obs == 0
 
-def xtest_Fitness_fit_type():
-    pass
+def test_Fitness_fit_type():
+    
+    f = Fitter()
+    assert f.fit_type == ""
+    f._fit_type = "something"
+    assert f.fit_type == "something"
 
-def xtest_Fitness_success():
-    pass
+def test_Fitness_success():
+    
+    f = Fitter()
+    assert f.success is None
+    f._success = True
+    assert f.success is True
 
-def xtest_Fitness_fit_info():
-    pass
+def test_Fitness_fit_info():
+    
+    f = Fitter()
+    with pytest.raises(NotImplementedError):
+        f.fit_info
 
-def xtest_Fitness_fit_result():
-    pass
+def test_Fitness_fit_result():
+    
+    f = Fitter()
+    assert f.fit_result is None
+    f._fit_result = "something"
+    assert f.fit_result == "something"
