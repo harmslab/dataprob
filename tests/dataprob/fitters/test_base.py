@@ -899,15 +899,27 @@ def test_Fitness__initialize_fit_df():
     # test on fake class
     class TestClass:
         def __init__(self):
-            self.param_df = {"name":["a","b"]}
+            self.param_df = {"name":["a","b"],
+                             "guess":[10,10],
+                             "fixed":[True,False],
+                             "lower_bound":[-np.inf,0],
+                             "upper_bound":[np.inf,100],
+                             "prior_mean":[1,np.nan],
+                             "prior_std":[1,np.nan]}
     
     tc = TestClass()
     Fitter._initialize_fit_df(tc)
-    assert np.array_equal(tc._fit_df["name"],["a","b"])
+    assert np.array_equal(tc.param_df["name"],tc._fit_df["name"])
     assert np.sum(np.isnan(tc._fit_df["estimate"]))
     assert np.sum(np.isnan(tc._fit_df["std"]))
     assert np.sum(np.isnan(tc._fit_df["low_95"]))
     assert np.sum(np.isnan(tc._fit_df["high_95"]))
+    
+    columns = ["guess","fixed",
+               "lower_bound","upper_bound",
+               "prior_mean","prior_std"]
+    for k in columns:
+        assert np.array_equal(tc.param_df[k],tc._fit_df[k],equal_nan=True)
     
 
 def test_Fitness__update_fit_df():
@@ -932,7 +944,9 @@ def test_Fitness_fit_df():
     assert len(f.fit_df) == 2
     assert np.array_equal(f.fit_df["name"],["a","b"])
     assert np.array_equal(f.fit_df.columns,
-                          ["name","estimate","std","low_95","high_95"])
+                          ["name","estimate","std","low_95","high_95",
+                           "guess","fixed","lower_bound","upper_bound",
+                           "prior_mean","prior_std"])
 
     f.y_obs = y_obs
     f.y_std = 0.1

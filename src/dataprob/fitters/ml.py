@@ -47,7 +47,6 @@ class MLFitter(Fitter):
         """
 
         to_fit = self._model.unfixed_mask
-
         guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
         bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
                            self._model.param_df.loc[to_fit,"upper_bound"]])
@@ -60,7 +59,11 @@ class MLFitter(Fitter):
                                                   **kwargs)
 
         self._success = self._fit_result.success
-
+        
+        # Delete samples if they were present from a previous fit
+        if hasattr(self,"_samples"):
+            del self._samples
+    
         self._update_fit_df()
 
     def _update_fit_df(self):
@@ -78,7 +81,7 @@ class MLFitter(Fitter):
             J = self._fit_result.jac
             cov = np.linalg.inv(2*np.dot(J.T,J))
 
-            stdev = np.sqrt(np.diagonal(cov)) #variance)
+            stdev = np.sqrt(np.diagonal(cov)) #variance
 
             # 95% confidence intervals from standard error
             z = scipy.stats.t(N-P-1).ppf(0.975)
@@ -123,37 +126,36 @@ class MLFitter(Fitter):
         https://stats.stackexchange.com/questions/120179/generating-data-with-a-given-sample-covariance-matrix
         """
 
+        # If we already have samples, return them
+        if hasattr(self,"_samples"):
+            return self._samples
+
+        # Return None if no fit has been run.        
+        if not self._fit_has_been_run:
+            return None
+                
         try:
-            return self._samples
-        except AttributeError:
+            J = self._fit_result.jac
+            cov = np.linalg.inv(2*np.dot(J.T,J))
+            chol_cov = np.linalg.cholesky(cov).T
+        except np.linalg.LinAlgError:
+            warning = "\n\nJacobian matrix was singular.\n"
+            warning += "Could not estimate parameter uncertainty.\n"
+            warning += "Consider using the Bayesian sampler.\n"
+            warnings.warn(warning)
 
-            try:
-                # Return None if no fit has been run.
-                try:
-                    J = self._fit_result.jac
-                except AttributeError:
-                    return None
+            # Return empty array
+            return None
 
-                cov = np.linalg.inv(2*np.dot(J.T,J))
-                chol_cov = np.linalg.cholesky(cov).T
-            except np.linalg.LinAlgError:
-                warning = "\n\nJacobian matrix was singular.\n"
-                warning += "Could not estimate parameter uncertainty.\n"
-                warning += "Consider using the Bayesian sampler.\n"
-                warnings.warn(warning)
+        estimate = np.array(self.fit_df["estimate"])
+        self._samples = np.dot(np.random.normal(size=(self._num_samples,
+                                                        chol_cov.shape[0])),
+                                                chol_cov)
+        
 
-                # Return empty array
-                return np.array([])
+        self._samples = self._samples + estimate
 
-            estimate = np.array(self.fit_df["estimate"])
-            self._samples = np.dot(np.random.normal(size=(self._num_samples,
-                                                          chol_cov.shape[0])),
-                                                    chol_cov)
-            
-
-            self._samples = self._samples + estimate
-
-            return self._samples
+        return self._samples
 
 
     def __repr__(self):

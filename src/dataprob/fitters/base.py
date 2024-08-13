@@ -600,6 +600,12 @@ class Fitter:
         df["std"] = np.nan
         df["low_95"] = np.nan
         df["high_95"] = np.nan
+        df["guess"] = self.param_df["guess"]
+        df["fixed"] = self.param_df["fixed"]
+        df["lower_bound"] = self.param_df["lower_bound"]
+        df["upper_bound"] = self.param_df["upper_bound"]
+        df["prior_mean"] = self.param_df["prior_mean"]
+        df["prior_std"] = self.param_df["prior_std"]
 
         self._fit_df = df
 
