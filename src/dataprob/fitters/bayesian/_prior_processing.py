@@ -1,3 +1,6 @@
+"""
+Functions for calculating priors used in Bayesian MCMC sampling.
+"""
 
 import numpy as np
 

@@ -18,7 +18,6 @@ from dataprob.check import check_array
 import emcee
 
 import numpy as np
-import scipy.optimize as optimize
 from scipy import stats
 
 import multiprocessing
@@ -109,26 +108,48 @@ class BayesianSampler(Fitter):
 
         for param in self.param_df.index:
 
+            # If a parameter is fixed, ignore it completely here. The param
+            # array that comes in will not have an entry for this parameter 
+            # so it should not even be in the mask as a False
+            if self.param_df.loc[param,"fixed"]:
+                continue
+
+            # Get prior mean and std. 
             prior_mean = self.param_df.loc[param,"prior_mean"]
             prior_std = self.param_df.loc[param,"prior_std"]
 
+            # Get bounds
             lower_bound = self.param_df.loc[param,"lower_bound"]
             upper_bound = self.param_df.loc[param,"upper_bound"]
             bounds = np.array([lower_bound,upper_bound])
 
+            # If prior_mean or prior_std is nan, use uniform priors. 
             if np.isnan(prior_mean) or np.isnan(prior_std):
-                uniform_priors.append(find_uniform_value(bounds))
-                gauss_prior_mask.append(False)
 
+                # Set the gauss_prior_mask to False for this parameter and add
+                # an appropriate chunk to the uniform prior 
+                gauss_prior_mask.append(False)
+                uniform_priors.append(find_uniform_value(bounds))
+        
             else:
+
+                # Set gauss_prior_mask to True for this parameter
+                gauss_prior_mask.append(True)
+
+                # Record gauss prior mean and std for use in the on-the-fly
+                # prior calc
                 gauss_prior_means.append(prior_mean)
                 gauss_prior_stds.append(prior_std)
 
+                # Reconcile the bounds and priors to find the normalization 
+                # offset for this parameter
                 z_bounds = (bounds - prior_mean)/prior_std
                 bounds_offset = reconcile_bounds_and_priors(bounds=z_bounds,
                                                             frozen_rv=self._prior_frozen_rv)
+                
+                # Record the normalization offset
                 gauss_prior_offsets.append(base_offset + bounds_offset)
-                gauss_prior_mask.append(True)
+                
     
         self._uniform_priors = np.sum(uniform_priors)
 
@@ -250,33 +271,33 @@ class BayesianSampler(Fitter):
         if self._use_ml_guess:
 
             ml_fit = MLFitter()
-            ml_fit.model = self._model
+            ml_fit.model = copy.deepcopy(self._model)
             ml_fit.y_obs = self.y_obs
             ml_fit.y_std = self.y_std
             ml_fit.fit()
-            walkers = ml_fit.samples[:self._num_walkers,:]
+            self._initial_state = ml_fit.samples[:self._num_walkers,:]
 
         # Generate walkers by sampling from the prior distribution. This will
         # only generate values for unfixed parameters. 
         else:
-            walkers = create_walkers(param_df=self.param_df,
-                                     num_walkers=self._num_walkers)
+            self._initial_state = create_walkers(param_df=self.param_df,
+                                                 num_walkers=self._num_walkers)
         
         # Build sampler object
         self._fit_result = emcee.EnsembleSampler(nwalkers=self._num_walkers,
-                                                 ndim=walkers.shape[1],
+                                                 ndim=self._initial_state.shape[1],
                                                  log_prob_fn=self._ln_prob,
                                                  **kwargs)
 
         # Run sampler
-        self._fit_result.run_mcmc(initial_state=walkers,
+        self._fit_result.run_mcmc(initial_state=self._initial_state,
                                   nsteps=self._num_steps,
                                   progress=True)
-
+    
         # Create numpy array of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
         chains = self._fit_result.get_chain()[to_discard:,:,:]
-        new_samples = chains.reshape((-1,walkers.shape[1]))
+        new_samples = chains.reshape((-1,self._initial_state.shape[1]))
 
         # Create numpy array of lnprob for each sample
         new_lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
@@ -305,17 +326,34 @@ class BayesianSampler(Fitter):
         # Calculate 95% confidence intervals
         lower = int(round(0.025*self._samples.shape[0],0))
         upper = int(round(0.975*self._samples.shape[0],0))
+
+        # For samples less than ~100, the rounding above will make the
+        # the upper cutoff the number of samples, and thus lead to an index 
+        # error below. 
+        if upper >= self._samples.shape[0]:
+            upper = self._samples.shape[0] - 1
+
         low_95 = []
         high_95 = []
         for i in range(self._samples.shape[1]):
-            nf = np.sort(self._samples[:,i])
-            low_95.append(nf[lower])
-            high_95.append(nf[upper])
+            sorted_samples = np.sort(self._samples[:,i])
+            low_95.append(sorted_samples[lower])
+            high_95.append(sorted_samples[upper])
 
-        self._fit_df["estimate"] = estimate
-        self._fit_df["std"] = std
-        self._fit_df["low_95"] = low_95
-        self._fit_df["high_95"] = high_95
+        # Get finalized parameters from param_df in case they were updated 
+        # after the model was set and the fit_df created. 
+        for col in ["guess","fixed","lower_bound","upper_bound","prior_mean",
+                    "prior_std"]:
+            self._fit_df[col] = self.param_df[col]
+
+        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        unfixed = np.logical_not(fixed)
+
+        self._fit_df.loc[unfixed,"estimate"] = estimate
+        self._fit_df.loc[fixed,"estimate"] = self._fit_df.loc[fixed,"guess"]
+        self._fit_df.loc[unfixed,"std"] = std
+        self._fit_df.loc[unfixed,"low_95"] = low_95
+        self._fit_df.loc[unfixed,"high_95"] = high_95
 
     
     @property
@@ -342,6 +380,10 @@ class BayesianSampler(Fitter):
         return output
     
     def __repr__(self):
+        """
+        Output to show when object is printed or displayed in a jupyter 
+        notebook.
+        """
 
         out = ["BayesianSampler\n---------------\n"]
 

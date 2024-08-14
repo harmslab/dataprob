@@ -146,6 +146,29 @@ def test__setup_priors():
     assert np.array_equal(f._gauss_prior_mask,[True,True])
 
     # ----------------------------------------------------------------------
+    # Two gauss, two uniform, one of each fixed
+
+    # Load model and set priors & bounds
+    f = BayesianSampler()
+    def four_param(a,b,c,d): return a*b*c*d
+    f.model = ModelWrapper(four_param)
+    f.param_df["prior_mean"] = [1.0,2.0,np.nan,np.nan]
+    f.param_df["prior_std"] = [3.0,4.0,np.nan,np.nan]
+    f.param_df["lower_bound"] = [-np.inf,-np.inf,-np.inf,-np.inf]
+    f.param_df["upper_bound"] = [np.inf,np.inf,np.inf,np.inf]
+    f.param_df["fixed"] = [True,False,True,False]
+    f._model.finalize_params()
+
+    f._setup_priors()
+
+    assert np.allclose(f._gauss_prior_means,[2.0])
+    assert np.allclose(f._gauss_prior_stds,[4.0])
+    assert len(f._gauss_prior_offsets) == 1
+    assert np.sum(f._gauss_prior_offsets < 0) == 1
+    assert np.array_equal(f._gauss_prior_mask,[True,False])
+
+
+    # ----------------------------------------------------------------------
     # check internal bounds calculation adjustment calculation
 
     # Load model and set priors & bounds
@@ -361,8 +384,6 @@ def test_BayesianSampler__fit(linear_fit):
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
     linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
     linear_mw.x = df.x
-    coeff = linear_fit["coeff"]
-    param = np.array([coeff["m"],coeff["b"]])
 
     # -------------------------------------------------------------------------
     # basic run; checking use_ml_guess = True effect
@@ -380,6 +401,7 @@ def test_BayesianSampler__fit(linear_fit):
     f.y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
+    assert not hasattr(f,"_initial_state")
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
     assert f.fit_result is None
     assert f.samples is None
@@ -391,6 +413,7 @@ def test_BayesianSampler__fit(linear_fit):
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[90,2]) 
     assert f._lnprob.shape == (90,)
     assert f._success is True
@@ -414,6 +437,7 @@ def test_BayesianSampler__fit(linear_fit):
     # set guess to 1, 1. works, but differs from ML guess of 2, 1 and can thus
     # be distinguished below
     f.param_df["guess"] = [1,1]
+    assert not hasattr(f,"_initial_state")
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
     assert f.fit_result is None
     assert f.samples is None
@@ -425,6 +449,7 @@ def test_BayesianSampler__fit(linear_fit):
 
     # look for non-ML guess
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[90,2]) 
     assert f._lnprob.shape == (90,)
     assert f._success is True
@@ -446,6 +471,7 @@ def test_BayesianSampler__fit(linear_fit):
     f.y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
+    assert not hasattr(f,"_initial_state")
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
     assert f.fit_result is None
     assert f.samples is None
@@ -457,6 +483,7 @@ def test_BayesianSampler__fit(linear_fit):
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (9,2)
     assert np.array_equal(f.samples.shape,[162,2]) 
     assert f._lnprob.shape == (162,)
     assert f._success is True
@@ -478,6 +505,7 @@ def test_BayesianSampler__fit(linear_fit):
     f.y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
+    assert not hasattr(f,"_initial_state")
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
     assert f.fit_result is None
     assert f.samples is None
@@ -489,13 +517,89 @@ def test_BayesianSampler__fit(linear_fit):
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[50,2]) 
     assert f._lnprob.shape == (50,)
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
+    # -------------------------------------------------------------------------
+    # basic run; fixed parameter; no ml
 
-def test_BayesianSampler__update_fit_df():
+    # Very small analysis, starting from no ML
+    f = BayesianSampler(num_walkers=10,
+                        use_ml_guess=False,
+                        num_steps=10,
+                        burn_in=0.1,
+                        num_threads=1)
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+    linear_mw.param_df.loc["b","fixed"] = True
+    linear_mw.param_df.loc["m","prior_mean"] = 2
+    linear_mw.param_df.loc["m","prior_std"] = 5
+    linear_mw.x = df.x
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    assert np.array_equal(f.param_df["guess"],[0,0])
+    assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
+    assert not hasattr(f,"_initial_state")
+    assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
+    assert f.fit_result is None
+    assert f.samples is None
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true. Make sure containing function ran completely. 
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # These outputs are determined within ._fit
+    assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,1)
+    assert np.array_equal(f.samples.shape,[90,1]) 
+    assert f._lnprob.shape == (90,)
+    assert f._success is True
+    assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
+    assert f.fit_df.loc["b","estimate"] == f.fit_df.loc["b","guess"]
+
+    # -------------------------------------------------------------------------
+    # basic run; fixed parameter; ml
+
+    # Very small analysis, starting from ML
+    f = BayesianSampler(num_walkers=10,
+                        use_ml_guess=True,
+                        num_steps=10,
+                        burn_in=0.1,
+                        num_threads=1)
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+    linear_mw.param_df.loc["b","fixed"] = True
+    linear_mw.x = df.x
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    assert np.array_equal(f.param_df["guess"],[0,0])
+    assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
+    assert not hasattr(f,"_initial_state")
+    assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
+    assert f.fit_result is None
+    assert f.samples is None
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true. Make sure containing function ran completely. 
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # These outputs are determined within ._fit
+    assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,1)
+    assert np.array_equal(f.samples.shape,[90,1]) 
+    assert f._lnprob.shape == (90,)
+    assert f._success is True
+    assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
+    assert f.fit_df.loc["b","estimate"] == f.fit_df.loc["b","guess"]
+
+def test_BayesianSampler__update_fit_df(linear_fit):
     
     # Create a BayesianSampler with a model loaded (and _fit_df implicitly 
     # created)
@@ -519,6 +623,61 @@ def test_BayesianSampler__update_fit_df():
     assert np.allclose(np.round(f._fit_df["low_95"],0),[-2,-2])
     assert np.allclose(np.round(f._fit_df["high_95"],0),[2,2])
 
+
+    # --------------------------------------------------------------------------
+    # make sure the updater properly copies in parameter values the user may 
+    # have altered after defining the model but before finalizing the fit. 
+
+    df = linear_fit["df"]
+    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+    linear_mw.x = df.x
+
+    # super small sampler
+    f = BayesianSampler(num_walkers=10,
+                        num_steps=10,
+                        use_ml_guess=False)
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    # fit_df should have been populated with default values from param_df
+    assert np.array_equal(f.fit_df["fixed"],[False,False])
+    assert np.array_equal(f.fit_df["guess"],[0,0])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-np.inf,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[np.inf,np.inf])
+
+    # update param_df
+    f.param_df.loc["b","fixed"] = True
+    f.param_df.loc["b","guess"] = 1
+    f.param_df.loc["b","prior_mean"] = 5
+    f.param_df.loc["b","prior_std"] = 3
+    f.param_df.loc["m","upper_bound"] = 10
+    f.param_df.loc["m","lower_bound"] = -10
+
+    # no change in fit_df yet
+    assert np.array_equal(f.fit_df["fixed"],[False,False])
+    assert np.array_equal(f.fit_df["guess"],[0,0])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-np.inf,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[np.inf,np.inf])
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true.
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # now fit_df should have been updated with guesses etc. 
+    assert np.array_equal(f.fit_df["fixed"],[False,True])
+    assert np.array_equal(f.fit_df["guess"],[0,1])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,5],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,3],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
+    
 
 def test_BayesianSampler_fit_info():
     

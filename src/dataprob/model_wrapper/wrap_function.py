@@ -1,4 +1,7 @@
-
+"""
+Convenience function that initializes a ModelWrapper class from a user-
+specified input function. 
+"""
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
 from dataprob.model_wrapper._dataframe_processing import read_spreadsheet

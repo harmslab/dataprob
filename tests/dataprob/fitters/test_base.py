@@ -503,12 +503,12 @@ def test_Fitter_fit(linear_fit):
     kwargs["y_obs"] = df["y_obs"]
     f.fit(**kwargs)
     
-def test_Fitness__fit():
+def test_Fitter__fit():
     f = Fitter()
     with pytest.raises(NotImplementedError):
         f._fit()
 
-def test_Fitness__unweighted_residuals(binding_curve_test_data):
+def test_Fitter__unweighted_residuals(binding_curve_test_data):
     """
     Test unweighted residuals call against "manual" code used to generate
     test data. Just make sure answer is right; no error checking on this 
@@ -532,7 +532,7 @@ def test_Fitness__unweighted_residuals(binding_curve_test_data):
 
     assert np.allclose(r,df.residual)
 
-def test_Fitness_unweighted_residuals(binding_curve_test_data):
+def test_Fitter_unweighted_residuals(binding_curve_test_data):
     """
     Test unweighted residuals call against "manual" code used to generate
     test data.
@@ -565,7 +565,7 @@ def test_Fitness_unweighted_residuals(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.unweighted_residuals([1,2])
 
-def test_Fitness__weighted_residuals(binding_curve_test_data):
+def test_Fitter__weighted_residuals(binding_curve_test_data):
     """
     Test weighted residuals call against "manual" code used to generate
     test data. Just make sure answer is right; no error checking on this 
@@ -591,7 +591,7 @@ def test_Fitness__weighted_residuals(binding_curve_test_data):
     assert np.allclose(r,df.weighted_residual)
 
 
-def test_Fitness_weighted_residuals(binding_curve_test_data):
+def test_Fitter_weighted_residuals(binding_curve_test_data):
     """
     Test weighted residuals call against "manual" code used to generate
     test data.
@@ -631,7 +631,7 @@ def test_Fitness_weighted_residuals(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.weighted_residuals([1,2])
 
-def test_Fitness__ln_like(binding_curve_test_data):
+def test_Fitter__ln_like(binding_curve_test_data):
     """
     Test internal function -- no error checking. 
     """
@@ -651,7 +651,7 @@ def test_Fitness__ln_like(binding_curve_test_data):
     L = f.ln_like(input_params)
     assert np.allclose(L,binding_curve_test_data["ln_like"])
 
-def test_Fitness_ln_like(binding_curve_test_data):
+def test_Fitter_ln_like(binding_curve_test_data):
     """
     Test log likelihood call against "manual" code used to generate
     test data.
@@ -696,7 +696,7 @@ def test_Fitness_ln_like(binding_curve_test_data):
 # Test setters, getters, and internal sanity checks
 # ---------------------------------------------------------------------------- #
 
-def test_Fitness_model_setter_getter(binding_curve_test_data):
+def test_Fitter_model_setter_getter(binding_curve_test_data):
     """
     Test the model setter.
     """
@@ -739,7 +739,7 @@ def test_Fitness_model_setter_getter(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.model = mw
 
-def test_Fitness_y_obs_setter_getter(binding_curve_test_data):
+def test_Fitter_y_obs_setter_getter(binding_curve_test_data):
     """
     Test the y_obs setter.
     """
@@ -771,7 +771,7 @@ def test_Fitness_y_obs_setter_getter(binding_curve_test_data):
     assert f.num_obs == y_obs_input.shape[0]
 
   
-def test_Fitness_y_std_setter_getter(binding_curve_test_data):
+def test_Fitter_y_std_setter_getter(binding_curve_test_data):
     """
     Test the y_std setter.
     """
@@ -830,7 +830,7 @@ def test_Fitness_y_std_setter_getter(binding_curve_test_data):
     assert np.array_equal(f.y_std,np.ones(f.y_obs.shape))
 
 
-def test_Fitness_param_df():
+def test_Fitter_param_df():
     
     f = Fitter()
     assert f.param_df is None
@@ -843,7 +843,7 @@ def test_Fitness_param_df():
     assert np.array_equal(f.param_df["name"],["a","b"])
 
 
-def test_Fitness_data_df():
+def test_Fitter_data_df():
     
     f = Fitter()
     out_df = f.data_df
@@ -894,7 +894,7 @@ def test_Fitness_data_df():
                           (y_obs - y_calc)/y_std)
 
 
-def test_Fitness__initialize_fit_df():
+def test_Fitter__initialize_fit_df():
     
     # test on fake class
     class TestClass:
@@ -922,12 +922,12 @@ def test_Fitness__initialize_fit_df():
         assert np.array_equal(tc.param_df[k],tc._fit_df[k],equal_nan=True)
     
 
-def test_Fitness__update_fit_df():
+def test_Fitter__update_fit_df():
     f = Fitter()
     with pytest.raises(NotImplementedError):
         f._update_fit_df()
 
-def test_Fitness_fit_df():
+def test_Fitter_fit_df():
 
     # This checks initialization. Need to write implementation-specific tests
 
@@ -952,7 +952,7 @@ def test_Fitness_fit_df():
     f.y_std = 0.1
 
 
-def test_Fitness_samples():
+def test_Fitter_samples():
     
     f = Fitter()
     assert f.samples is None
@@ -960,7 +960,7 @@ def test_Fitness_samples():
     assert f.samples == "something"
 
 
-def test_Fitness_get_sample_df():
+def test_Fitter_get_sample_df():
     
     # some test data
     y_obs = np.arange(10)
@@ -1119,13 +1119,7 @@ def test_corner_plot():
     assert issubclass(type(fig),matplotlib.figure.Figure)
 
 
-
-
-
-
-
-
-def test_Fitness_write_samples(tmpdir):
+def test_Fitter_write_samples(tmpdir):
     
     cwd = os.getcwd()
     os.chdir(tmpdir)
@@ -1160,7 +1154,7 @@ def test_Fitness_write_samples(tmpdir):
 
     os.chdir(cwd)
 
-def test_Fitness_append_samples(tmpdir):
+def test_Fitter_append_samples(tmpdir):
 
     cwd = os.getcwd()
     os.chdir(tmpdir)
@@ -1268,9 +1262,28 @@ def test_Fitness_append_samples(tmpdir):
     with pytest.raises(RuntimeError):
         f.append_samples(sample_array=sample_array)
 
+    # -----------------------------------------------------------------------
+    # Run test with a fixed parameter
+
+    def test_fcn(a,b,c): return a*b*c
+    def dummy(*args,**kwargs): pass
+    mw = ModelWrapper(test_fcn)
+    f = Fitter()
+    f.model = mw
+    f.param_df.loc["a","fixed"] = True
+    
+    # some hacks to put this into a state to append samples
+    f._samples = np.ones((100,2),dtype=float)
+    f._update_fit_df = dummy
+
+    with pytest.raises(ValueError):
+        f.append_samples(sample_array=np.ones((100,3),dtype=float))
+    
+    f.append_samples(sample_array=np.ones((100,2),dtype=float))
+
     os.chdir(cwd)
 
-def test_Fitness_num_params(binding_curve_test_data):
+def test_Fitter_num_params(binding_curve_test_data):
 
     f = Fitter()
     assert f.num_params is None
@@ -1297,7 +1310,7 @@ def test_Fitness_num_params(binding_curve_test_data):
     with pytest.raises(ValueError):
         f.model([7,8,9,10])
 
-def test_Fitness_num_obs():
+def test_Fitter_num_obs():
 
     f = Fitter()
     assert f.num_obs is None
@@ -1309,27 +1322,45 @@ def test_Fitness_num_obs():
     f.y_obs = np.array([])
     assert f.num_obs == 0
 
-def test_Fitness_fit_type():
+def test_Fitter_num_unfixed_params():
+
+    f = Fitter()
+    assert f.num_unfixed_params is None
+    
+    def test_fcn(a=2,b=3,c=4): return a*b*c
+    mw = ModelWrapper(test_fcn)
+    f.model = mw
+    
+    assert f.num_unfixed_params == 3
+    
+    f.param_df.loc["a","fixed"] = True
+    assert f.num_unfixed_params == 2
+
+    f.param_df.loc["b","fixed"] = True
+    assert f.num_unfixed_params == 1
+
+
+def test_Fitter_fit_type():
     
     f = Fitter()
     assert f.fit_type == ""
     f._fit_type = "something"
     assert f.fit_type == "something"
 
-def test_Fitness_success():
+def test_Fitter_success():
     
     f = Fitter()
     assert f.success is None
     f._success = True
     assert f.success is True
 
-def test_Fitness_fit_info():
+def test_Fitter_fit_info():
     
     f = Fitter()
     with pytest.raises(NotImplementedError):
         f.fit_info
 
-def test_Fitness_fit_result():
+def test_Fitter_fit_result():
     
     f = Fitter()
     assert f.fit_result is None

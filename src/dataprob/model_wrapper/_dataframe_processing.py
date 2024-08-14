@@ -1,7 +1,9 @@
+"""
+Functions for processing parameter dataframes.
+"""
 
 import numpy as np
 import pandas as pd
-
 
 def _check_name(param_df,param_in_order):
     """

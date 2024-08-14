@@ -50,7 +50,6 @@ class MLFitter(Fitter):
         guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
         bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
                            self._model.param_df.loc[to_fit,"upper_bound"]])
-        
         # Do the actual fit
         def fn(*args): return -self._weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
@@ -81,12 +80,12 @@ class MLFitter(Fitter):
             J = self._fit_result.jac
             cov = np.linalg.inv(2*np.dot(J.T,J))
 
-            stdev = np.sqrt(np.diagonal(cov)) #variance
+            std = np.sqrt(np.diagonal(cov)) #variance
 
             # 95% confidence intervals from standard error
             z = scipy.stats.t(N-P-1).ppf(0.975)
-            c1 = estimate - z*stdev
-            c2 = estimate + z*stdev
+            c1 = estimate - z*std
+            c2 = estimate + z*std
 
             low_95 = []
             high_95 = []
@@ -95,19 +94,28 @@ class MLFitter(Fitter):
                 high_95.append(c2[i])
 
         except np.linalg.LinAlgError:
-            warning = "\n\nJacobian matrix was singular.\n"
-            warning += "Could not estimate parameter uncertainty.\n"
-            warning += "Consider using the Bayesian sampler.\n"
-            warnings.warn(warning)
+            w = "\n\nJacobian matrix was singular. Could not fit parameter\n"
+            w += "uncertainty.\n\n"
+            warnings.warn(w)
 
-            stdev = np.nan*np.ones(len(estimate),dtype=float)
+            std = np.nan*np.ones(len(estimate),dtype=float)
             low_95 = np.nan*np.ones(len(estimate),dtype=float)
             high_95 = np.nan*np.ones(len(estimate),dtype=float)
-        
-        self._fit_df["estimate"] = estimate
-        self._fit_df["std"] = stdev
-        self._fit_df["low_95"] = low_95
-        self._fit_df["high_95"] = high_95
+
+        # Get finalized parameters from param_df in case they were updated 
+        # after the model was set and the fit_df created. 
+        for col in ["guess","fixed","lower_bound","upper_bound","prior_mean",
+                    "prior_std"]:
+            self._fit_df[col] = self.param_df[col]
+
+        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        unfixed = np.logical_not(fixed)
+
+        self._fit_df.loc[unfixed,"estimate"] = estimate
+        self._fit_df.loc[fixed,"estimate"] = self._fit_df.loc[fixed,"guess"]
+        self._fit_df.loc[unfixed,"std"] = std
+        self._fit_df.loc[unfixed,"low_95"] = low_95
+        self._fit_df.loc[unfixed,"high_95"] = high_95
 
 
     @property
@@ -139,26 +147,29 @@ class MLFitter(Fitter):
             cov = np.linalg.inv(2*np.dot(J.T,J))
             chol_cov = np.linalg.cholesky(cov).T
         except np.linalg.LinAlgError:
-            warning = "\n\nJacobian matrix was singular.\n"
-            warning += "Could not generate samples.\n"
-            warning += "Consider using the Bayesian sampler.\n"
-            warnings.warn(warning)
+            w = "\n\nJacobian matrix was singular. Could not generate\n"
+            w += "parameter samples.\n\n"
+            warnings.warn(w)
 
             # Return empty array
             return None
 
-        estimate = np.array(self.fit_df["estimate"])
+        unfixed = np.logical_not(np.array(self.fit_df["fixed"],dtype=bool))
+        estimate = np.array(self.fit_df.loc[unfixed,"estimate"])
         self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                       chol_cov.shape[0])),
                                                 chol_cov)
-        
-
+    
         self._samples = self._samples + estimate
 
         return self._samples
 
 
     def __repr__(self):
+        """
+        Output to show when object is printed or displayed in a jupyter 
+        notebook.
+        """
 
         out = ["MLFitter\n--------\n"]
 

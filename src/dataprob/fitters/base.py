@@ -702,7 +702,7 @@ class Fitter:
                 err = f"'{sample_file}' does not appear to be a pickle file.\n"
                 raise pickle.UnpicklingError(err)
 
-        # Check sanity of sample_array; update num_params if not specified
+        # Check sanity of sample_array;
         try:
             sample_array = np.array(sample_array,dtype=float)
         except Exception as e:
@@ -710,11 +710,11 @@ class Fitter:
             raise ValueError(err) from e
         
         if len(sample_array.shape) != 2:
-            err = "sample_array should have dimensions (num_samples,num_param)\n"
+            err = "sample_array should have dimensions (num_samples,num_unfixed_param)\n"
             raise ValueError(err)
 
-        if sample_array.shape[1] != self.num_params:
-            err = "sample_array should have dimensions (num_samples,num_param)\n"
+        if sample_array.shape[1] != self.num_unfixed_params:
+            err = "sample_array should have dimensions (num_samples,num_unfixed_param)\n"
             raise ValueError(err)
 
         # Concatenate the new samples to the existing samples
@@ -893,6 +893,19 @@ class Fitter:
             return self._y_obs.shape[0]
         except AttributeError:
             return None
+        
+    @property
+    def num_unfixed_params(self):
+        """
+        Number of unfixed parameters.
+        """
+        
+        if not hasattr(self,"_model"):
+            return None
+        
+        self._model.finalize_params()
+        return np.sum(self._model.unfixed_mask)
+
 
     @property
     def fit_type(self):

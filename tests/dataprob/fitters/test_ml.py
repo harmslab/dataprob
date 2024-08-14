@@ -83,9 +83,6 @@ def test_MLFitter__fit(linear_fit):
     assert np.array_equal(f.param_df["fixed"],[False,True])
     f.fit()
 
-    print(f.fit_df)
-    assert False
-
 
 def test_MLFitter__update_fit_df(linear_fit):
     
@@ -129,6 +126,54 @@ def test_MLFitter__update_fit_df(linear_fit):
     assert np.sum(np.isnan(f._fit_df["low_95"])) == 2
     assert np.sum(np.isnan(f._fit_df["high_95"])) == 2
     
+    # --------------------------------------------------------------------------
+    # make sure the updater properly copies in parameter values the user may 
+    # have altered after defining the model but before finalizing the fit. 
+
+    f = MLFitter()
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    # fit_df should have been populated with default values from param_df
+    assert np.array_equal(f.fit_df["fixed"],[False,False])
+    assert np.array_equal(f.fit_df["guess"],[0,0])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-np.inf,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[np.inf,np.inf])
+
+    # update param_df
+    f.param_df.loc["b","fixed"] = True
+    f.param_df.loc["b","guess"] = 1
+    f.param_df.loc["b","prior_mean"] = 5
+    f.param_df.loc["b","prior_std"] = 3
+    f.param_df.loc["m","upper_bound"] = 10
+    f.param_df.loc["m","lower_bound"] = -10
+
+    # no change in fit_df yet
+    assert np.array_equal(f.fit_df["fixed"],[False,False])
+    assert np.array_equal(f.fit_df["guess"],[0,0])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,np.nan],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-np.inf,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[np.inf,np.inf])
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true.
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # now fit_df should have been updated
+    assert np.array_equal(f.fit_df["fixed"],[False,True])
+    assert np.array_equal(f.fit_df["guess"],[0,1])
+    assert np.array_equal(f.fit_df["prior_mean"],[np.nan,5],equal_nan=True)
+    assert np.array_equal(f.fit_df["prior_std"],[np.nan,3],equal_nan=True)
+    assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
+    assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
+
+
+
 
 def test_MLFitter_samples(linear_fit):
 
