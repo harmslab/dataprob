@@ -15,236 +15,6 @@ import scipy.optimize as optimize
 from scipy import stats
 
 import multiprocessing
-import warnings
-
-def _find_normalization(scale,rv,**kwargs):
-    """
-    This method finds an offset to add to the output of rv.logpdf that 
-    makes the total area under the pdf curve 1.0. 
-
-    Parameters
-    ----------
-    scale : float
-        scale argument to scipy.stats.rv
-    rv : rv_continuous
-        object for calculating logpdf
-    kwargs : dict
-        kwargs are passed to rv_continuous to initialize
-
-    Returns
-    -------
-    offset : float
-        offset to add to frozen_rv.logpdf(x) to normalize pdf to 1.0 
-
-    Notes
-    -----
-
-    Calculate the minimum difference between floats we can represent using our
-    data type. This sets the bin width for a discrete approximation of the
-    continuous distribution.
-
-        res = np.finfo(dtype).resolution
-    
-    Calculate the sum of the un-normalized pdf over a range spanning zero. We
-    use a range of -num_to_same*res -> num_to_sample*res, taking steps of res:
-
-        frozen_rv = rv(loc=0,scale=scale,**kwargs)
-        x = np.arange(-num_to_sample*res,
-                      num_to_sample*(res + 1),
-                      res)
-        un_norm_prob = np.sum(frozen_rv.pdf(loc=x))
-
-    Calculate the difference in the cdf between num_to_sample*res and 
-    -num_to_sample*res. This is the normalized probability of the slice
-    centered on zero we calculated above. 
-
-        norm_prob = cdf(num_to_sample*res) - cdf(-num_to_sample*res). 
-
-    The ratio of norm_prob and un_norm_prob is a scalar that converts from raw
-    pdf calculations to normalized probabilities. 
-
-        norm_prob_x = frozen_rv.pdf(x)*norm_prob/un_norm_prob
-
-    Since we care about log versions of this, it becomes:
-
-        log_norm_prob_x = frozen_rv.logpdf(x) + log(norm_prob) - log(un_norm_prob)
-
-    We can define a pre-calculated offset;
-
-        offset = log(norm_prob) - log(un_norm_prob) 
-
-    So, finally:
-
-        log_norm_prob_x = frozen_rv.logpdf(x) + offset
-    """
-
-    # Create frozen distribution located at 0.0
-    centered_rv = rv(loc=0,scale=scale,**kwargs)
-
-    # Get smallest float step (resolution) for this datatype on this
-    # platform.
-    res = np.finfo(centered_rv.cdf(0).dtype).resolution
-
-    num_to_sample = int(np.round(1/res/1e9,0))
-
-    # Calculate prob of -1000res -> 1000res using cdf
-    cdf = centered_rv.cdf(num_to_sample*res) - centered_rv.cdf(-num_to_sample*res)
-
-    # Calculate pdf over this interval with a step size of res
-    pdf = np.sum(centered_rv.pdf(np.linspace(-num_to_sample*res,
-                                             num_to_sample*res,
-                                             2*num_to_sample + 1)))
-    
-    # This normalizes logpdf. It's the log version of:
-    # norm_prob_x = rv.pdf(x)*cdf/pdf. 
-    offset = np.log(cdf) - np.log(pdf)
-    
-    return offset
-
-def _reconcile_bounds_and_priors(bounds,frozen_rv):
-    """
-    Figure out how much bounds trim off priors and return amount to add to the 
-    prior offset area to set to pdf area to 1.
-
-    Parameters
-    ----------
-    bounds : list-like or None
-        bounds applied to parameter
-    
-    Returns
-    -------
-    offset : float
-        offset to add to np.logpdf(x) that accounts for the fact that bounds 
-        may have trimmed some of the probability density and normalizes the 
-        area of the pdf to 1.0. 
-    """
-
-    # bounds specified, no offset to area
-    if bounds is None:
-        return 0.0
-
-    # Parse bounds list.
-    left = float(bounds[0])
-    right = float(bounds[1])
-    
-    # left and right the same. prob of this value is 1 (np.log(1) = 0)
-    if left == right:
-        w = f"left and right bounds {bounds} are identical\n"
-        warnings.warn(w)
-        return 0.0
-    
-    # Calculate the amount the bounds trim off the top and the bottom of the 
-    # distribution. 
-    left_trim = frozen_rv.cdf(left) 
-    right_trim = frozen_rv.sf(right)
-
-    # Figure out how much we need to scale the area up given we lost some
-    # of the tails. 
-    remaining = 1 - (left_trim + right_trim)
-
-    # If remaining ends up zero, the left and right edges of the bounds
-    # are identical within numerical error. prob of this value is 1 (np.log(1) = 0)
-    if remaining == 0:
-        w = f"left and right bounds {bounds} are numerically identical\n"
-        warnings.warn(w)
-        return 0.0
-
-    # Return amount to scale the area by
-    return np.log(1/remaining)
-
-def _find_uniform_value(bounds):
-    """
-    Find the log probability for a specific value between bounds to use in a 
-    uniform prior. 
-
-    Parameters
-    ----------
-    bounds : list-like, optional
-        list like float of two values. function assumes these are non-nanf 
-        floats where bounds[1] >= bounds[0]. If bounds is None, assume 
-        infinite bounds. 
-    
-    The idea here is to find the maximum finite width the parameter can occupy
-    (bound[1] - bound[0]) and then to divide that by the number of steps based 
-    on our numerical resolution. If our resolution was 0.1 and we were between 
-    0 and 1, there would be 11 values, so the uniform prior would be ln(1/11).
-    The log prior ends up being: np.log(resolution/width)
-
-    For finite bounds, this is:
-    
-        np.log(resolution) - np.log(upper - lower)
-
-    For infinite bounds, this is:
-        
-        np.log(resolution) - (np.log(scalar) + log(max_positive_finite_float)).
-
-    max_positive_finite_float is the largest number we can represent. scalar
-    ranges (0,2]. It would be 2 for the bounds (-infinity,infinity), because 
-    this covers a span 2*max_positive_finite_float. To avoid overflow, we 
-    represent as logs (ln(2*max) --> ln(2) + ln(max)). Scalar values lower than
-    2 represent smaller chunks of the finite number line. A value of 1 would 
-    be half the number line (-infinity,0), (0,infinity). The value approaches
-    zero for the bounds (-infinity, -infinity + resolution) and 
-    (infinity - resolution,infinity). 
-    """
-
-    # float architecture information
-    finfo = np.finfo(np.ones(1,dtype=float)[0].dtype)
-    log_resolution = np.log(finfo.resolution)
-    log_max_value = np.log(finfo.max)
-    max_value = finfo.max
-
-    # width is 2*max_value --> log(2) + log_max_value
-    if bounds is None:
-        return log_resolution - (np.log(2) + log_max_value)
-
-    # Parse bounds list
-    left = float(bounds[0])
-    right = float(bounds[1])
-
-    # left and right the same, probability is 1.0 (log(P) = 0) for this value
-    if left == right:
-        w = f"left and right bounds {bounds} are identical\n"
-        warnings.warn(w)
-        return 0.0
-    
-    # width is 2*max_value --> log(2) + log_max_value
-    if np.isinf(left) and np.isinf(right):
-        return log_resolution - (np.log(2) + log_max_value)
-
-    # Figure out scalars (see docstring)
-    if np.isinf(left):
-
-        # exactly half the number line; scalar = 1
-        if right == 0:
-            return log_resolution - log_max_value
-        
-        # scalar is less than 1 if left and right are both to the left of zero,
-        # more than 1 if right is above zero
-        if right < 0:
-            scalar = 1 - np.abs(right/max_value)
-        else:
-            scalar = 1 + np.abs(right/max_value)
-        
-        return log_resolution - (np.log(scalar) + log_max_value)
-    
-    if np.isinf(right):
-        
-        # exactly half the number line; scalar = 1
-        if left == 0:
-            return log_resolution - log_max_value
-        
-        # scalar is less than 1 if left and right are both to the right of zero,
-        # more than 1 if left is below zero
-        if left > 0:
-            scalar = 1 - np.abs(left/max_value)
-        else:
-            scalar = 1 + np.abs(left/max_value)
-        
-        return log_resolution - (np.log(scalar) + log_max_value)
-
-    # simple case with finite bounds. resolution/bound_width
-    return np.log(finfo.resolution) - np.log((right - left))
 
 
 class BayesianSampler(Fitter):
@@ -367,7 +137,8 @@ class BayesianSampler(Fitter):
         self._gauss_prior_offsets = np.array(gauss_prior_offsets,dtype=float)
         self._gauss_prior_mask = np.array(gauss_prior_mask,dtype=bool)
 
-        # Grab lower and upper bounds
+        # Grab lower and upper bounds. We pull them out of the dataframe so we
+        # can use in prior calculations without any dictionary lookups. 
         self._lower_bounds = np.array(self.param_df["lower_bound"])
         self._upper_bounds = np.array(self.param_df["upper_bound"])
 
@@ -405,17 +176,17 @@ class BayesianSampler(Fitter):
             log of priors.
         """
 
-        self._sanity_check("fit can be done",["priors","bounds"])     
+        # Make sure model is loaded
+        self._sanity_check("fit can be done",["model"])
+        
+        # Set up priors given model and param_df
+        self._setup_priors()
 
         param = check_array(value=param,
                             variable_name="param",
                             expected_shape=(self.num_params,),
                             expected_shape_names="(num_param,)")
         
-        # This call should finalize the number of parameters if not already set
-        if self.num_params is None:
-            self._num_params = len(param)
-
         return self._ln_prior(param)
 
 
@@ -449,17 +220,14 @@ class BayesianSampler(Fitter):
             log posterior proability
         """
 
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev","priors","bounds"])
+        self._sanity_check("fit can be done",["model","y_obs","y_std"])
+        self._setup_priors()
         
         param = check_array(value=param,
                             variable_name="param",
                             expected_shape=(self.num_params,),
                             expected_shape_names="(num_param,)")
         
-        # This call should finalize the number of parameters if not already set
-        if self.num_params is None:
-            self._num_params = len(param)
-
         return self._ln_prob(param)
 
     def _fit(self,**kwargs):
@@ -475,13 +243,14 @@ class BayesianSampler(Fitter):
         # Set up the priors
         self._setup_priors()
 
-        guesses = np.array(self.param_df["guess"])            
-        bounds = np.array([self._model.param_df["lower_bound"],
-                            self._model.param_df["upper_bound"]])
-
+        to_fit = self._model.unfixed_mask
+        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
+        bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
+                           self._model.param_df.loc[to_fit,"upper_bound"]])
+        
         # Make initial guess (ML or just whatever the parameters sent in were)
         if self._ml_guess:
-            fn = lambda *args: -self.weighted_residuals(*args)
+            def fn(*args): return -self._weighted_residuals(*args)
             ml_fit = optimize.least_squares(fn,x0=guesses,bounds=bounds)
             self._initial_guess = np.copy(ml_fit.x)
         else:
@@ -492,9 +261,9 @@ class BayesianSampler(Fitter):
         # Size of perturbation in parameter depends on the scale of the parameter
         perturb_size = self._initial_guess*self._initial_walker_spread
 
-        ndim = len(guesses)
+        ndim = len(self._initial_guess)
         pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
-               for i in range(self._num_walkers)]
+               for _ in range(self._num_walkers)]
 
         # Sample using walkers
         self._fit_result = emcee.EnsembleSampler(self._num_walkers,
@@ -504,18 +273,22 @@ class BayesianSampler(Fitter):
 
         self._fit_result.run_mcmc(pos, self._num_steps,progress=True)
 
-        # Create list of samples
+        # Create numpy array of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
         new_samples = self._fit_result.get_chain()[to_discard:,:,:].reshape((-1,ndim))
 
+        # Create numpy array of lnprob for each sample
+        new_lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
+        new_lnprob = new_lnprob[-new_samples.shape[0]:]
+
         if self.samples is None:
             self._samples = new_samples
-
-        # If samples have already been done, append to them.
+            self._lnprob = new_lnprob
         else:
             self._samples = np.concatenate((self._samples,new_samples))
+            self._lnprob = np.concatenate((self._lnprob,new_lnprob))
 
-        self._lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
+        self._success = True
 
         self._update_fit_df()
 
@@ -543,8 +316,7 @@ class BayesianSampler(Fitter):
         self._fit_df["low_95"] = low_95
         self._fit_df["high_95"] = high_95
 
-        self._success = True
-
+    
     @property
     def fit_info(self):
         """
@@ -559,7 +331,7 @@ class BayesianSampler(Fitter):
         output["Burn in"] = self._burn_in
 
         if self.samples is not None:
-            num_samples = len(self.samples[:,0])
+            num_samples = self.samples.shape[0]
         else:
             num_samples = None
 

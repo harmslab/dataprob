@@ -50,9 +50,9 @@ class MLFitter(Fitter):
         guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
         bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
                            self._model.param_df.loc[to_fit,"upper_bound"]])
-
+        
         # Do the actual fit
-        fn = lambda *args: -self.weighted_residuals(*args)
+        def fn(*args): return -self._weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
                                                   x0=guesses,
                                                   bounds=bounds,
@@ -140,7 +140,7 @@ class MLFitter(Fitter):
             chol_cov = np.linalg.cholesky(cov).T
         except np.linalg.LinAlgError:
             warning = "\n\nJacobian matrix was singular.\n"
-            warning += "Could not estimate parameter uncertainty.\n"
+            warning += "Could not generate samples.\n"
             warning += "Consider using the Bayesian sampler.\n"
             warnings.warn(warning)
 
@@ -149,7 +149,7 @@ class MLFitter(Fitter):
 
         estimate = np.array(self.fit_df["estimate"])
         self._samples = np.dot(np.random.normal(size=(self._num_samples,
-                                                        chol_cov.shape[0])),
+                                                      chol_cov.shape[0])),
                                                 chol_cov)
         
 

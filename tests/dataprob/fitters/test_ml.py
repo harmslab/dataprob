@@ -12,7 +12,7 @@ def test_MLFitter___init__():
     assert f.fit_type == "maximum likelihood"
     assert f._num_samples == 100
 
-def test_MLFitter_fit(linear_fit):
+def test_MLFitter__fit(linear_fit):
 
     # Basic functionality and logic tests. Numerical tests on more interesting
     # fitting problems are below. Tests run through .fit() because that
@@ -69,6 +69,22 @@ def test_MLFitter_fit(linear_fit):
     assert hasattr(f,"_samples")
     
     assert preserved_samples is not new_samples
+
+    # --------------------------------------------------------------------------
+    # Make sure that parameter fixing is propagating properly
+
+    f = MLFitter()
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    f.param_df.loc["b","guess"] = 0
+    f.param_df.loc["b","fixed"] = True
+    assert np.array_equal(f.param_df["fixed"],[False,True])
+    f.fit()
+
+    print(f.fit_df)
+    assert False
 
 
 def test_MLFitter__update_fit_df(linear_fit):

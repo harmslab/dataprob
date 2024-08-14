@@ -879,7 +879,7 @@ class Fitter:
         """
 
         try:
-            return len(self._model.param_df)
+            return np.sum(self._model.unfixed_mask)
         except AttributeError:
             return None
 
