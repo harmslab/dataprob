@@ -3,7 +3,6 @@ from dataprob.check import check_bool
 from dataprob.check import check_float
 from dataprob.check import check_int
 from dataprob.check import check_array
-from dataprob.check import column_to_bool
 
 import pytest
 import numpy as np
@@ -11,7 +10,7 @@ import pandas as pd
 
 def test_check_bool():
 
-    true_values = [True,1.0,1,np.ones(1,dtype=np.bool_)[0]]
+    true_values = [True,1.0,1,np.ones(1,dtype=np.bool_)[0],1.000001]
     for t in true_values:
         assert check_bool(t)
 
@@ -19,7 +18,7 @@ def test_check_bool():
     for f in false_values:
         assert not check_bool(f)
 
-    bad_value = [None,123,-1,bool,"stupid",[1.0,1.0],np.array([1.0,1.0]),{},float]
+    bad_value = [None,123,-1,bool,"stupid",[1.0,1.0],np.array([1.0,1.0]),{},float,1.1,0.1]
     for b in bad_value:
         with pytest.raises(ValueError):
             value = check_bool(b)
@@ -70,6 +69,11 @@ def test_check_float():
         check_float(None)
     assert np.isnan(check_float(None,allow_nan=True))
 
+    # check bounds == None case for error message
+    with pytest.raises(ValueError):
+        check_float(None,minimum_allowed=None,maximum_allowed=None)
+
+
 
 def test_check_int():
 
@@ -91,9 +95,13 @@ def test_check_int():
 
     with pytest.raises(ValueError):
         check_int(1,minimum_allowed=1,minimum_inclusive=False)
-
+    
     value = check_int(1,minimum_allowed=1,minimum_inclusive=True)
     assert value == 1
+    value = check_int(2,minimum_allowed=1,minimum_inclusive=True)
+    assert value == 2
+    value = check_int(2,minimum_allowed=1,minimum_inclusive=False)
+    assert value == 2
 
     with pytest.raises(ValueError):
         check_int(1,maximum_allowed=0)
@@ -101,8 +109,12 @@ def test_check_int():
     with pytest.raises(ValueError):
         check_int(1,maximum_allowed=1,maximum_inclusive=False)
 
-    value = check_int(1,minimum_allowed=1,maximum_inclusive=True)
+    value = check_int(1,maximum_allowed=1,maximum_inclusive=True)
     assert value == 1
+    value = check_int(0,maximum_allowed=1,maximum_inclusive=True)
+    assert value == 0
+    value = check_int(0,maximum_allowed=1,maximum_inclusive=False)
+    assert value == 0
 
 def test_check_array():
     
@@ -246,29 +258,3 @@ def test_check_array():
                 check_array([pd.NA,1],nan_allowed=False)
 
 
-
-
-
-def test_column_to_bool():
-
-    df = pd.DataFrame({"test":[True,False,
-                               "True","False",
-                               1,0,
-                               "1","0",
-                               "yes","no",
-                               "T","F",
-                               "Y","N"]})
-
-    expected = np.array((1,0,1,0,1,0,1,0,1,0,1,0,1,0),dtype=bool)
-    out = column_to_bool(df["test"],"test")
-    assert np.array_equal(out,expected)
-
-    df = pd.DataFrame({"test":[True,False,
-                               "True","False",
-                               1,0,
-                               "1","0",
-                               "yes","no",
-                               "T","F",
-                               "X","N"]})
-    with pytest.raises(ValueError):
-        out = column_to_bool(df["test"],"test")

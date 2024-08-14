@@ -9,4 +9,4 @@ from .fitters.ml import MLFitter
 from .fitters.bootstrap import BootstrapFitter
 from .fitters.bayesian.bayesian_sampler import BayesianSampler
 
-
+from .__version__ import __version__

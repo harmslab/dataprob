@@ -39,17 +39,17 @@ def test_BayesianSampler__init__():
     # check num threads passing
     with pytest.raises(NotImplementedError):
         f = BayesianSampler(num_walkers=100,
-                        use_ml_guess=True,
-                        num_steps=100,
-                        burn_in=0.1,
-                        num_threads=0)
+                            use_ml_guess=True,
+                            num_steps=100,
+                            burn_in=0.1,
+                            num_threads=0)
         
     with pytest.raises(NotImplementedError):
         f = BayesianSampler(num_walkers=100,
-                        use_ml_guess=True,
-                        num_steps=100,
-                        burn_in=0.1,
-                        num_threads=10)
+                            use_ml_guess=True,
+                            num_steps=100,
+                            burn_in=0.1,
+                            num_threads=10)
     
     # Pass bad value into each kwarg to make sure checker is running
     with pytest.raises(ValueError):
@@ -599,6 +599,51 @@ def test_BayesianSampler__fit(linear_fit):
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
     assert f.fit_df.loc["b","estimate"] == f.fit_df.loc["b","guess"]
 
+    # -------------------------------------------------------------------------
+    # run twice in a row to check for sample appending
+
+    # Very small analysis, starting from ML
+    f = BayesianSampler(num_walkers=10,
+                        use_ml_guess=True,
+                        num_steps=10,
+                        burn_in=0.1,
+                        num_threads=1)
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+    linear_mw.x = df.x
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    assert np.array_equal(f.param_df["guess"],[0,0])
+    assert not hasattr(f,"_initial_state")
+    assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
+    assert f.fit_result is None
+    assert f.samples is None
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true. Make sure containing function ran completely. 
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # These outputs are determined within ._fit
+    assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,2)
+    assert np.array_equal(f.samples.shape,[90,2]) 
+    assert f._lnprob.shape == (90,)
+    assert f._success is True
+    assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
+
+    # now run again
+    f.fit()
+
+    assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
+    assert f._initial_state.shape == (10,2)
+    assert np.array_equal(f.samples.shape,[180,2]) 
+    assert f._lnprob.shape == (180,)
+    assert f._success is True
+    assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
+
+
 def test_BayesianSampler__update_fit_df(linear_fit):
     
     # Create a BayesianSampler with a model loaded (and _fit_df implicitly 
@@ -678,6 +723,35 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
     assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
     
+
+    # --------------------------------------------------------------------------
+    # make sure the function handles a tiny number of samples
+
+    df = linear_fit["df"]
+    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
+    linear_mw.x = df.x
+
+    # super small sampler
+    f = BayesianSampler(num_walkers=10,
+                        num_steps=10,
+                        use_ml_guess=False)
+    f.model = linear_mw
+    f.y_obs = df.y_obs
+    f.y_std = df.y_std
+
+    assert f.samples is None
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true.
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    assert f.samples.shape == (90,2)
+    f._samples = f._samples[:5,:]
+    f._update_fit_df()
+
+
 
 def test_BayesianSampler_fit_info():
     
