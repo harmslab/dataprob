@@ -3,6 +3,13 @@ Fitter subclass for performing bayesian (MCMC) parameter estimation.
 """
 
 from dataprob.fitters.base import Fitter
+from dataprob.fitters.ml import MLFitter
+
+from dataprob.fitters.bayesian._prior_processing import find_normalization
+from dataprob.fitters.bayesian._prior_processing import find_uniform_value
+from dataprob.fitters.bayesian._prior_processing import reconcile_bounds_and_priors
+from dataprob.fitters.bayesian._prior_processing import create_walkers
+
 from dataprob.check import check_int
 from dataprob.check import check_float
 from dataprob.check import check_bool
@@ -15,6 +22,7 @@ import scipy.optimize as optimize
 from scipy import stats
 
 import multiprocessing
+import copy
 
 
 class BayesianSampler(Fitter):
@@ -23,8 +31,7 @@ class BayesianSampler(Fitter):
     """
     def __init__(self,
                  num_walkers=100,
-                 initial_walker_spread=1e-4,
-                 ml_guess=True,
+                 use_ml_guess=True,
                  num_steps=100,
                  burn_in=0.1,
                  num_threads=1):
@@ -33,17 +40,14 @@ class BayesianSampler(Fitter):
 
         Parameters
         ----------
-        num_walkers : int > 0
-            how many markov chains to have in the analysis
-        initial_walker_spread : float
-            each walker is initialized with parameters sampled from normal
-            distributions with mean equal to the initial guess and a standard
-            deviation of guess*initial_walker_spread
-        ml_guess : bool
-            if true, do an ML optimization to get the initial guess
-        num_steps:
-            number of steps to run the markov chains
-        burn_in : float between 0 and 1
+        num_walkers : int, default=100
+            number of markov chains to use in the analysis
+        use_ml_guess : bool, default=True
+            if true, do a maximum likelihood maximization then sample from the
+            fit parameter covariance matrix to get the initial chain positions
+        num_steps: int, default=100
+            number of steps to run each markov chain
+        burn_in : float, default = 0.1
             fraction of samples to discard from the start of the run
         num_threads : int
             number of threads to use.  if `0`, use the total number of cpus. 
@@ -55,13 +59,9 @@ class BayesianSampler(Fitter):
         # Set keywords, validating as we go
         self._num_walkers = check_int(value=num_walkers,
                                       variable_name="num_walkers",
-                                      minimum_allowed=1)
-        self._initial_walker_spread = check_float(value=initial_walker_spread,
-                                                  variable_name="initial_walker_spread",
-                                                  minimum_allowed=0,
-                                                  minimum_inclusive=False)               
-        self._ml_guess = check_bool(value=ml_guess,
-                                    variable_name="ml_guess")
+                                      minimum_allowed=1)    
+        self._use_ml_guess = check_bool(value=use_ml_guess,
+                                        variable_name="use_ml_guess")
         self._num_steps = check_int(value=num_steps,
                                     variable_name="num_steps",
                                     minimum_allowed=1)
@@ -99,7 +99,7 @@ class BayesianSampler(Fitter):
 
         # Figure out the offset that normalizes the area of the pdf curve to 1.0
         # given the float precision etc. of the system
-        base_offset = _find_normalization(scale=1,rv=stats.norm)
+        base_offset = find_normalization(scale=1,rv=stats.norm)
 
         uniform_priors = []
         gauss_prior_means = []
@@ -117,7 +117,7 @@ class BayesianSampler(Fitter):
             bounds = np.array([lower_bound,upper_bound])
 
             if np.isnan(prior_mean) or np.isnan(prior_std):
-                uniform_priors.append(_find_uniform_value(bounds))
+                uniform_priors.append(find_uniform_value(bounds))
                 gauss_prior_mask.append(False)
 
             else:
@@ -125,8 +125,8 @@ class BayesianSampler(Fitter):
                 gauss_prior_stds.append(prior_std)
 
                 z_bounds = (bounds - prior_mean)/prior_std
-                bounds_offset = _reconcile_bounds_and_priors(bounds=z_bounds,
-                                                             frozen_rv=self._prior_frozen_rv)
+                bounds_offset = reconcile_bounds_and_priors(bounds=z_bounds,
+                                                            frozen_rv=self._prior_frozen_rv)
                 gauss_prior_offsets.append(base_offset + bounds_offset)
                 gauss_prior_mask.append(True)
     
@@ -243,39 +243,40 @@ class BayesianSampler(Fitter):
         # Set up the priors
         self._setup_priors()
 
-        to_fit = self._model.unfixed_mask
-        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
-        bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
-                           self._model.param_df.loc[to_fit,"upper_bound"]])
-        
-        # Make initial guess (ML or just whatever the parameters sent in were)
-        if self._ml_guess:
-            def fn(*args): return -self._weighted_residuals(*args)
-            ml_fit = optimize.least_squares(fn,x0=guesses,bounds=bounds)
-            self._initial_guess = np.copy(ml_fit.x)
+        # Construct initial walker positions. If use_ml_guess is specified, do a
+        # maximum likelihood fit, then sample from the fit parameter covariance
+        # matrix to generate initial guesses. This will sample only unfixed
+        # parameters. 
+        if self._use_ml_guess:
+
+            ml_fit = MLFitter()
+            ml_fit.model = self._model
+            ml_fit.y_obs = self.y_obs
+            ml_fit.y_std = self.y_std
+            ml_fit.fit()
+            walkers = ml_fit.samples[:self._num_walkers,:]
+
+        # Generate walkers by sampling from the prior distribution. This will
+        # only generate values for unfixed parameters. 
         else:
-            self._initial_guess = np.copy(guesses)
-
-        # Create walker positions
-
-        # Size of perturbation in parameter depends on the scale of the parameter
-        perturb_size = self._initial_guess*self._initial_walker_spread
-
-        ndim = len(self._initial_guess)
-        pos = [self._initial_guess + np.random.randn(ndim)*perturb_size
-               for _ in range(self._num_walkers)]
-
-        # Sample using walkers
-        self._fit_result = emcee.EnsembleSampler(self._num_walkers,
-                                                 ndim,
-                                                 self._ln_prob,
+            walkers = create_walkers(param_df=self.param_df,
+                                     num_walkers=self._num_walkers)
+        
+        # Build sampler object
+        self._fit_result = emcee.EnsembleSampler(nwalkers=self._num_walkers,
+                                                 ndim=walkers.shape[1],
+                                                 log_prob_fn=self._ln_prob,
                                                  **kwargs)
 
-        self._fit_result.run_mcmc(pos, self._num_steps,progress=True)
+        # Run sampler
+        self._fit_result.run_mcmc(initial_state=walkers,
+                                  nsteps=self._num_steps,
+                                  progress=True)
 
         # Create numpy array of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
-        new_samples = self._fit_result.get_chain()[to_discard:,:,:].reshape((-1,ndim))
+        chains = self._fit_result.get_chain()[to_discard:,:,:]
+        new_samples = chains.reshape((-1,walkers.shape[1]))
 
         # Create numpy array of lnprob for each sample
         new_lnprob = self._fit_result.get_log_prob()[:,:].reshape(-1)
@@ -325,8 +326,7 @@ class BayesianSampler(Fitter):
 
         output = {}
         output["Num walkers"] = self._num_walkers
-        output["Initial walker spread"] = self._initial_walker_spread
-        output["Use ML guess"] = self._ml_guess
+        output["Use ML guess"] = self._use_ml_guess
         output["Num steps"] = self._num_steps
         output["Burn in"] = self._burn_in
 

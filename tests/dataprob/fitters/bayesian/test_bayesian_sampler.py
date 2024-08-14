@@ -7,9 +7,9 @@ from scipy import stats
 import emcee
 
 from dataprob.fitters.bayesian.bayesian_sampler import BayesianSampler
-from dataprob.fitters.bayesian._prior_processing import _find_normalization
-from dataprob.fitters.bayesian._prior_processing import _reconcile_bounds_and_priors
-from dataprob.fitters.bayesian._prior_processing import _find_uniform_value
+from dataprob.fitters.bayesian._prior_processing import find_normalization
+from dataprob.fitters.bayesian._prior_processing import reconcile_bounds_and_priors
+from dataprob.fitters.bayesian._prior_processing import find_uniform_value
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
@@ -23,15 +23,13 @@ def test_BayesianSampler__init__():
 
     # args are being set
     f = BayesianSampler(num_walkers=100,
-                       initial_walker_spread=1e-4,
-                       ml_guess=True,
+                       use_ml_guess=True,
                        num_steps=100,
                        burn_in=0.1,
                        num_threads=1)
 
     assert f._num_walkers == 100
-    assert np.isclose(f._initial_walker_spread,1e-4)
-    assert f._ml_guess is True
+    assert f._use_ml_guess is True
     assert f._num_steps == 100
     assert np.isclose(f._burn_in,0.1)
     assert f._num_threads == 1
@@ -41,16 +39,14 @@ def test_BayesianSampler__init__():
     # check num threads passing
     with pytest.raises(NotImplementedError):
         f = BayesianSampler(num_walkers=100,
-                        initial_walker_spread=1e-4,
-                        ml_guess=True,
+                        use_ml_guess=True,
                         num_steps=100,
                         burn_in=0.1,
                         num_threads=0)
         
     with pytest.raises(NotImplementedError):
         f = BayesianSampler(num_walkers=100,
-                        initial_walker_spread=1e-4,
-                        ml_guess=True,
+                        use_ml_guess=True,
                         num_steps=100,
                         burn_in=0.1,
                         num_threads=10)
@@ -59,9 +55,7 @@ def test_BayesianSampler__init__():
     with pytest.raises(ValueError):
         f = BayesianSampler(num_walkers=0)        
     with pytest.raises(ValueError):
-        f = BayesianSampler(initial_walker_spread="stupid")
-    with pytest.raises(ValueError):
-        f = BayesianSampler(ml_guess="not a bool")
+        f = BayesianSampler(use_ml_guess="not a bool")
     with pytest.raises(ValueError):
         f = BayesianSampler(num_steps=1.2)
     with pytest.raises(ValueError):
@@ -175,10 +169,10 @@ def test__setup_priors():
     # Make sure final offset from the code matches what we calculate here. (Not
     # really testing math bit -- that's in the _find_normalization and 
     # _reconcile_bounds_and_priors tests).
-    base_offset = _find_normalization(scale=1,rv=stats.norm)
+    base_offset = find_normalization(scale=1,rv=stats.norm)
     bounds = np.array([0,20])
-    bounds_offset = _reconcile_bounds_and_priors(bounds=(bounds - 10)/5,
-                                                 frozen_rv=stats.norm(loc=0,scale=1))
+    bounds_offset = reconcile_bounds_and_priors(bounds=(bounds - 10)/5,
+                                                frozen_rv=stats.norm(loc=0,scale=1))
     assert np.isclose(base_offset + bounds_offset,f._gauss_prior_offsets[0])
 
     # Make sure the code is really pulling the bounds from the param_df (needed
@@ -204,10 +198,10 @@ def test_BayesianSampler__ln_prior():
 
     # Set up local calculation
     frozen_rv = stats.norm(loc=0,scale=1)
-    base_offset = _find_normalization(scale=1,rv=stats.norm)
+    base_offset = find_normalization(scale=1,rv=stats.norm)
     bounds = np.array([-1,1])
-    bounds_offset = _reconcile_bounds_and_priors(bounds=(bounds-0)/1,
-                                                 frozen_rv=frozen_rv)
+    bounds_offset = reconcile_bounds_and_priors(bounds=(bounds-0)/1,
+                                                frozen_rv=frozen_rv)
     
     # Try a set of values
     for v in [-0.9,-0.1,0.0,0.1,0.9]:
@@ -239,13 +233,13 @@ def test_BayesianSampler__ln_prior():
 
     # Set up local calculation
     frozen_rv = stats.norm(loc=0,scale=1)
-    base_offset = _find_normalization(scale=1,rv=stats.norm)
+    base_offset = find_normalization(scale=1,rv=stats.norm)
     bounds = np.array([-np.inf,10])
-    bounds_offset = _reconcile_bounds_and_priors(bounds=(bounds-2)/10,
-                                                 frozen_rv=frozen_rv)
+    bounds_offset = reconcile_bounds_and_priors(bounds=(bounds-2)/10,
+                                                frozen_rv=frozen_rv)
     
     total_gauss_offset = base_offset + bounds_offset
-    uniform_prior = _find_uniform_value(bounds=np.array([-np.inf,0]))
+    uniform_prior = find_uniform_value(bounds=np.array([-np.inf,0]))
 
     for v in [-1e6,-1,0,8]:
         print("testing",v)
@@ -371,12 +365,11 @@ def test_BayesianSampler__fit(linear_fit):
     param = np.array([coeff["m"],coeff["b"]])
 
     # -------------------------------------------------------------------------
-    # basic run; checking ml_guess = True effect
+    # basic run; checking use_ml_guess = True effect
 
     # Very small analysis, starting from ML
     f = BayesianSampler(num_walkers=10,
-                        initial_walker_spread=1e-4,
-                        ml_guess=True,
+                        use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
@@ -388,7 +381,6 @@ def test_BayesianSampler__fit(linear_fit):
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
-    assert not hasattr(f,"_initial_guess")
     assert f.fit_result is None
     assert f.samples is None
 
@@ -398,7 +390,6 @@ def test_BayesianSampler__fit(linear_fit):
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
-    assert np.array_equal(np.round(f._initial_guess,1),param)
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert np.array_equal(f.samples.shape,[90,2]) 
     assert f._lnprob.shape == (90,)
@@ -406,12 +397,11 @@ def test_BayesianSampler__fit(linear_fit):
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
     # -------------------------------------------------------------------------
-    # basic run; checking ml_guess = False effect
+    # basic run; checking use_ml_guess = False effect
 
     # Very small analysis, starting from ML
     f = BayesianSampler(num_walkers=10,
-                        initial_walker_spread=1e-4,
-                        ml_guess=False,
+                        use_ml_guess=False,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
@@ -425,7 +415,6 @@ def test_BayesianSampler__fit(linear_fit):
     # be distinguished below
     f.param_df["guess"] = [1,1]
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
-    assert not hasattr(f,"_initial_guess")
     assert f.fit_result is None
     assert f.samples is None
 
@@ -435,7 +424,6 @@ def test_BayesianSampler__fit(linear_fit):
     assert f._fit_has_been_run is True
 
     # look for non-ML guess
-    assert np.array_equal(np.round(f._initial_guess,1),[1,1])
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert np.array_equal(f.samples.shape,[90,2]) 
     assert f._lnprob.shape == (90,)
@@ -447,8 +435,7 @@ def test_BayesianSampler__fit(linear_fit):
 
     # Very small analysis, starting from ML
     f = BayesianSampler(num_walkers=9,
-                        initial_walker_spread=1e-4,
-                        ml_guess=True,
+                        use_ml_guess=True,
                         num_steps=20,
                         burn_in=0.1,
                         num_threads=1)
@@ -460,7 +447,6 @@ def test_BayesianSampler__fit(linear_fit):
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
-    assert not hasattr(f,"_initial_guess")
     assert f.fit_result is None
     assert f.samples is None
 
@@ -470,7 +456,6 @@ def test_BayesianSampler__fit(linear_fit):
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
-    assert np.array_equal(np.round(f._initial_guess,1),param)
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert np.array_equal(f.samples.shape,[162,2]) 
     assert f._lnprob.shape == (162,)
@@ -482,8 +467,7 @@ def test_BayesianSampler__fit(linear_fit):
 
     # Very small analysis, starting from ML
     f = BayesianSampler(num_walkers=10,
-                        initial_walker_spread=1e-4,
-                        ml_guess=True,
+                        use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.5,
                         num_threads=1)
@@ -495,7 +479,6 @@ def test_BayesianSampler__fit(linear_fit):
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
-    assert not hasattr(f,"_initial_guess")
     assert f.fit_result is None
     assert f.samples is None
 
@@ -505,7 +488,6 @@ def test_BayesianSampler__fit(linear_fit):
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
-    assert np.array_equal(np.round(f._initial_guess,1),param)
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert np.array_equal(f.samples.shape,[50,2]) 
     assert f._lnprob.shape == (50,)
@@ -542,8 +524,7 @@ def test_BayesianSampler_fit_info():
     
     f = BayesianSampler()
     assert f.fit_info["Num walkers"] == f._num_walkers
-    assert f.fit_info["Initial walker spread"] == f._initial_walker_spread
-    assert f.fit_info["Use ML guess"] == f._ml_guess
+    assert f.fit_info["Use ML guess"] == f._use_ml_guess
     assert f.fit_info["Num steps"] == f._num_steps
     assert f.fit_info["Burn in"] == f._burn_in
     assert f.fit_info["Num threads"] == f._num_threads
@@ -566,20 +547,20 @@ def test_BayesianSampler___repr__():
           y_std=[0.1,0.1,0.1])
 
     out = f.__repr__().split("\n")
-    assert len(out) == 24
+    assert len(out) == 23
 
     # hack, run _fit_has_been_run, _fit_failed branch
     f._success = False
 
     out = f.__repr__().split("\n")
-    assert len(out) == 19    
+    assert len(out) == 18 
 
     # Run not _fit_has_been_run
     f = BayesianSampler(num_steps=10)
     f.model = mw
 
     out = f.__repr__().split("\n")
-    assert len(out) == 15
+    assert len(out) == 14
 
 
 @pytest.mark.slow

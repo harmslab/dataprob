@@ -237,6 +237,12 @@ def _sample_gaussian(prior_mean,
                      lower_bound,
                      upper_bound,
                      num_walkers):
+    """
+    Attempt to generate num_walkers samples from a gaussian with prior_mean
+    and prior_std, subject to the constraint that all samples are between 
+    lower and upper bounds. Either return an array of samples num_walkers 
+    long or, if no samples are found, return None. 
+    """
     
     # generate a huge number of possible priors 
     gaussian_priors = np.random.normal(loc=prior_mean,
@@ -257,10 +263,17 @@ def _sample_gaussian(prior_mean,
 
     return None
 
-def _sample_uniform(lower_bound,
-                    upper_bound,
-                    num_walkers,
-                    infinity_proxy):
+def _cover_uniform(lower_bound,
+                   upper_bound,
+                   num_walkers,
+                   infinity_proxy,
+                   span_base=10):
+    """
+    Create samples at even steps (logarithmic) between lower and upper bound.
+    Returns a numpy array num_walkers long with sampled values between lower
+    and upper bound. These are shuffled, but steps rather than purely random
+    samples. span_base sets 
+    """
 
     # Slice down infinite bounds to largish numbers
     if np.isinf(lower_bound): 
@@ -274,10 +287,11 @@ def _sample_uniform(lower_bound,
 
     # If the upper and lower bounds have the same sign, make a uniform
     # span between them (log steps). For example, 1e-9 to 1e-6 with four
-    # walkers would yield 1e-9, 1e-8, 1e-7, 1e-6
-    if upper_bound*lower_bound > 0:
+    # walkers would yield approximately 1e-9, 1e-8, 1e-7, 1e-6 (uses ln,
+    # so not quite powers of 10)
+    if upper_bound*lower_bound >= 0:
         
-        steps = np.exp(np.arange(num_walkers))
+        steps = np.exp(np.linspace(0,span_base,num_walkers))
         steps = (steps - np.min(steps))/(np.max(steps) - np.min(steps))
         walkers = steps*(upper_bound - lower_bound) + lower_bound
         np.random.shuffle(walkers)
@@ -304,14 +318,20 @@ def _sample_uniform(lower_bound,
     num_above = num_walkers - num_below
 
     # Create steps from 0 to upper_bound
-    steps = np.exp(np.arange(num_above))
-    steps = (steps - np.min(steps))/(np.max(steps) - np.min(steps))
-    above_walkers = list(steps*upper_bound)
+    if num_above > 1:
+        steps = np.exp(np.linspace(0,span_base,num_above))
+        steps = (steps - np.min(steps))/(np.max(steps) - np.min(steps))
+        above_walkers = list(steps*upper_bound)
+    else:
+        above_walkers = [upper_bound]
 
     # Create steps from 0 to lower_bound
-    steps = np.exp(np.arange(num_below))
-    steps = (steps - np.min(steps))/(np.max(steps) - np.min(steps))
-    below_walkers = list(steps*lower_bound)
+    if num_below > 1:
+        steps = np.exp(np.linspace(0,span_base,num_below))
+        steps = (steps - np.min(steps))/(np.max(steps) - np.min(steps))
+        below_walkers = list(steps*lower_bound)
+    else:
+        below_walkers = [lower_bound]
 
     # Combine all steps
     above_walkers.extend(below_walkers)
@@ -323,8 +343,30 @@ def _sample_uniform(lower_bound,
     return walkers
 
 def create_walkers(param_df,
-                    num_walkers,
-                    infinity_proxy=1e9):
+                   num_walkers,
+                   infinity_proxy=1e9):
+    """
+    Create a collection of starting walkers from a parameter dataframe. 
+    
+    Parameters
+    ----------
+    param_df : pandas.DataFrame
+        parameter dataframe (usually taken from a ModelWrapper instance) that
+        should have fixed, guess, prior_mean, prior_std, lower_bound, and
+        upper_bound columns. This dataframe is not validated by the function; 
+        this is the callers responsibility.
+    num_walkers : int
+        number of walkers to generate. 
+    infinity_proxy : float, default = 1e9
+        substitute this for infinite bounds. should generally be a large-ish
+        number, but not so large as to lead to numerical problems. 
+
+    Returns
+    -------
+    walkers : numpy.ndarray
+        numpy array with dimensions (num_walkers,num_parameters) with sampled
+        starting points for an MCMC calculation 
+    """
 
     walker_list = []
 
@@ -336,7 +378,6 @@ def create_walkers(param_df,
             continue
 
         # Get prior mean, std, and bounds
-        guess = param_df.loc[p,"guess"]
         prior_mean = param_df.loc[p,"prior_mean"]
         prior_std = param_df.loc[p,"prior_std"]
         lower_bound = param_df.loc[p,"lower_bound"]
@@ -355,10 +396,10 @@ def create_walkers(param_df,
                 continue
 
         # If we get here, gaussian priors were not given or did not work.
-        uniform_priors = _sample_uniform(lower_bound,
-                                         upper_bound,
-                                         num_walkers,
-                                         infinity_proxy)
+        uniform_priors = _cover_uniform(lower_bound,
+                                        upper_bound,
+                                        num_walkers,
+                                        infinity_proxy)
         walker_list.append(uniform_priors)
         
     walkers = np.array(walker_list).T
