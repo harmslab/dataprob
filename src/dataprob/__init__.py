@@ -7,6 +7,6 @@ from .model_wrapper.wrap_function import wrap_function
 
 from .fitters.ml import MLFitter
 from .fitters.bootstrap import BootstrapFitter
-from .fitters.bayesian import BayesianSampler
+from .fitters.bayesian.bayesian_sampler import BayesianSampler
 
-
+from .__version__ import __version__

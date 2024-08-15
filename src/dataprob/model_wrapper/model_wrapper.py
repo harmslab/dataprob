@@ -2,18 +2,18 @@
 Class for wrapping functions for use in likelihood calculations. 
 """
 
-from dataprob.fit_param import FitParameter
-from dataprob.check import check_array
-
 from dataprob.model_wrapper._function_processing import analyze_fcn_sig
 from dataprob.model_wrapper._function_processing import reconcile_fittable
 from dataprob.model_wrapper._function_processing import param_sanity_check
 
-from dataprob.model_wrapper.read_spreadsheet import load_param_spreadsheet
+from dataprob.model_wrapper._dataframe_processing import read_spreadsheet
+from dataprob.model_wrapper._dataframe_processing import validate_dataframe
+from dataprob.model_wrapper._dataframe_processing import param_into_existing
+
+from dataprob.check import check_float
 
 import numpy as np
 import pandas as pd
-
 
 class ModelWrapper:
     """
@@ -30,10 +30,13 @@ class ModelWrapper:
     # to the model. These have to be defined across class because we are going
     # to hijack __getattr__ and __setattr__ and need to look inside this as soon
     # as we start setting attributes.
-    _mw_fit_parameters = {}
-    _mw_other_arguments = {}
+    _param_df = pd.DataFrame({"name":[]})
+    _other_arguments = {}
 
-    def __init__(self,model_to_fit,fittable_params=None):
+    def __init__(self,
+                 model_to_fit,
+                 fittable_params=None,
+                 default_guess=0.0):
         """
 
         Parameters
@@ -42,20 +45,25 @@ class ModelWrapper:
             a function or method to fit.
         fittable_params : list-like, optional
             list of arguments to fit.
+        default_guess : float, default=0
+            assign parameters with no default value this value
         """
 
-        # Define these here so __setattr__ and __getattr__ end up looking at
-        # instance-level attributes rather than class-level attributes.
-        self._mw_fit_parameters = {}
-        self._mw_other_arguments = {}
+        self._default_guess = check_float(value=default_guess,
+                                          variable_name="default_guess")
 
-        self._mw_load_model(model_to_fit,fittable_params)
+        # Re-define these here so __setattr__ and __getattr__ end up looking at
+        # instance-level (__dict__) attributes rather than class-level
+        # attributes.
+        self._param_df = pd.DataFrame({"name":[]})
+        self._other_arguments = {}
 
-    def _mw_load_model(self,model_to_fit,fittable_params):
+        self._load_model(model_to_fit,fittable_params)
+
+    def _load_model(self,model_to_fit,fittable_params):
         """
-        Load a model into the wrapper, making the arguments into attributes.
-        Fittable arguments are made into FitParameter instances.  Non-fittable
-        arguments are set as generic attributes.
+        Load a model into the wrapper. Fittable arguments are put into param_df.
+        Non-fittable arguments are placed in the other_arguments dictionary.
 
         Parameters
         ----------
@@ -72,9 +80,11 @@ class ModelWrapper:
 
         self._model_to_fit = model_to_fit
 
+        # Parse function arguments
         all_args, can_be_fit, cannot_be_fit, has_kwargs = \
             analyze_fcn_sig(fcn=self._model_to_fit)
 
+        # Decide which parameters are fittable and which are not
         fittable_params, not_fittable_parameters = \
             reconcile_fittable(fittable_params=fittable_params,
                                all_args=all_args,
@@ -82,23 +92,48 @@ class ModelWrapper:
                                cannot_be_fit=cannot_be_fit,
                                has_kwargs=has_kwargs)
 
+        # Make sure input arguments are sane and compatible with the ModelWrapper
+        # class namespace
         reserved_params = dir(self.__class__)
         fittable_params = param_sanity_check(fittable_params=fittable_params,
                                              reserved_params=reserved_params)
         not_fittable_parameters = param_sanity_check(fittable_params=not_fittable_parameters,
                                                      reserved_params=reserved_params)
 
+        # Go through fittable params.
+        fit_params = []
+        guesses = []
         for p in fittable_params:
 
-            # if there are kwargs, p will be in fittable_params but not in
+            fit_params.append(p)
+
+            # if **kwargs is defined, p could be in fittable_params but not in
             # can_be_fit.
             if p in can_be_fit:
-                guess = can_be_fit[p]        
+                guesses.append(can_be_fit[p])
             else:
-                guess = None
+                guesses.append(None)
 
-            self._mw_fit_parameters[p] = FitParameter(guess=guess)
+        # Remove any 'None' guesses and replace with default
+        final_guesses = []
+        for g in guesses:
+            if g is None:
+                final_guesses.append(self._default_guess)
+            else:
+                final_guesses.append(g)
+
+        # Fix the order of the fit parameters
+        self._fit_params_in_order = fit_params[:]
         
+        # Build a param_df dataframe
+        param_df = pd.DataFrame({"name":fit_params,
+                                 "guess":final_guesses})
+        self._param_df = validate_dataframe(param_df,
+                                            param_in_order=self._fit_params_in_order,
+                                            default_guess=self._default_guess)
+
+        # Go through non-fittable parameters and record their keyword arguments
+        # in _other_arguments
         for p in not_fittable_parameters:
             
             if p in can_be_fit:
@@ -106,9 +141,11 @@ class ModelWrapper:
             else:
                 starting_value = cannot_be_fit[p]
                 
-            self._mw_other_arguments[p] = starting_value
-        
-        self._update_parameter_map()
+            self._other_arguments[p] = starting_value
+          
+        # Finalize -- read to run the model
+        self.finalize_params()
+
 
     def __setattr__(self, key, value):
         """
@@ -117,12 +154,18 @@ class ModelWrapper:
         """
 
         # We're setting the guess of the fit parameter
-        if key in self._mw_fit_parameters.keys():
-            self._mw_fit_parameters[key].guess = value
+        if key in self._param_df.name:
+
+            tmp_param_df = self._param_df.copy()
+            tmp_param_df.loc[key,"guess"] = check_float(value=value,
+                                                        variable_name="guess")
+            self._param_df = validate_dataframe(tmp_param_df,
+                                                param_in_order=self._fit_params_in_order,
+                                                default_guess=self._default_guess)
 
         # We're setting another argument
-        elif key in self._mw_other_arguments.keys():
-            self._mw_other_arguments[key] = value
+        elif key in self._other_arguments.keys():
+            self._other_arguments[key] = value
 
         # Otherwise, just set it like normal
         else:
@@ -135,12 +178,12 @@ class ModelWrapper:
         """
 
         # We're getting a fit parameter
-        if key in self._mw_fit_parameters.keys():
-            return self._mw_fit_parameters[key]
+        if key in self._param_df.name:
+            return self._param_df.loc[key,"guess"]
 
         # We're getting another argument
-        if key in self._mw_other_arguments.keys():
-            return self._mw_other_arguments[key]
+        if key in self._other_arguments.keys():
+            return self._other_arguments[key]
 
         # Otherwise, get like normal
         else:
@@ -152,198 +195,95 @@ class ModelWrapper:
             # if not there, fall back to base __getattribute__
             return super().__getattribute__(key)
 
-    def _update_parameter_map(self):
+    def finalize_params(self):
         """
-        Update the map between the parameter vector that will be passed in to
-        the fitter and the parameters in this wrapper. 
+        Validate current state of param_df and build map between parameters
+        and the model arguments. This will be called by a Fitter instance 
+        before doing a fit. 
         """
+    
+        # Make sure the parameter dataframe is sane. It could have problems 
+        # because we let the user edit it directly.
+        self._param_df = validate_dataframe(param_df=self._param_df,
+                                            param_in_order=self._fit_params_in_order,
+                                            default_guess=self._default_guess)
+        
+        # Get currently un-fixed parameters
+        self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
+        self._current_param_index = self._param_df.index[self._unfixed_mask]
 
-        self._position_to_param = []
+        # Build a dictionary of keyword arguments to pass to the model when
+        # called. 
         self._mw_kwargs = {}
-        for p in self._mw_fit_parameters.keys():
-            if self._mw_fit_parameters[p].fixed:
-                self._mw_kwargs[p] = self._mw_fit_parameters[p].value
-            else:
-                self._mw_kwargs[p] = None
-                self._position_to_param.append(p)
-
-        self._mw_kwargs.update(self._mw_other_arguments)
+        for p in self._fit_params_in_order:
+            self._mw_kwargs[p] = self._param_df.loc[p,"guess"]
+        self._mw_kwargs.update(self._other_arguments)
 
     def _mw_observable(self,params=None):
         """
-        Actual function called by the fitter. params are either None (saying 
-        grab parameter values from fit_paramater.value) or an array of 
-        float parameter values. 
+        Actual function called by the fitter. 
         """
 
-        # If parameters are not passed, stick in the current parameter
-        # values
+        # If parameters are not passed, get current parameter values
         if params is None:
-            for p in self._position_to_param:
-                self._mw_kwargs[p] = self.fit_parameters[p].value
-        else:
-            if len(params) != len(self._position_to_param):
-                err = f"Number of fit parameters ({len(params)}) does not match\n"
-                err += f"number of unfixed parameters ({len(self._position_to_param)})\n"
-                raise ValueError(err)
+            params = np.array(self._param_df.loc[self._unfixed_mask,"guess"])
 
-            for i in range(len(params)):
-                self._mw_kwargs[self._position_to_param[i]] = params[i]
+        # Sanity check
+        if len(params) != np.sum(self._unfixed_mask):
+            err = f"Number of fit parameters ({len(params)}) does not match\n"
+            err += f"number of unfixed parameters ({np.sum(self._unfixed_mask)})\n"
+            raise ValueError(err)
+
+        # Update kwargs
+        for i in range(len(params)):
+            self._mw_kwargs[self._current_param_index[i]] = params[i]
 
         try:
             return self._model_to_fit(**self._mw_kwargs)
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
             raise RuntimeError(err) from e
-
-    def load_fit_result(self,fitter):
+        
+    def update_params(self,param_input):
         """
-        Load the result of a fit into all fit parameters. Parameters much match
-        exactly between the two fits. 
+        Update the parameter features. 
 
         Parameters
         ----------
-        fitter : dataprob.Fitter
-            fitter instance that has had .fit() run previously. 
-        """
-
-        if not np.array_equal(fitter.names,self.names):
-            err = "mismatch in the parameter names between the current model\n"
-            err += "and the fit\n"
-            raise ValueError(err)
-
-        for i, p in enumerate(self._position_to_param):
-            self.fit_parameters[p].load_fit_result(fitter,i)
-
-    def load_param_dict(self,params_to_load):
-        """
-        Load parameter guesses, fixed-ness, bounds, and priors from a
-        dictionary. 
-        
-        Parameters
-        ----------
-        params_to_load : dict
-            Dictionary keys should be the names of parameters loaded into the
-            model_wrapper. Values are themselves dictionaries keying attributes
-            to their appropriate value. For example, the following argument:
-                `param_to_load['K'] = {'fixed':True,'guess':5}`
-            would fix parameter 'K' and set its guess to 5. Not all parameters
-            and attributes need to be in the dictionary. Parameters not seen in 
-            the model will cause an error. 
-        
-        Note
-        ----
-        Allowed attributes: 
-
-        +----------+----------------------------------------------------------+
-        | key      | value                                                    |
-        +==========+==========================================================+
-        | 'guess'  | single float value (must be within bounds, if specified) |
-        +----------+----------------------------------------------------------+
-        | 'fixed'  | True of False                                            |
-        +----------+----------------------------------------------------------+
-        | 'bounds' | (lower,upper) as floats (-np.inf,np.inf) allowed         |
-        +----------+----------------------------------------------------------+
-        | 'prior'  | (mean,stdev) as floats (np.nan,np.nan) allowed, meaning  |
-        |          | uniform prior                                            |
-        +----------+----------------------------------------------------------+
-
-        """
-
-        # make sure its a dictionary
-        if not issubclass(type(params_to_load),dict):
-            err = "params_to_load should be a dictionary keying parameter names\n"
-            err += "to dictionaries of attribute values.\n"
-            raise ValueError(err)
-
-        # Set fit parameter attributes from the spreadsheet values
-        for p in params_to_load:
-            for field in params_to_load[p]:
-
-                if p not in self.fit_parameters:
-                    err = f"parameter '{p}' is not in this model\n"
-                    raise ValueError(err)
-                
-                setattr(self.fit_parameters[p],field,params_to_load[p][field])
-        
-        # Update parameters with new information. 
-        self._update_parameter_map()
-
-    def load_param_spreadsheet(self,spreadsheet):
-        """
-        Load parameter guesses, fixed-ness, bounds, and priors from a
-        spreadsheet. 
-
-        Parameters
-        ----------
-        spreadsheet : str or pandas.DataFrame
-            spreadsheet to read data from. If a string, the program will treat 
-            it as a filename and attempt to read (xslx, csv, tsv, and txt) will
-            be recognized. If a dataframe, values will be read directly from the
-            dataframe
+        param_input : pandas.DataFrame or dict or str
+            param_input should hold parameter features. If param_input is a
+            string, it will be treated as a filename and read by pandas (xslx,
+            csv, tsv, and txt are recognized). If param_input is a dataframe,
+            values will be read directly from the dataframe. If param_input is a
+            dict, it will be treated as a nested dictionary keying parameter
+            names to columns to values (param_input[parameter][column] -> value).
+            (Example: ``param_input={"K":{"guess":1.0}}`` would set the guess
+            for parameter "K" to 1.0).
 
         Notes
         -----
+        See the param_df docstring for details on parameter inputs. 
 
-        Allowable columns:
-
-        +---------------+-----------------------------------------------------+
-        | key           | value                                               |
-        +===============+=====================================================+
-        | 'param'       | string name of the parameter                        |
-        +---------------+-----------------------------------------------------+
-        | 'guess'       | guess as single float value (must be within bounds, |
-        |               | if specified)                                       |
-        +---------------+-----------------------------------------------------+
-        | 'fixed'       | True of False                                       |
-        +---------------+-----------------------------------------------------+
-        | 'lower_bound' | single float value; -np.inf allowed                 |
-        +---------------+-----------------------------------------------------+
-        | 'upper_bound' | single float value; np.inf allowed                  |
-        +---------------+-----------------------------------------------------+
-        | 'prior_mean'  | single float value; np.nan allowed                  |
-        +---------------+-----------------------------------------------------+
-        | 'prior_std'   | single float value; np.nan allowed                  |
-        +---------------+-----------------------------------------------------+
-
-        + The 'param' column is required. All parameters in the spreadsheet must
-          match parameters in the model; however, not all parameters in the
-          model must be in the spreadsheet. Parameters not in the spreadsheet 
-          retain their current features in the class. 
-
-        + Parameter features specified in the spreadsheet will overwrite
-          features already in the class. Features not set in the spreadsheet
-          will not affect features in the class. (For example, you can safely 
-          specify a spreadsheet with a 'guess' column for each parameter without
-          altering priors set previously). 
-
-        + If a 'guess' column is in the spreadsheet, all values must be finite
-          and non-nan floats. 
-
-        + If a 'fixed' column is in the spreadsheet, all values must be TRUE or
-          FALSE.
-
-        + Bounds are specified using the 'lower_bound' and 'upper_bound' columns.
-          If only one is specified, the other is set to infinity. (For example,
-          if there is an 'upper_bound' column, the lower bound is set to 
-          -np.inf). Nan entries are interpreted as infinities. NOTE: you cannot
-          set a lower bound in the spreadsheet while preserving upper bounds 
-          already in the class (and vice versa). If you wish to set non-infinite
-          bounds with a spreadsheet, you must specify both upper and lower 
-          bounds.
-
-        + Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
-          columns, declaring the prior mean and standard deviation. If either
-          'prior_mean' or 'prior_std' is set to a non-nan value, both must be 
-          set. If both are set to nan, the priors are set to uniform for that
-          parameter. 
+        Parameter features specified in param_input will overwrite features in
+        param_df. Features *not* set in param_input will *not* alter existing
+        features in param_df. For example, you can safely specify a spreadsheet
+        with a 'guess' column without altering priors already set in param_df. 
+        Or, you could send in a dictionary setting the lower_bound for a single
+        parameter without altering any other parameters. 
         """
 
-        # Load spreadsheet into a dictionary
-        params_to_load = load_param_spreadsheet(spreadsheet=spreadsheet)
+        # If a string, read as a spreadsheet
+        if issubclass(type(param_input),str):
+            param_input = read_spreadsheet(param_input)
 
-        # Load via load_param_dict
-        self.load_param_dict(params_to_load=params_to_load)
+        # Load the parameter input into the dataframe
+        param_df = param_into_existing(param_input=param_input,
+                                       param_df=self._param_df)
+        
+        # Validate the final dataframe and store it
+        self._param_df = validate_dataframe(param_df=param_df,
+                                            param_in_order=self._fit_params_in_order,
+                                            default_guess=self._default_guess)
 
     @property
     def model(self):
@@ -355,258 +295,105 @@ class ModelWrapper:
         ----------
         params : numpy.ndarray, optional
             float numpy array the length of the number of unfixed parameters.
-            If this is not specified, the model is run using the values of each
-            parameter (that is, the values seen in the "values" attribute). 
+            If this is not specified, the model is run using the parameter 
+            guess values. 
         """
 
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
+        self.finalize_params()
 
-        # This model, once returned, does not have to re-run update_parameter_map
-        # and should thus be faster when run again and again in regression
+        # This model, once returned, does not have to re-run finalize and should
+        # thus be faster when run again and again in regression
         return self._mw_observable
 
     @property
-    def names(self):
+    def param_df(self):
         """
-        Names of unfixed parameters in the order they appear in the parameters
-        array passed to model(param). 
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value. (NOTE: this update happens in the public
-        # property. Most of the time, self._position_to_param should be accessed
-        # by internal methods to avoid triggering this update.)
-        self._update_parameter_map()
-
-        return self._position_to_param
+        Dataframe holding the fittable parameters in the model. This can be set 
+        by ``mw.param_df = some_new_df``. It can also be edited in place 
+        (e.g. ``mw.param_df.loc["K1","guess"] = 5``).
         
+        The 'name' column is set when the dataframe is initialized. This defines
+        the names of the parameters, which cannot be changed later. The 'name'
+        column is used as the index for the dataframe. 
 
-    @property
-    def guesses(self):
-        """
-        Array of model guesses (only including unfixed parameters).
-        """
+        This dataframe will minimally have the following columns. Other
+        columns may be present if set by the user, but will be ignored. 
 
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
+        +---------------+-----------------------------------------------------+
+        | key           | value                                               |
+        +===============+=====================================================+
+        | 'name'        | string name of the parameter. should not be changed |
+        |               | by the user.                                        |
+        +---------------+-----------------------------------------------------+
+        | 'guess'       | guess as single float value (must be non-nan and    |
+        |               | within bounds if specified)                         |
+        +---------------+-----------------------------------------------------+
+        | 'fixed'       | whether or not parameter can vary. True of False    |
+        +---------------+-----------------------------------------------------+
+        | 'lower_bound' | single float value; -np.inf allowed; None, nan or   |
+        |               | pd.NA interpreted as -np.inf.                       |
+        +---------------+-----------------------------------------------------+
+        | 'upper_bound' | single float value; -np.inf allowed; None, nan or   |
+        |               | pd.NA interpreted as np.inf.                        |
+        +---------------+-----------------------------------------------------+
+        | 'prior_mean'  | single float value; np.nan allowed (see below)      |
+        +---------------+-----------------------------------------------------+
+        | 'prior_std'   | single float value; np.nan allowed (see below)      |
+        +---------------+-----------------------------------------------------+
 
-        guesses = []
-        for p in self._position_to_param:
-            guesses.append(self.fit_parameters[p].guess)
-
-        return np.array(guesses,dtype=float)
-    
-    @guesses.setter
-    def guesses(self,guesses):
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        n = len(self._position_to_param)
-
-        guesses = check_array(value=guesses,
-                              variable_name="guesses",
-                              expected_shape=(n,),
-                              expected_shape_names="(num_unfixed_param,)")
-        for i, p in enumerate(self._position_to_param):
-            self._mw_fit_parameters[p].guess = guesses[i]
-
-
-    @property
-    def bounds(self):
-        """
-        Array of parameter bounds (only including unfixed parameters).
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        bounds = [[],[]]
-        for p in self._position_to_param:
-            bounds[0].append(self.fit_parameters[p].bounds[0])
-            bounds[1].append(self.fit_parameters[p].bounds[1])
-
-        return np.array(bounds,dtype=float)
-    
-    @bounds.setter
-    def bounds(self,bounds):
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        n = len(self._position_to_param)
-
-        bounds = check_array(value=bounds,
-                             variable_name="bounds",
-                             expected_shape=(2,n),
-                             expected_shape_names="(2,num_unfixed_param)")
-        for i, p in enumerate(self._position_to_param):
-            self._mw_fit_parameters[p].bounds = bounds[:,i]
-
-
-    @property
-    def priors(self):
-        """
-        Array of the priors (only including unfixed parameters).
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        priors = [[],[]]
-        for p in self._position_to_param:
-            priors[0].append(self.fit_parameters[p].prior[0])
-            priors[1].append(self.fit_parameters[p].prior[1])
-
-        return np.array(priors,dtype=float)
-    
-    @priors.setter
-    def priors(self,priors):
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        n = len(self._position_to_param)
-
-        priors = check_array(value=priors,
-                             variable_name="priors",
-                             expected_shape=(2,n),
-                             expected_shape_names="(2,num_unfixed_param)")
-        for i, p in enumerate(self._position_to_param):
-            self._mw_fit_parameters[p].prior = priors[:,i]
-
-    
-    @property
-    def fixed_mask(self):
-        """
-        Boolean array as long as the total number of parameters. True entries
-        are fixed parameters; False entries are floating.
+        Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
+        fields, declaring the prior mean and standard deviation. If both are
+        set to nan for a parameter, the prior is set to uniform between the
+        parameter bounds. If either 'prior_mean' or 'prior_std' is set to a
+        non-nan value, both must be non-nan to define the prior. When set, 
+        'prior_std' must be greater than zero. Neither can be np.inf. 
         """
         
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value
-        self._update_parameter_map()
-
-        fixed_mask = []
-        for p in self._mw_fit_parameters:
-            fixed_mask.append(self._mw_fit_parameters[p].fixed)
-
-        return np.array(fixed_mask,dtype=bool)
+        return self._param_df
     
-    @fixed_mask.setter
-    def fixed_mask(self,fixed_mask):
+    @param_df.setter
+    def param_df(self,param_df):
 
-        if not hasattr(fixed_mask,'__iter__'):
-            err = "fixed_mask should be an bool array the same length as the\n"
-            err += "total number of parameters\n"
-            raise ValueError(err)
+        # Validate the parameter dataframe before setting it
+        self._param_df = validate_dataframe(param_df,
+                                            param_in_order=self._fit_params_in_order)
         
-        if len(fixed_mask) != len(self._mw_fit_parameters):
-            err = "fixed_mask should be an bool array the same length as the\n"
-            err += "total number of parameters\n"
-            raise ValueError(err)
-
-        for i, p in enumerate(self._mw_fit_parameters):
-            self._mw_fit_parameters[p].fixed = fixed_mask[i]
-
-        # Update mapping between parameters and model arguments since we just
-        # set fixedness
-        self._update_parameter_map()
-
-    @property
-    def dataframe(self):
-        """
-        Parameters as a dataframe. Parameters can also be set using this
-        property.
-
-        ```
-        # mw is a ModelWrapper instance
-        df = mw.dataframe
-        df.loc[0,"guess"] = 5
-        mw.dataframe = df
-        ```
-        """
-
-        # Update parameter mapping and model arguments to our dataframe is in
-        # sync with the model 
-        self._update_parameter_map()
-
-        out = {"param":[],
-               "guess":[],
-               "fixed":[],
-               "lower_bound":[],
-               "upper_bound":[],
-               "prior_mean":[],
-               "prior_std":[]}
-        
-        for p in self._mw_fit_parameters:
-
-            out["param"].append(p)
-            
-            fp = self._mw_fit_parameters[p]
-
-            out["guess"].append(fp.guess)
-            out["fixed"].append(fp.fixed)
-            out["lower_bound"].append(fp.bounds[0])
-            out["upper_bound"].append(fp.bounds[1])
-            out["prior_mean"].append(fp.prior[0])
-            out["prior_std"].append(fp.prior[1])
-
-        return pd.DataFrame(out)
-
-    
-    @dataframe.setter
-    def dataframe(self,dataframe):
-        
-        # Setter is a convenience wrapper for load_param_spreadsheet.
-        self.load_param_spreadsheet(dataframe)
-
-
-    @property
-    def fit_parameters(self):
-        """
-        A dictionary of FitParameter instances, including both fixed and 
-        unfixed parameters. 
-        """
-
-        return self._mw_fit_parameters
-
     @property
     def other_arguments(self):
         """
         A dictionary with every model argument that is not a fit parameter.
         """
 
-        return self._mw_other_arguments
+        return self._other_arguments
+    
+    @property
+    def unfixed_mask(self):
+        """
+        Mask for param_df that returns only floating (unfixed) parameters.
+        """
 
-
+        return self._unfixed_mask
+        
     def __repr__(self):
         """
         Useful summary of current model wrapper state.
         """
         
-        self._update_parameter_map()
+        self.finalize_params()
 
+        out = []
         out = ["ModelWrapper\n------------\n"]
 
         # model name
-        out.append(f"wrapped_model: {self._model_to_fit.__name__}\n")
+        out.append(f"  wrapped_model: {self._model_to_fit.__name__}\n")
 
         # Non fittable arguments
         out.append(f"  non-fittable arguments:\n")
-        for p in self._mw_other_arguments:
+        for p in self._other_arguments:
             out.append(f"    {p}:")
 
             # See if there are multiple lines on this repr...
-            variable_lines = repr(self._mw_other_arguments[p]).split("\n")
+            variable_lines = repr(self._other_arguments[p]).split("\n")
             if len(variable_lines) > 6:
                 to_add = variable_lines[:3]
                 to_add.append("...")
@@ -621,7 +408,7 @@ class ModelWrapper:
 
         # Fittable arguments
         out.append(f"  fittable parameters:\n")
-        for dataframe_line in repr(self.dataframe).split("\n"):
+        for dataframe_line in repr(self.param_df).split("\n"):
             out.append(f"    {dataframe_line}")
         out.append("\n")
 

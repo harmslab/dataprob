@@ -3,8 +3,9 @@ import pytest
 from dataprob.fitters.ml import MLFitter
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
-
 import pandas as pd
+import numpy as np
+
 import os
 import json
 import glob
@@ -187,7 +188,7 @@ def fitter_object(binding_curve_test_data):
     generic_fit.fit(model=model,
                     guesses=guesses,
                     y_obs=df.Y,
-                    y_stdev=df.Y_stdev)
+                    y_std=df.Y_stdev)
 
     if not generic_fit.success:
         raise RuntimeError("generic test fit did not converge!")
@@ -205,22 +206,42 @@ def fitter_object(binding_curve_test_data):
 
     guesses = binding_curve_test_data["guesses"]
     
-
     wrapped_fit.fit(model=model,
                     guesses=guesses,
                     y_obs=df.Y,
-                    y_stdev=df.Y_stdev)
+                    y_std=df.Y_stdev)
     
     if not wrapped_fit.success:
         raise RuntimeError("wrapped test fit did not converge!")
 
     out_dict["wrapped_fit"] = wrapped_fit
 
-
     return out_dict
 
-## Code for skipping slow tests.
+@pytest.fixture(scope="module")
+def linear_fit():
+    
+    out = {}
 
+    out["coeff"] = {"m":2,"b":1}
+
+    x = np.arange(10)
+    y_obs = out["coeff"]["m"]*x + out["coeff"]["b"]
+    y_std = 0.1*np.ones(10)
+
+    out["df"] = pd.DataFrame({"x":x,
+                              "y_obs":y_obs,
+                              "y_std":y_std})
+
+    def simple_linear(m,b,x):
+        return m*x + b
+    
+    out["fcn"] = simple_linear
+
+    return out
+
+
+## Code for skipping slow tests.
 def pytest_addoption(parser):
     parser.addoption("--runslow",
                      action="store_true",

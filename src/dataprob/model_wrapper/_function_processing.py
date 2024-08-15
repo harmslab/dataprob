@@ -1,3 +1,6 @@
+"""
+Functions for processing function signatures and identifying fit parameters.
+"""
 
 import inspect
 

@@ -2,14 +2,14 @@
 Fitter subclass for performing bootstrap analyses.
 """
 
-from .base import Fitter
+from dataprob.fitters.base import Fitter
+from dataprob.check import check_int
 
 import numpy as np
-import scipy.optimize
-
+import scipy
 from tqdm.auto import tqdm
 
-import sys
+import warnings
 
 class BootstrapFitter(Fitter):
     """
@@ -29,7 +29,9 @@ class BootstrapFitter(Fitter):
 
         super().__init__()
 
-        self._num_bootstrap = num_bootstrap
+        self._num_bootstrap = check_int(value=num_bootstrap,
+                                        variable_name="num_bootstrap",
+                                        minimum_allowed=2)
         self._fit_type = "bootstrap"
 
     def _fit(self,**kwargs):
@@ -43,61 +45,136 @@ class BootstrapFitter(Fitter):
             scipy.optimize.least_squares
         """
 
-        # Create array to store bootstrap replicates
-        samples = np.zeros((self._num_bootstrap,len(self.guesses)),dtype=float)
+        # Grab un-fixed guesses and bounds
+        to_fit = self._model.unfixed_mask
+        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
+        bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
+                           self._model.param_df.loc[to_fit,"upper_bound"]])
 
+        # Create array to store bootstrap replicates
+        samples = np.zeros((self._num_bootstrap,len(guesses)),dtype=float)
+
+        # Record y_obs
         original_y_obs = np.copy(self._y_obs)
 
+        # Define function to regress against
+        def fn(*args): return -self._weighted_residuals(*args)
+        
         # Go through bootstrap reps
+        problems = []
         for i in tqdm(range(self._num_bootstrap)):
+        
+            # Create updated version of y_obs sampled from y_std
+            self._y_obs = original_y_obs + np.random.normal(0.0,self._y_std)
 
-            # Add random error to each sample
-            self.y_obs = original_y_obs + np.random.normal(0.0,self.y_stdev)
+            # Do regression
+            try:
+                fit = scipy.optimize.least_squares(fn,
+                                                   x0=guesses,
+                                                   bounds=bounds,
+                                                   **kwargs)
+            except Exception as e:
+                problems.append(str(e))
+                samples[i,:] = np.nan
+                continue
 
-            # Do the fit
-            fit = scipy.optimize.least_squares(self.unweighted_residuals,
-                                               x0=self.guesses,
-                                               bounds=self.bounds,
-                                               **kwargs)
+            # Record the fit results. If the fit fails, record np.nan
+            if fit.success:
+                samples[i,:] = fit.x
+            else:
+                samples[i,:] = np.nan
 
-            # record the fit results
-            samples[i,:] = fit.x
-
+        # Restore y_obs from our stored copy
         self._y_obs = np.copy(original_y_obs)
 
+        # If no samples yet, store them. Otherwise, append them to the existing
+        # samples. 
         if self.samples is None:
             self._samples = samples
-
-        # If samples have already been done, append to them.
         else:
-            self._samples = np.concatenate((self._samples,samples))
+            self.append_samples(sample_array=samples)
 
-        self._fit_result = self._samples
+        # Record the current stats on the number of samples and number that 
+        # failed and place in _fit_result. 
+        total_samples = self.samples.shape[0]
+        num_failed = np.sum(np.isnan(self.samples[:,0]))
+        num_success = total_samples - num_failed
+        self._fit_result = {"total_samples":total_samples,
+                            "num_success":num_success,
+                            "num_failed":num_failed}
 
-        self._update_estimates()
+        # warn if a fit failed to converge
+        if num_failed > 0:
+            w = f"\n\nOnly {num_success} of {total_samples} fits were successful.\n\n"
+            
+            if len(problems) > 0:
+                prob_types, prob_counts = np.unique(problems,
+                                                    return_counts=True)
+                w += "The fitter threw the following errors:\n"
+                for i in range(len(prob_types)):
+                    w += f"  '{prob_types[i]}' {prob_counts[i]} times.\n"
+                
+            warnings.warn(w)
 
-    def _update_estimates(self):
+        # If at least two replicates worked, record this as success
+        if num_success > 2:
+            self._success = True
+        else:
+            self._success = False
+
+        if self._success:
+            self._update_fit_df()
+
+    def _update_fit_df(self):
         """
         Recalculate the parameter estimates from any new samples.
         """
+        
+        samples = self.samples
+        good_mask = np.logical_not(np.isnan(samples[:,0]))
+        samples = samples[good_mask,:]
+        if samples.shape[0] < 2:
+            err = f"_update_fit_df requires at least two non-nan samples. The\n"
+            err += f".samples array has {samples.shape[0]} non-nan parameters.\n"
+            raise ValueError(err)
 
-        # mean of bootstrap samples
-        self._estimate = np.mean(self._samples,axis=0)
+        # Get mean and standard deviation
+        estimate = np.mean(samples,axis=0)
+        std = np.std(samples,axis=0)
 
-        # standard deviation from bootstrap samples
-        self._stdev = np.std(self._samples,axis=0)
+        # Calculate 95% confidence intervals
+        lower = int(round(0.025*samples.shape[0],0))
+        upper = int(round(0.975*samples.shape[0],0))
 
-        # 95% from bootstrap samples
-        self._ninetyfive = [[],[]]
-        for i in range(self._samples.shape[1]):
-            lower = np.percentile(self._samples[:,i], 2.5)
-            upper = np.percentile(self._samples[:,i],97.5)
-            self._ninetyfive[0].append(lower)
-            self._ninetyfive[1].append(upper)
-        self._ninetyfive = np.array(self._ninetyfive)
+        # For samples less than ~100, the rounding above will make the
+        # the upper cutoff the number of samples, and thus lead to an index 
+        # error below. 
+        if upper >= samples.shape[0]:
+            upper = samples.shape[0] - 1
 
-        self._success = True
+        low_95 = []
+        high_95 = []
+        for i in range(samples.shape[1]):
+            sorted_samples = np.sort(samples[:,i])
+            low_95.append(sorted_samples[lower])
+            high_95.append(sorted_samples[upper])
 
+        # Get finalized parameters from param_df in case they were updated 
+        # after the model was set and the fit_df created. 
+        for col in ["guess","fixed","lower_bound","upper_bound","prior_mean",
+                    "prior_std"]:
+            self._fit_df[col] = self.param_df[col]
+
+        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        unfixed = np.logical_not(fixed)
+
+        self._fit_df.loc[unfixed,"estimate"] = estimate
+        self._fit_df.loc[fixed,"estimate"] = self._fit_df.loc[fixed,"guess"]
+        self._fit_df.loc[unfixed,"std"] = std
+        self._fit_df.loc[unfixed,"low_95"] = low_95
+        self._fit_df.loc[unfixed,"high_95"] = high_95
+
+    
     @property
     def fit_info(self):
         """

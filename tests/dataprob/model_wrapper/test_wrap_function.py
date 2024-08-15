@@ -25,10 +25,10 @@ def test_wrap_function(tmpdir):
                        fit_parameters=None,
                        vector_first_arg=False)
     
-    assert len(mw.fit_parameters) == 3
-    assert mw.fit_parameters["a"].guess == 0
-    assert mw.fit_parameters["b"].guess == 2
-    assert mw.fit_parameters["c"].guess == 3
+    assert len(mw.param_df) == 3
+    assert mw.param_df.loc["a","guess"] == 0
+    assert mw.param_df.loc["b","guess"] == 2
+    assert mw.param_df.loc["c","guess"] == 3
 
     assert issubclass(type(mw),ModelWrapper)
 
@@ -37,9 +37,9 @@ def test_wrap_function(tmpdir):
                        fit_parameters=["a","b"],
                        vector_first_arg=False)
     
-    assert len(mw.fit_parameters) == 2
-    assert mw.fit_parameters["a"].guess == 0
-    assert mw.fit_parameters["b"].guess == 2
+    assert len(mw.param_df) == 2
+    assert mw.param_df.loc["a","guess"] == 0
+    assert mw.param_df.loc["b","guess"] == 2
 
     assert issubclass(type(mw),ModelWrapper)
 
@@ -48,26 +48,26 @@ def test_wrap_function(tmpdir):
                        fit_parameters={"a":{"guess":20}},
                        vector_first_arg=False)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),ModelWrapper)
 
     # send in dataframe of fit parameters
-    df = pd.DataFrame({"param":["a"],
+    df = pd.DataFrame({"name":["a"],
                        "guess":[20]})
     
     mw = wrap_function(some_function=model_to_test_wrap,
                        fit_parameters=df,
                        vector_first_arg=False)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),ModelWrapper)
 
-    # send in dataframe without param column
-    df = pd.DataFrame({"not_param":["a"],
+    # send in dataframe without name column
+    df = pd.DataFrame({"not_name":["a"],
                        "guess":[20]})
     with pytest.raises(ValueError):
         mw = wrap_function(some_function=model_to_test_wrap,
@@ -76,7 +76,7 @@ def test_wrap_function(tmpdir):
 
 
     # send in spreadsheet file of fit parameters
-    df = pd.DataFrame({"param":["a"],
+    df = pd.DataFrame({"name":["a"],
                        "guess":[20]})
     df.to_csv("dataframe.csv")
     
@@ -84,8 +84,8 @@ def test_wrap_function(tmpdir):
                        fit_parameters="dataframe.csv",
                        vector_first_arg=False)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),ModelWrapper)
 
@@ -111,9 +111,9 @@ def test_wrap_function(tmpdir):
                        fit_parameters=["a","b"],
                        vector_first_arg=True)
     
-    assert len(mw.fit_parameters) == 2
-    assert mw.fit_parameters["a"].guess == 0
-    assert mw.fit_parameters["b"].guess == 0
+    assert len(mw.param_df) == 2
+    assert mw.param_df.loc["a","guess"] == 0
+    assert mw.param_df.loc["b","guess"] == 0
 
     assert issubclass(type(mw),VectorModelWrapper)
 
@@ -122,26 +122,26 @@ def test_wrap_function(tmpdir):
                        fit_parameters={"a":{"guess":20}},
                        vector_first_arg=True)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),VectorModelWrapper)
 
     # send in dataframe of fit parameters
-    df = pd.DataFrame({"param":["a"],
+    df = pd.DataFrame({"name":["a"],
                        "guess":[20]})
     
     mw = wrap_function(some_function=model_to_test_wrap,
                        fit_parameters=df,
                        vector_first_arg=True)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),VectorModelWrapper)
 
-    # send in dataframe without param column
-    df = pd.DataFrame({"not_param":["a"],
+    # send in dataframe without name column
+    df = pd.DataFrame({"not_name":["a"],
                        "guess":[20]})
     with pytest.raises(ValueError):
         mw = wrap_function(some_function=model_to_test_wrap,
@@ -150,7 +150,7 @@ def test_wrap_function(tmpdir):
 
 
     # send in spreadsheet file of fit parameters
-    df = pd.DataFrame({"param":["a"],
+    df = pd.DataFrame({"name":["a"],
                        "guess":[20]})
     df.to_csv("dataframe.csv")
     
@@ -158,8 +158,8 @@ def test_wrap_function(tmpdir):
                        fit_parameters="dataframe.csv",
                        vector_first_arg=True)
     
-    assert len(mw.fit_parameters) == 1
-    assert mw.fit_parameters["a"].guess == 20
+    assert len(mw.param_df) == 1
+    assert mw.param_df.loc["a","guess"] == 20
 
     assert issubclass(type(mw),VectorModelWrapper)
 

@@ -25,7 +25,8 @@ dependencies = [
   "matplotlib",
   "scipy",
   "emcee",
-  "corner"
+  "corner",
+  "tqdm"
 ]
 
 requires-python = ">=3.10"

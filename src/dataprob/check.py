@@ -278,7 +278,8 @@ def check_int(value,
 def check_array(value,
                 variable_name=None,
                 expected_shape=None,
-                expected_shape_names=None):
+                expected_shape_names=None,
+                nan_allowed=True):
 
     """
     Do a sanity check on arguments that send in parameters (ln_like, etc.).
@@ -294,6 +295,8 @@ def check_array(value,
         present but does not have a specified length
     expected_shape_names : str
         name of dimensions (string, for error message)
+    name_allowed : bool, default=True
+        if True, allow nan. If False, throw an error on nan
         
     Returns
     -------
@@ -317,11 +320,19 @@ def check_array(value,
     if not hasattr(value,"__iter__"):
         raise ValueError(err)
 
+    # Initial conversion to an object array, then filter pd.NA into np.nan. 
+    # The initial conversion should eb extraordinarily robust. 
+    value = np.array(value,dtype=object)
+    value[pd.isna(value)] = np.nan
+    
+    # Coerce to float (could have np.nan)
     try:
         value = np.array(value,dtype=float)
     except Exception as e:
+        err = f"{err} Could not coerce to a float numpy array\n"
         raise ValueError(err) from e
     
+    # Check final shape
     if expected_shape is not None:
 
         if len(value.shape) != len(expected_shape):
@@ -332,79 +343,10 @@ def check_array(value,
                 if value.shape[i] != expected_shape[i]:
                     raise ValueError(err)
     
+    if not nan_allowed:
+        num_nan = np.sum(np.isnan(value))
+        if num_nan > 0:
+            err = f"{err} without nan values. Array has {num_nan} nan entries.\n"
+            raise ValueError(err)
+
     return value
-
-
-
-def column_to_bool(column,column_name):
-    """
-    Convert a generic pandas column to bool. If already bool, just return. If
-    not, try to convert and return as a numpy bool array.
-
-    Parameters
-    ----------
-    column : pandas.Series
-        column from dataframe that should be boolean
-    column_name : str
-        name of column (for error message)
-
-    Returns
-    -------
-    column : numpy.array
-        boolean numpy array.
-    """
-
-    # Do a pass trying to infer the datatype of the column. (This is useful if
-    # we dropped empty rows that made the original pandas read this column in
-    # as a mix of bool and object).
-    column = column.infer_objects()
-
-    # If it's not a boolean column, try to turn into one
-    if not np.dtype(column.dtypes) is np.dtype(bool):
-
-        # Base message. If everything works great, let user know what
-        # happened as warning. If things go awry, use as start of error
-        # message
-        w = "\n\n"
-        w += f"The '{column_name}' column must be boolean (True/False). pandas\n"
-        w += "did not recognize the column as boolean, so we're parsing it\n"
-        w += "manually by looking for 0/1, yes/no, true/false, etc.\n\n"
-
-        new_column = []
-        look_for_true = re.compile("[1yt]",re.IGNORECASE)
-        look_for_false = re.compile("[0nf]",re.IGNORECASE)
-        for k in column:
-            if issubclass(type(k),bool):
-                is_true = True and k
-                is_false = not is_true
-                looks_like_a = "bool"
-            elif issubclass(type(k),str):
-                is_true = look_for_true.search(k) is not None
-                is_false = look_for_false.search(k) is not None
-                looks_like_a = "string"
-            elif issubclass(type(k),int):
-                is_true = (k != 0)
-                is_false = (k == 0)
-                looks_like_a = "int"
-            elif issubclass(type(k),float):
-                is_true = np.logical_not(np.isclose(k,0))
-                is_false = np.isclose(k,0)
-                looks_like_a = "float"
-            else:
-                w += f"Could not figure out how to parse '{k}'\n\n"
-                raise ValueError(w)
-
-            if (is_true and is_false) or (not is_true and not is_false):
-                w += f"Trying to parse '{k}' as a {looks_like_a}, but\n"
-                w += f"could not figure out whether true or false.\n\n"
-                raise ValueError(w)
-            else:
-                new_column.append(is_true)
-
-        # Record newly boolean-ized values
-        column = np.array(new_column,dtype=bool)
-
-        # Let user know we manually parsed the keep column...
-        print(w)
-
-    return column
