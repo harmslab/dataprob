@@ -110,7 +110,7 @@ def binding_curve_test_data():
 
     # Find directory with test files
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    example_dir = os.path.abspath(os.path.join(base_dir,"examples"))
+    example_dir = os.path.abspath(os.path.join(base_dir,"test_data","binding_curve"))
 
     # Load json describing test informations
     json_file = os.path.join(example_dir,"binding-curves.json")
