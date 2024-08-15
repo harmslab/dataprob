@@ -37,7 +37,7 @@ maintainers = [
   {name = "Mike Harms", email = "harms@uoregon.edu"}
 ]
 description = "Do likelihood based parameter estimation using maximum likeihood and bayesian methods"
-readme = "README.md"
+readme = "README.rst"
 license = {file = "LICENSE"}
 keywords = ["likelihood", "maximum likelihood", "ML", "Bayesian", "MCMC", "monte carlo", "regression", "estimator"]
 classifiers = [
