@@ -36,7 +36,7 @@ class ModelWrapper:
     def __init__(self,
                  model_to_fit,
                  fittable_params=None,
-                 not_fittable_params=None,
+                 non_fit_kwargs=None,
                  default_guess=0.0):
         """
         Parameters
@@ -45,8 +45,9 @@ class ModelWrapper:
             a function or method to fit.
         fittable_params : list-like, optional
             list of arguments to fit.
-        not_fittable_params : list-like, optional
-            list of parameters that should not be fit
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for model_to_fit that should
+            be fit but need to be specified to non-default values. 
         default_guess : float, default=0
             assign parameters with no default value this value
         """
@@ -60,16 +61,13 @@ class ModelWrapper:
         if fittable_params is not None:
             if not hasattr(fittable_params,"__iter__") or issubclass(type(fittable_params),str):
                 err = "fittable_parameters should be a list of parameter names\n"
-                err += "or a dictionary keying parameter names to parameter\n"
-                err += "guesses\n"
                 raise ValueError(err)
         
-        # check not_fittable_params
-        if not_fittable_params is not None:
-            if not hasattr(not_fittable_params,"__iter__") or issubclass(type(not_fittable_params),str):
-                err = "not_fittable_params should be a list of parameter names\n"
-                err += "or a dictionary keying non-fittable parameter names to\n"
-                err += "values\n"
+        # check non_fit_kwargs
+        if non_fit_kwargs is not None:
+            if not issubclass(type(non_fit_kwargs),dict):
+                err = "non_fit_kwargs must be a dictionary of keyword arguments\n"
+                err += "to be passed to model_to_fit when the function is run.\n"
                 raise ValueError(err)
 
         self._default_guess = check_float(value=default_guess,
@@ -83,10 +81,10 @@ class ModelWrapper:
 
         self._load_model(model_to_fit=model_to_fit,
                          fittable_params=fittable_params,
-                         not_fittable_params=not_fittable_params)
+                         non_fit_kwargs=non_fit_kwargs)
         
 
-    def _load_model(self,model_to_fit,fittable_params,not_fittable_params):
+    def _load_model(self,model_to_fit,fittable_params,non_fit_kwargs):
         """
         Load a model into the wrapper. Fittable arguments are put into param_df.
         Non-fittable arguments are placed in the other_arguments dictionary.
@@ -97,11 +95,15 @@ class ModelWrapper:
             a function or method to fit.
         fittable_params : list-like or None
             list of parameters to fit 
-        not_fittable_params : list-like or None
-            list of parameters that should not be fit
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for model_to_fit that should
+            be fit but need to be specified to non-default values. 
         """
 
         self._model_to_fit = model_to_fit
+
+        if non_fit_kwargs is None:
+            non_fit_kwargs = {}
 
         # Parse function arguments
         all_args, can_be_fit, cannot_be_fit, has_kwargs = \
@@ -110,7 +112,7 @@ class ModelWrapper:
         # Decide which parameters are fittable and which are not
         fittable_params, not_fittable_parameters = \
             reconcile_fittable(fittable_params=fittable_params,
-                               not_fittable_params=not_fittable_params,
+                               non_fit_kwargs=non_fit_kwargs,
                                all_args=all_args,
                                can_be_fit=can_be_fit,
                                cannot_be_fit=cannot_be_fit,
@@ -119,10 +121,10 @@ class ModelWrapper:
         # Make sure input arguments are sane and compatible with the ModelWrapper
         # class namespace
         reserved_params = dir(self.__class__)
-        fittable_params = param_sanity_check(fittable_params=fittable_params,
+        fittable_params = param_sanity_check(param_to_check=fittable_params,
                                              reserved_params=reserved_params)
-        not_fittable_parameters = param_sanity_check(fittable_params=not_fittable_parameters,
-                                                     reserved_params=reserved_params)
+        non_fit_kwargs = param_sanity_check(param_to_check=non_fit_kwargs,
+                                            reserved_params=reserved_params)
 
         # Go through fittable params.
         fit_params = []
@@ -157,17 +159,23 @@ class ModelWrapper:
                                             default_guess=self._default_guess)
 
         # Go through non-fittable parameters and record their keyword arguments
-        # in _other_arguments
+        # in _other_arguments. Look in 'can_be_fit', then 'cannot_be_fit'. If
+        # no default argument from either of those, set to 'None'. Finally, 
+        # look in 'non_fit_kwargs.' If defined here, it will take precedence 
+        # over the default values. 
         for p in not_fittable_parameters:
             
             if p in can_be_fit:
-                starting_value = can_be_fit[p]
+                non_fit_param_value = can_be_fit[p]
             elif p in cannot_be_fit:
-                starting_value = cannot_be_fit[p]
+                non_fit_param_value = cannot_be_fit[p]
             else:
-                starting_value = None
+                non_fit_param_value = None
+
+            if p in non_fit_kwargs:
+                non_fit_param_value = non_fit_kwargs[p]
                 
-            self._other_arguments[p] = starting_value
+            self._other_arguments[p] = non_fit_param_value
           
         # Finalize -- read to run the model
         self.finalize_params()

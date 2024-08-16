@@ -25,7 +25,7 @@ class VectorModelWrapper(ModelWrapper):
     def _load_model(self,
                     model_to_fit,
                     fittable_params,
-                    not_fittable_params):
+                    non_fit_kwargs):
         """
         Load a model into the wrapper, putting all fittable parameters into the
         param_df dataframe. Non-fittable arguments are set as attributes. 
@@ -36,8 +36,9 @@ class VectorModelWrapper(ModelWrapper):
             a function or method to fit.
         fittable_params : list or dict
             dictionary of fit parameters with guesses
-        not_fittable_params : list-like or None
-            list of parameters that should not be fit
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for model_to_fit that should
+            be fit but need to be specified to non-default values. 
         """
 
         self._model_to_fit = model_to_fit
@@ -76,7 +77,7 @@ class VectorModelWrapper(ModelWrapper):
 
         # Make sure these do not conflict with attributes already in the class
         reserved_params = dir(self.__class__)
-        fittable_params = param_sanity_check(fittable_params=fittable_params,
+        fittable_params = param_sanity_check(param_to_check=fittable_params,
                                              reserved_params=reserved_params)
 
         # --------------------------------------------------------------------
@@ -108,28 +109,34 @@ class VectorModelWrapper(ModelWrapper):
                                             default_guess=self._default_guess)
 
         # --------------------------------------------------------------------
-        # Deal with not_fittable_params. 
+        # Deal with non_fit_kwargs
 
-        if not_fittable_params is None:
+        # Construct not_fittable_params from non_fit_kwargs keys
+        if non_fit_kwargs is not None:
+            not_fittable_params = list(non_fit_kwargs.keys())
+        else:
             not_fittable_params = []
 
         # Make sure param_arg is not in not_fittable_params
         if param_arg in not_fittable_params:
-            err = f"the first argument {param_arg} cannot be in not_fittable_params\n"
+            err = f"the first argument {param_arg} cannot be in non_fit_kwargs\n"
             raise ValueError(err)
 
-        # If not already in other_args and **kwargs, assign each
-        # not_fittable_parameter a starting value of None
+        # Go through non-fittable parameters. If they are not in other_args 
+        # and the function does not have **kwargs, throw an error. 
         for p in not_fittable_params:
-            if p not in other_args:
-                if not has_kwargs:
-                    err = f"not_fittable parameter '{p}' is not in the function definition\n"
-                    raise ValueError(err)
-                other_args[p] = None
+            if p not in other_args and not has_kwargs:
+                err = f"not_fittable parameter '{p}' is not in the function definition\n"
+                raise ValueError(err)
+            
+            # If we get here, overwrite whatever was in other_args (default from
+            # signature) with what hte user passed in. 
+            other_args[p] = non_fit_kwargs[p]
+                
 
         # Validate non_fittable params 
-        _ = param_sanity_check(fittable_params=other_args,
-                               reserved_params=reserved_params)
+        other_args = param_sanity_check(param_to_check=other_args,
+                                        reserved_params=reserved_params)
         
         # Make sure that we don't have a situation where we have the same 
         # parameter name in both fittable and not_fittable
@@ -137,11 +144,11 @@ class VectorModelWrapper(ModelWrapper):
         not_fittable_set = set(other_args)
         intersect = fittable_set.intersection(not_fittable_set)
         if len(intersect) != 0:
-            err = "a parameter cannot be in both fittable_params and not_fittable_params.\n"
+            err = "a parameter cannot be in both fittable_params and non_fit_kwargs.\n"
             err += f"Bad parameters: {str(intersect)}\n"
             raise ValueError(err)
         
-        # Set other argument values
+        # Store the non fit parameter values. 
         for p in other_args:
             self._other_arguments[p] = other_args[p]
 

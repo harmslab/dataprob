@@ -192,36 +192,15 @@ def wrap_function(some_function,
         err += "for details.\n"
         raise ValueError(err)
 
-    # -------------------------------------------------------------------------
-    # Figure out how to treat non_fit_parameters based on type
-
-    non_fit_param_type = type(non_fit_kwargs)
-    if issubclass(non_fit_param_type,type(None)):
-        non_fit_param_list = None
-        non_fit_param_values = {}
-
-    elif issubclass(non_fit_param_type,dict):
-        non_fit_param_list = list(non_fit_kwargs.keys())
-        non_fit_param_values = non_fit_kwargs
-
-    else:
-        err = "non_fit_kwargs was not recognized. If specified,\n"
-        err += "non_fit_kwargs must be a dictionary of keyword arguments\n"
-        err += "to be passed to some_function when the function is run.\n"
-        raise ValueError(err)
     
     # Create class with appropriate parameters
     mw = mw_class(model_to_fit=some_function,
                   fittable_params=fit_param_list,
-                  not_fittable_params=non_fit_param_list)
+                  non_fit_kwargs=non_fit_kwargs)
     
-    # Update fit parameters
+    # Update fit parameters with values
     mw.update_params(fit_param_values)
 
-    # Update non-fit parameters
-    for k in non_fit_param_values:
-        mw.__setattr__(k,non_fit_param_values[k])
-    
     return mw
 
         

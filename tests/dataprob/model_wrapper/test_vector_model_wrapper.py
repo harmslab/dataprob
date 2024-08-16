@@ -39,28 +39,28 @@ def test_VectorModelWrapper__load_model():
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={"x":1,"y":2,"z":3},
-                       not_fittable_params=None)
+                       non_fit_kwargs=None)
         
     # no fittable_params
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={},
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
         
     # bad fittable_params
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params=None,
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
     
     # bad fittable_params --> has same name as first arg
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params=["x"],
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
     
 
     # fittable_param dict, bad value
@@ -68,7 +68,7 @@ def test_VectorModelWrapper__load_model():
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={"a":"test"},
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
         
     # fittable_param dict, bad value because it matches secondary 
     # argument to function
@@ -76,21 +76,21 @@ def test_VectorModelWrapper__load_model():
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={"a":1.0},
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
     
     # extra argument conflicts with attribute of the class
     def test_fcn(x,model): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={"a":1.0},
-                       not_fittable_params=None) 
+                       non_fit_kwargs=None) 
     
     # fittable_param dict, good value
     mw = TestVectorModelWrapper()
     def test_fcn(x): pass
     mw._load_model(model_to_fit=test_fcn,
                    fittable_params={"a":20},
-                   not_fittable_params=None) 
+                   non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
 
@@ -99,7 +99,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x): pass
     mw._load_model(model_to_fit=test_fcn,
                    fittable_params=["a","b"],
-                   not_fittable_params=None) 
+                   non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 0
     assert mw.param_df.loc["b","guess"] == 0
@@ -110,7 +110,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x,b,c=6): pass
     mw._load_model(model_to_fit=test_fcn,
                    fittable_params={"a":20},
-                   not_fittable_params=None) 
+                   non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
     assert len(mw._other_arguments) == 2
@@ -118,12 +118,12 @@ def test_VectorModelWrapper__load_model():
     assert mw._other_arguments["c"] == 6
 
     # fittable_param dict, good value, extra args in function, with kwargs. 
-    # kwargs ignored because no new not_fittable_params
+    # kwargs ignored because no new non_fit_kwargs
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     mw._load_model(model_to_fit=test_fcn,
                    fittable_params={"a":20},
-                   not_fittable_params=None) 
+                   non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
     assert len(mw._other_arguments) == 2
@@ -131,43 +131,43 @@ def test_VectorModelWrapper__load_model():
     assert mw._other_arguments["c"] == 6
 
     # fittable_param dict, good value, extra args in function, with kwargs. 
-    # new not_fittable_param in kwarg
+    # new non_fit_kwargs in kwarg
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     mw._load_model(model_to_fit=test_fcn,
                    fittable_params={"a":20},
-                   not_fittable_params=["c","d"]) 
+                   non_fit_kwargs={"c":16,"d":17}) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
     assert len(mw._other_arguments) == 3
     assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 6
-    assert mw._other_arguments["d"] == None
+    assert mw._other_arguments["c"] == 16
+    assert mw._other_arguments["d"] == 17
 
-    # Should not work if first arg is in not_fittable
+    # Should not work if first arg is in non_fit_kwargs
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                     fittable_params={"a":20},
-                    not_fittable_params=["x"])
+                    non_fit_kwargs={"x":1})
 
-    # Should not work if fittable and not fittable have same args
+    # Should not work if fittable and non_fit_kwargs have same args
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"a":20},
-                       not_fittable_params=["a"])
+                       fittable_params=["a"],
+                       non_fit_kwargs={"a":20})
     
 
-    # Should not work if not fittable is not in arg list and no kwargs
+    # Should not work if non_fit_kwargs is not in arg list and no kwargs
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
                        fittable_params={"a":20},
-                       not_fittable_params=["d"]), 
+                       non_fit_kwargs={"d":"missing"}), 
 
 
     
