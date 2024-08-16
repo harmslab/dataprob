@@ -121,6 +121,7 @@ def test_analyze_fcn_sig():
 def test_reconcile_fittable():
 
     base_kwargs = {"fittable_params":None,
+                   "not_fittable_params":None,
                    "all_args":[],
                    "can_be_fit":{},
                    "cannot_be_fit":{},
@@ -200,7 +201,7 @@ def test_reconcile_fittable():
     # Fail. non-fittable in the mix
     kwargs = copy.deepcopy(base_kwargs)
     kwargs["fittable_params"] = ["a","d"]
-    kwargs["all_args"] = ["a","b","c"]
+    kwargs["all_args"] = ["a","b","c","d"]
     kwargs["can_be_fit"] = {"a":1,"c":2}
     kwargs["cannot_be_fit"] = {"b":"test"}
     kwargs["has_kwargs"] = True
@@ -208,6 +209,105 @@ def test_reconcile_fittable():
     fittable, not_fittable = reconcile_fittable(**kwargs)
     assert np.array_equal(fittable,["a","d"])
     assert np.array_equal(not_fittable,["b","c"])
+
+    # Send in not_fittable_params where this is in "cannot be fit"
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = ["a","b"]
+    kwargs["not_fittable_params"] = ["c"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2}
+    kwargs["cannot_be_fit"] = {"c":"test"}
+    kwargs["has_kwargs"] = True
+
+    fittable, not_fittable = reconcile_fittable(**kwargs)
+    assert np.array_equal(fittable,["a","b"])
+    assert np.array_equal(not_fittable,["c"])
+    
+    # Send in not_fittable_params where this is in "cannot be fit"
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = ["a","b"]
+    kwargs["not_fittable_params"] = ["c"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    fittable, not_fittable = reconcile_fittable(**kwargs)
+    assert np.array_equal(fittable,["a","b"])
+    assert np.array_equal(not_fittable,["c"])
+
+    # Send in not_fittable_params but not fittable_params
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = None
+    kwargs["not_fittable_params"] = ["c"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    fittable, not_fittable = reconcile_fittable(**kwargs)
+    assert np.array_equal(fittable,["a","b"])
+    assert np.array_equal(not_fittable,["c"])
+
+    # Send in same value in not_fittable_params and fittable_params
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = ["a","b"]
+    kwargs["not_fittable_params"] = ["b","c"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    with pytest.raises(ValueError):
+        fittable, not_fittable = reconcile_fittable(**kwargs)
+
+    # Send in all args as not_fittable_params, no fittable!
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = None
+    kwargs["not_fittable_params"] = ["a","b","c"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    with pytest.raises(ValueError):
+        fittable, not_fittable = reconcile_fittable(**kwargs)
+    
+    # Send in not_fittable_params params that are not in the function signature
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = None
+    kwargs["not_fittable_params"] = ["d"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = False
+    with pytest.raises(ValueError):
+        fittable, not_fittable = reconcile_fittable(**kwargs)
+
+    # Send in not_fittable_params params that are not in the function signature, but
+    # has_kwargs, so okay
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = None
+    kwargs["not_fittable_params"] = ["d"]
+    kwargs["all_args"] = ["a","b","c"]
+    kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    
+    fittable, not_fittable = reconcile_fittable(**kwargs)
+    assert np.array_equal(fittable,["a","b","c"])
+    assert np.array_equal(not_fittable,["d"])
+
+
+    # Send in fittable_params and not_fittable_params with only **kwargs
+    kwargs = copy.deepcopy(base_kwargs)
+    kwargs["fittable_params"] = ["a","b"]
+    kwargs["not_fittable_params"] = ["c","d"]
+    kwargs["all_args"] = []
+    kwargs["can_be_fit"] = {}
+    kwargs["cannot_be_fit"] = {}
+    kwargs["has_kwargs"] = True
+    
+    fittable, not_fittable = reconcile_fittable(**kwargs)
+    assert np.array_equal(fittable,["a","b"])
+    assert np.array_equal(not_fittable,["c","d"])
+
     
 def test_param_sanity_check():
 
@@ -231,30 +331,53 @@ def test_analyze_vector_input_fcn():
 
     def test_fcn(a,b=1,*args,**kwargs): pass
     
-    first_args, other_kwargs = analyze_vector_input_fcn(test_fcn)
+    first_args, other_kwargs, has_kwargs = analyze_vector_input_fcn(test_fcn)
     assert first_args == "a"
     assert len(other_kwargs) == 1
     assert other_kwargs["b"] == 1
+    assert has_kwargs is True
 
     def test_fcn(*args,**kwargs): pass
     
-    first_args, other_kwargs = analyze_vector_input_fcn(test_fcn)
+    first_args, other_kwargs, has_kwargs = analyze_vector_input_fcn(test_fcn)
     assert first_args == None
     assert len(other_kwargs) == 0
+    assert has_kwargs is True
 
     def test_fcn(a=20,*args,**kwargs): pass
     
-    first_args, other_kwargs = analyze_vector_input_fcn(test_fcn)
+    first_args, other_kwargs, has_kwargs = analyze_vector_input_fcn(test_fcn)
     assert first_args == "a"
     assert len(other_kwargs) == 0
+    assert has_kwargs is True
 
     def test_fcn(a,b,c,d=5,*args,**kwargs): pass
     
-    first_args, other_kwargs = analyze_vector_input_fcn(test_fcn)
+    first_args, other_kwargs, has_kwargs = analyze_vector_input_fcn(test_fcn)
     assert first_args == "a"
     assert len(other_kwargs) == 3
     assert other_kwargs["b"] is None
     assert other_kwargs["c"] is None
     assert other_kwargs["d"] == 5
+    assert has_kwargs is True
 
+    def test_fcn(a,b,c,d=5): pass
+    
+    first_args, other_kwargs, has_kwargs = analyze_vector_input_fcn(test_fcn)
+    assert first_args == "a"
+    assert len(other_kwargs) == 3
+    assert other_kwargs["b"] is None
+    assert other_kwargs["c"] is None
+    assert other_kwargs["d"] == 5
+    assert has_kwargs is False
+
+    def test_fcn(a,b,c,d,*args): pass
+    
+    first_args, other_kwargs, has_kwargs= analyze_vector_input_fcn(test_fcn)
+    assert first_args == "a"
+    assert len(other_kwargs) == 3
+    assert other_kwargs["b"] is None
+    assert other_kwargs["c"] is None
+    assert other_kwargs["d"] is None
+    assert has_kwargs is False
     

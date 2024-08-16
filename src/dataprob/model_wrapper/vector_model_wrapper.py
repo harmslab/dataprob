@@ -24,7 +24,8 @@ class VectorModelWrapper(ModelWrapper):
 
     def _load_model(self,
                     model_to_fit,
-                    fittable_params):
+                    fittable_params,
+                    not_fittable_params):
         """
         Load a model into the wrapper, putting all fittable parameters into the
         param_df dataframe. Non-fittable arguments are set as attributes. 
@@ -35,17 +36,14 @@ class VectorModelWrapper(ModelWrapper):
             a function or method to fit.
         fittable_params : list or dict
             dictionary of fit parameters with guesses
+        not_fittable_params : list-like or None
+            list of parameters that should not be fit
         """
-
-        # Make sure input model is callable
-        if not hasattr(model_to_fit,"__call__"):
-            err = f"'{model_to_fit}' should be callable\n"
-            raise ValueError(err)
 
         self._model_to_fit = model_to_fit
 
         # Parse function
-        param_arg, other_args = analyze_vector_input_fcn(self._model_to_fit)
+        param_arg, other_args, has_kwargs = analyze_vector_input_fcn(self._model_to_fit)
 
         # Make sure it has at least one argument
         if param_arg is None:
@@ -69,8 +67,21 @@ class VectorModelWrapper(ModelWrapper):
         if len(fit_set.intersection(args_set)) > 0:
             err = "fittable_params must not include other arguments to the function\n"
             raise ValueError(err)
+        
+        if param_arg in fittable_params:
+            err = f"the first vector arg '{param_arg}' cannot be in fittable_params.\n"
+            err += "fittable_params should specify the names of every element\n"
+            err += "*within* this vector\n"
+            raise ValueError(err)
 
+        # Make sure these do not conflict with attributes already in the class
+        reserved_params = dir(self.__class__)
+        fittable_params = param_sanity_check(fittable_params=fittable_params,
+                                             reserved_params=reserved_params)
+
+        # --------------------------------------------------------------------
         # Go through fittable params 
+
         fit_params = []
         guesses = []
         for p in fittable_params:
@@ -88,6 +99,7 @@ class VectorModelWrapper(ModelWrapper):
             fit_params.append(p)
             guesses.append(guess)
         
+        # Construct fit parameter dataframe
         self._fit_params_in_order = fit_params[:]
         param_df = pd.DataFrame({"name":fit_params,
                                  "guess":guesses})
@@ -95,16 +107,43 @@ class VectorModelWrapper(ModelWrapper):
                                             param_in_order=self._fit_params_in_order,
                                             default_guess=self._default_guess)
 
+        # --------------------------------------------------------------------
+        # Deal with not_fittable_params. 
+
+        if not_fittable_params is None:
+            not_fittable_params = []
+
+        # Make sure param_arg is not in not_fittable_params
+        if param_arg in not_fittable_params:
+            err = f"the first argument {param_arg} cannot be in not_fittable_params\n"
+            raise ValueError(err)
+
+        # If not already in other_args and **kwargs, assign each
+        # not_fittable_parameter a starting value of None
+        for p in not_fittable_params:
+            if p not in other_args:
+                if not has_kwargs:
+                    err = f"not_fittable parameter '{p}' is not in the function definition\n"
+                    raise ValueError(err)
+                other_args[p] = None
+
+        # Validate non_fittable params 
+        _ = param_sanity_check(fittable_params=other_args,
+                               reserved_params=reserved_params)
+        
+        # Make sure that we don't have a situation where we have the same 
+        # parameter name in both fittable and not_fittable
+        fittable_set = set(fittable_params)
+        not_fittable_set = set(other_args)
+        intersect = fittable_set.intersection(not_fittable_set)
+        if len(intersect) != 0:
+            err = "a parameter cannot be in both fittable_params and not_fittable_params.\n"
+            err += f"Bad parameters: {str(intersect)}\n"
+            raise ValueError(err)
+        
         # Set other argument values
         for p in other_args:
             self._other_arguments[p] = other_args[p]
-
-        # Make sure these do not conflict with attributes already in the class
-        reserved_params = dir(self.__class__)
-        fittable_params = param_sanity_check(fittable_params=fittable_params,
-                                             reserved_params=reserved_params)
-        _ = param_sanity_check(fittable_params=other_args,
-                               reserved_params=reserved_params)
 
         # Finalize -- read to run the model
         self.finalize_params()
@@ -125,7 +164,7 @@ class VectorModelWrapper(ModelWrapper):
         
         # Get currently un-fixed parameters
         self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
-        self._current_param_index = self._param_df.index[self._unfixed_mask]
+        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
 
     def _mw_observable(self,params=None):
         """

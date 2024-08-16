@@ -12,6 +12,7 @@ import pandas as pd
 
 def wrap_function(some_function,
                   fit_parameters=None,
+                  non_fit_kwargs=None,
                   vector_first_arg=False):
     """
     Wrap a function for regression or Bayesian sampling. 
@@ -25,6 +26,9 @@ def wrap_function(some_function,
     fit_parameters : list, dict, str, pandas.DataFrame; optional
         fit_parameters lets the user specify information about the parameters 
         in the fit. See Note below for details.
+    non_fit_kwargs : dict
+        non_fit_kwargs are keyword arguments for some_function that should not
+        be fit but need to be specified to non-default values. 
     vector_first_arg : bool, default=False
         If True, the first argument of the function is taken as a vector of 
         parameters to fit. All other arguments to some_function are treated as 
@@ -153,57 +157,70 @@ def wrap_function(some_function,
     else:
         mw_class = ModelWrapper
     
-    # Figure out how to set up the ModelWrapper based on the type of 
-    # fit_parameters
+    # -------------------------------------------------------------------------
+    # Figure out how to treat fit_parameters based on type
+
     fit_param_type = type(fit_parameters)
 
-    # None --> not specified. Use ModelWrapper default scheme
     if issubclass(fit_param_type,type(None)):
-        
         fit_param_list = None
-        mw = mw_class(model_to_fit=some_function,
-                      fittable_params=fit_param_list)
-
-    # List --> send in a list of fit parameters
-    elif issubclass(fit_param_type,list):
-
-        fit_param_list = fit_parameters
-        mw = mw_class(model_to_fit=some_function,
-                      fittable_params=fit_param_list)
-
-    # dict --> send in keys as a list of fit parameters, then load the parameter
-    # values in via the update_params method. 
+        fit_param_values = {}
+    
     elif issubclass(fit_param_type,dict):
-
         fit_param_list = list(fit_parameters.keys())
-        mw = mw_class(model_to_fit=some_function,
-                      fittable_params=fit_param_list)
-        mw.update_params(fit_parameters)
-
-    # pd.DataFrame or str: treat as a spreadsheet. 
+        fit_param_values = fit_parameters
+    
     elif issubclass(fit_param_type,pd.DataFrame) or issubclass(fit_param_type,str):
 
         # Read fit_parameters spreadsheet (or get copy of dataframe)
-        fit_parameters = read_spreadsheet(fit_parameters)
-    
-        # Get list of fit parameters
-        if "name" not in fit_parameters.columns:
+        fit_param_values = read_spreadsheet(fit_parameters)
+        if "name" not in fit_param_values.columns:
             err = "fit_parameters DataFrame must have a 'name' column\n"
             raise ValueError(err)
-        fit_param_list = list(fit_parameters["name"])
+        
+        # Get list of parameters from the dataframe
+        fit_param_list = list(fit_param_values["name"])
 
-        # Initialize class, then load fit parameter data from the spreadsheet
-        mw = mw_class(model_to_fit=some_function,
-                      fittable_params=fit_param_list)
-        mw.update_params(fit_parameters)
+    elif hasattr(fit_param_type,"__iter__"):
+        fit_param_list = fit_parameters
+        fit_param_values = {}
 
     else:
-    
         err = "fit_parameters not recognized. If specified, fit_parameters\n"
         err += "must be a list, dictionary, pandas DataFrame, or filename\n"
         err += "pointing to a spreadsheet. See the wrap_model docstring\n"
         err += "for details.\n"
         raise ValueError(err)
+
+    # -------------------------------------------------------------------------
+    # Figure out how to treat non_fit_parameters based on type
+
+    non_fit_param_type = type(non_fit_kwargs)
+    if issubclass(non_fit_param_type,type(None)):
+        non_fit_param_list = None
+        non_fit_param_values = {}
+
+    elif issubclass(non_fit_param_type,dict):
+        non_fit_param_list = list(non_fit_kwargs.keys())
+        non_fit_param_values = non_fit_kwargs
+
+    else:
+        err = "non_fit_kwargs was not recognized. If specified,\n"
+        err += "non_fit_kwargs must be a dictionary of keyword arguments\n"
+        err += "to be passed to some_function when the function is run.\n"
+        raise ValueError(err)
+    
+    # Create class with appropriate parameters
+    mw = mw_class(model_to_fit=some_function,
+                  fittable_params=fit_param_list,
+                  not_fittable_params=non_fit_param_list)
+    
+    # Update fit parameters
+    mw.update_params(fit_param_values)
+
+    # Update non-fit parameters
+    for k in non_fit_param_values:
+        mw.__setattr__(k,non_fit_param_values[k])
     
     return mw
 

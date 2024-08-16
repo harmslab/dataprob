@@ -36,18 +36,41 @@ class ModelWrapper:
     def __init__(self,
                  model_to_fit,
                  fittable_params=None,
+                 not_fittable_params=None,
                  default_guess=0.0):
         """
-
         Parameters
         ----------
         model_to_fit : callable
             a function or method to fit.
         fittable_params : list-like, optional
             list of arguments to fit.
+        not_fittable_params : list-like, optional
+            list of parameters that should not be fit
         default_guess : float, default=0
             assign parameters with no default value this value
         """
+
+        # Make sure input model is callable
+        if not hasattr(model_to_fit,"__call__"):
+            err = f"'{model_to_fit}' should be callable\n"
+            raise ValueError(err)
+
+        # Check fittable_params
+        if fittable_params is not None:
+            if not hasattr(fittable_params,"__iter__") or issubclass(type(fittable_params),str):
+                err = "fittable_parameters should be a list of parameter names\n"
+                err += "or a dictionary keying parameter names to parameter\n"
+                err += "guesses\n"
+                raise ValueError(err)
+        
+        # check not_fittable_params
+        if not_fittable_params is not None:
+            if not hasattr(not_fittable_params,"__iter__") or issubclass(type(not_fittable_params),str):
+                err = "not_fittable_params should be a list of parameter names\n"
+                err += "or a dictionary keying non-fittable parameter names to\n"
+                err += "values\n"
+                raise ValueError(err)
 
         self._default_guess = check_float(value=default_guess,
                                           variable_name="default_guess")
@@ -58,9 +81,12 @@ class ModelWrapper:
         self._param_df = pd.DataFrame({"name":[]})
         self._other_arguments = {}
 
-        self._load_model(model_to_fit,fittable_params)
+        self._load_model(model_to_fit=model_to_fit,
+                         fittable_params=fittable_params,
+                         not_fittable_params=not_fittable_params)
+        
 
-    def _load_model(self,model_to_fit,fittable_params):
+    def _load_model(self,model_to_fit,fittable_params,not_fittable_params):
         """
         Load a model into the wrapper. Fittable arguments are put into param_df.
         Non-fittable arguments are placed in the other_arguments dictionary.
@@ -71,12 +97,9 @@ class ModelWrapper:
             a function or method to fit.
         fittable_params : list-like or None
             list of parameters to fit 
+        not_fittable_params : list-like or None
+            list of parameters that should not be fit
         """
-
-        # Make sure input model is callable
-        if not hasattr(model_to_fit,"__call__"):
-            err = f"'{model_to_fit}' should be callable\n"
-            raise ValueError(err)
 
         self._model_to_fit = model_to_fit
 
@@ -87,6 +110,7 @@ class ModelWrapper:
         # Decide which parameters are fittable and which are not
         fittable_params, not_fittable_parameters = \
             reconcile_fittable(fittable_params=fittable_params,
+                               not_fittable_params=not_fittable_params,
                                all_args=all_args,
                                can_be_fit=can_be_fit,
                                cannot_be_fit=cannot_be_fit,
@@ -138,8 +162,10 @@ class ModelWrapper:
             
             if p in can_be_fit:
                 starting_value = can_be_fit[p]
-            else:
+            elif p in cannot_be_fit:
                 starting_value = cannot_be_fit[p]
+            else:
+                starting_value = None
                 
             self._other_arguments[p] = starting_value
           
@@ -210,7 +236,7 @@ class ModelWrapper:
         
         # Get currently un-fixed parameters
         self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
-        self._current_param_index = self._param_df.index[self._unfixed_mask]
+        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
 
         # Build a dictionary of keyword arguments to pass to the model when
         # called. 
@@ -226,7 +252,10 @@ class ModelWrapper:
 
         # If parameters are not passed, get current parameter values
         if params is None:
-            params = np.array(self._param_df.loc[self._unfixed_mask,"guess"])
+            params = np.array(self._param_df.loc[self._unfixed_mask,
+                                                 "guess"],dtype=float)
+        else:
+            params = np.array(params,dtype=float)
 
         # Sanity check
         if len(params) != np.sum(self._unfixed_mask):
@@ -236,7 +265,7 @@ class ModelWrapper:
 
         # Update kwargs
         for i in range(len(params)):
-            self._mw_kwargs[self._current_param_index[i]] = params[i]
+            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
 
         try:
             return self._model_to_fit(**self._mw_kwargs)
