@@ -2,6 +2,8 @@
 dataprob
 ========
 
+.. image:: docs/badges/coverage-badge.svg
+
 Library for using likelihoods (the probability of observed data given a model)
 to extract parameter estimates for models describing experimental data. Can do
 maximum likelihood, Bayesian MCMC sampling, and Bootstrap sampling using a
@@ -277,3 +279,4 @@ types:
     
 Samples
 =======
+

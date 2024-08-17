@@ -580,9 +580,9 @@ def test_Fitter_data_df():
     assert np.array_equal(out_df["y_std"],y_std)
     assert np.array_equal(out_df["y_calc"],y_calc)
     assert np.array_equal(out_df["unweighted_residuals"],
-                          y_obs - y_calc)
+                          y_calc - y_obs)
     assert np.array_equal(out_df["weighted_residuals"],
-                          (y_obs - y_calc)/y_std)
+                          (y_calc - y_obs)/y_std)
 
 
 def test_Fitter__initialize_fit_df():
@@ -727,83 +727,6 @@ def test_Fitter_get_sample_df():
     assert np.array_equal(sample_df.columns[:4],["y_obs","y_std","y_calc","s00000"])
     assert sample_df.columns[-1] == "s00999"
     assert len(sample_df.columns) == 13
-
-
-def test_Fitter_corner_plot():
-
-    # tests run the whole decision tree of the function to identify major 
-    # errors, but I'm not checking output here because it's graphical. 
-    
-    # some test data
-    y_obs = np.arange(10)
-    y_std = np.ones(10)
-    def test_fcn(a=1,b=2): return a*b*np.ones(10)
-    fake_samples = np.random.normal(loc=0,scale=1,size=(1000,2))
-
-    # Create a fitter that has apparently been run and has some samples
-    f = Fitter(some_function=test_fcn)
-    f.y_obs = y_obs
-    f.y_std = y_std
-    f._fit_df = pd.DataFrame({"name":["a","b"],"estimate":[10,20]})
-    f._success = True
-    f._samples = fake_samples
-
-    # no fit_type specified
-    fig = f.corner_plot()
-    assert fig is None
-
-    # set fit type, should now run
-    f._fit_type = "fake"
-    fig = f.corner_plot()
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # Send in filter parameter possibilities. It should gracefully handle all
-    # of these cases. 
-    fig = f.corner_plot(filter_params=None)
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-    
-    fig = f.corner_plot(filter_params="blah")
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    fig = f.corner_plot(filter_params=["blah"])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    fig = f.corner_plot(filter_params=[1])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-    
-    # filter all parameters
-    with pytest.raises(ValueError):
-        fig = f.corner_plot(filter_params=["a","b"])
-    
-    # filter one
-    fig = f.corner_plot(filter_params=["a"])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # filter other
-    fig = f.corner_plot(filter_params=["b"])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # Get rid of samples attribute. Should now fail 
-    f._samples = None
-    with pytest.raises(RuntimeError):
-        fig = f.corner_plot()
-
-    # put samples back in
-    f._samples = fake_samples
-    fig = f.corner_plot(filter_params=None)
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # pass in labels
-    fig = f.corner_plot(filter_params=None,labels=["x","y"])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # pass in range
-    fig = f.corner_plot(filter_params=None,range=[(-10,10),(-100,100)])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-
-    # pass in truths
-    fig = f.corner_plot(filter_params=None,truths=[1,2])
-    assert issubclass(type(fig),matplotlib.figure.Figure)
 
 
 def test_Fitter_write_samples(tmpdir):
