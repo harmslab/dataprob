@@ -2,7 +2,7 @@
 dataprob
 ========
 
-Library for calculating probability of data given a model (the likelihood)
+Library for using likelihoods (the probability of observed data given a model)
 to extract parameter estimates for models describing experimental data. Can do
 maximum likelihood, Bayesian MCMC sampling, and Bootstrap sampling using a
 consistent API.  
@@ -31,19 +31,20 @@ analysis by changing the definition of `f`.
     noise = np.random.normal(loc=0,scale=0.5,size=x_array.shape[0])
     y_obs = linear_model(5,5.7,x_array) + noise
 
-    # Wrap the model, creating object mw. Note that other_kwargs let us define
-    # the value of the `x` parameter. 
-    mw = dataprob.wrap_function(linear_model,
-                                other_kwargs={"x":x_array})
-
     # Create an MLFitter (or Bayesian or Bootstrap...)
-    f = dataprob.MLFitter() 
-    #f = dataprob.BayesianSampler() 
-    #f = dataprob.BootstrapSampler() 
+    f = dataprob.MLFitter(some_function=linear_model,
+                          non_fit_kwargs={"x":x_array})
+    
+    #f = dataprob.BayesianSampler(some_function=linear_model,
+    #                             non_fit_kwargs={"x":x_array})
+    
+    #f = dataprob.BootstrapFitter(some_function=linear_model,
+    #                             non_fit_kwargs={"x":x_array})
 
     # Fit the wrapped model to y_obs, setting our estimated uncertainty
     # on each observed point to 0.5
-    f.fit(model=mw,y_obs=y_obs,y_std=0.5)
+    f.fit(y_obs=y_obs,
+          y_std=0.5)
 
     f.fit_df
 

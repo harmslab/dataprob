@@ -10,33 +10,37 @@ import pandas as pd
 
 def test_BootstrapFitter__init():
 
-    f = BootstrapFitter()
+    def test_fcn(a,b): return None
+
+    f = BootstrapFitter(some_function=test_fcn)
     assert f.fit_type == "bootstrap"
     assert f.num_obs is None
 
-    f = BootstrapFitter(num_bootstrap=5)
+    f = BootstrapFitter(some_function=test_fcn,
+                        num_bootstrap=5)
     assert f._num_bootstrap == 5
 
     # check value checking
     with pytest.raises(ValueError):
-        BootstrapFitter(num_bootstrap=0)
+        BootstrapFitter(some_function=test_fcn,
+                        num_bootstrap=0)
     with pytest.raises(ValueError):
-        BootstrapFitter(num_bootstrap="a")
+        BootstrapFitter(some_function=test_fcn,
+                        num_bootstrap="a")
 
 def test_BootstrapFitter__fit(linear_fit):
     
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
 
     # -------------------------------------------------------------------------
     # basic run with small number of bootstraps
 
-    f = BootstrapFitter(num_bootstrap=10)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+    f = BootstrapFitter(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_bootstrap=10)
+
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -76,9 +80,8 @@ def test_BootstrapFitter__fit(linear_fit):
     # success == False
 
     def bad_model(a,b): return np.ones(10)*np.nan
-    mw = ModelWrapper(bad_model)
-    f = BootstrapFitter(num_bootstrap=10)
-    f.model = mw
+    f = BootstrapFitter(some_function=bad_model,
+                        num_bootstrap=10)
     f.y_obs = df.y_obs
     f.y_std = df.y_std
     
@@ -101,10 +104,10 @@ def test_BootstrapFitter__fit(linear_fit):
     # basic run by set number of steps so small it never converges. should have
     # fit.success == False on each least squares
 
-    f = BootstrapFitter(num_bootstrap=10)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+    f = BootstrapFitter(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_bootstrap=10)
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -139,17 +142,14 @@ def test_BootstrapFitter__fit(linear_fit):
 
 
 
-
-
     
 def test_BootstrapFitter__update_fit_df(linear_fit):
     
     # Create a BootstrapFitter with a model loaded (and _fit_df implicitly 
     # created)
-    f = BootstrapFitter()
     def test_fcn(a=1,b=2): return a*b
-    f.model = ModelWrapper(test_fcn)
-
+    f = BootstrapFitter(some_function=test_fcn)
+    
     # add some fake samples
     f._samples = np.random.normal(loc=0,scale=1,size=(10000,2))
 
@@ -171,10 +171,9 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
 
     # Create a BootstrapFitter with a model loaded (and _fit_df implicitly 
     # created)
-    f = BootstrapFitter()
     def test_fcn(a=1,b=2): return a*b
-    f.model = ModelWrapper(test_fcn)
-
+    f = BootstrapFitter(some_function=test_fcn)
+    
     # add some fake samples, then some nans. Should have no effect because we
     # have plenty of samples. 
     f._samples = np.random.normal(loc=0,scale=1,size=(10000,2))
@@ -211,12 +210,12 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
 
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-
+    
     # super small sampler
-    f = BootstrapFitter(num_bootstrap=5)
-    f.model = linear_mw
+    f = BootstrapFitter(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_bootstrap=5)
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -263,12 +262,12 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
 
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
 
     # super small sampler
-    f = BootstrapFitter(num_bootstrap=5)
-    f.model = linear_mw
+    f = BootstrapFitter(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_bootstrap=5)
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -287,11 +286,9 @@ def test_BootstrapFitter___repr__():
 
     # Stupidly simple fitting problem. find slope
     def model_to_wrap(m=1,x=np.array([1,2,3])): return m*x
-    mw = ModelWrapper(model_to_fit=model_to_wrap)
-
+    
     # Run _fit_has_been_run, success branch
-    f = BootstrapFitter()
-    f.model = mw
+    f = BootstrapFitter(some_function=model_to_wrap)
     f.fit(y_obs=np.array([2,4,6]),
           y_std=[0.1,0.1,0.1])
 
@@ -305,8 +302,7 @@ def test_BootstrapFitter___repr__():
     assert len(out) == 13
 
     # Run not _fit_has_been_run
-    f = BootstrapFitter()
-    f.model = mw
+    f = BootstrapFitter(some_function=model_to_wrap)
 
     out = f.__repr__().split("\n")
     assert len(out) == 9

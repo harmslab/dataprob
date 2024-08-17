@@ -342,6 +342,28 @@ class ModelWrapper:
         # thus be faster when run again and again in regression
         return self._mw_observable
 
+    def fast_model(self,params):
+        """
+        Calculate model result with minimal error checking. 
+
+        Parameters
+        ----------
+        params : numpy.ndarray, optional
+            float numpy array the length of the number of unfixed parameters.
+            
+        Returns
+        -------
+        out : numpy.ndarray
+            result of model(params)
+        """
+
+        # Update kwargs
+        for i in range(len(params)):
+            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
+        
+        return self._model_to_fit(**self._mw_kwargs)
+
+
     @property
     def param_df(self):
         """

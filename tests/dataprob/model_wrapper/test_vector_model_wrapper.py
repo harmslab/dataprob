@@ -316,3 +316,33 @@ def test_VectorModelWrapper_model():
 
     # and now mw_observable should be too
     assert mw._mw_observable([2,3]) == 10*2*3
+
+def test_VectorModelWrapper_fast_model():
+
+    # light wrapper for fast_model 
+
+    # fittable_param dict, good value
+    def test_fcn(x,z="test"): return x[0] * x[1] * x[2]
+    mw = VectorModelWrapper(model_to_fit=test_fcn,
+                            fittable_params={"a":20,"b":30,"c":50}) 
+    
+    # Make sure it is callable and takes arguments
+    assert mw.fast_model([10,20,30]) == 10*20*30
+
+    # Make sure it calls finalize. 
+    # Run model and _mw_observable
+    assert mw.model([1,2,3]) == 1*2*3
+    assert mw._mw_observable([1,2,3]) == 1*2*3
+    assert mw.fast_model(np.array([1,2,3])) == 1*2*3
+
+    # fix and change "a"
+    mw.param_df.loc["a","fixed"] = True
+    mw.param_df.loc["a","guess"] = 10
+
+    # fast_model is not aware of this 
+    assert mw.fast_model(np.array([1,2,3])) == 1*2*3
+    
+    mw.finalize_params()
+
+    # and now fast_model should be too if finalized
+    assert mw.fast_model(np.array([2,3])) == 10*2*3

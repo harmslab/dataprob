@@ -16,17 +16,20 @@ from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 def test_BayesianSampler__init__():
 
+    def test_fcn(a,b): return a*b
+
     # default args work. check to make sure super().__init__ actually ran.
-    f = BayesianSampler()
+    f = BayesianSampler(some_function=test_fcn)
     assert f.fit_type == "bayesian"
     assert f.num_obs is None
 
     # args are being set
-    f = BayesianSampler(num_walkers=100,
-                       use_ml_guess=True,
-                       num_steps=100,
-                       burn_in=0.1,
-                       num_threads=1)
+    f = BayesianSampler(some_function=test_fcn,
+                        num_walkers=100,
+                        use_ml_guess=True,
+                        num_steps=100,
+                        burn_in=0.1,
+                        num_threads=1)
 
     assert f._num_walkers == 100
     assert f._use_ml_guess is True
@@ -38,14 +41,16 @@ def test_BayesianSampler__init__():
 
     # check num threads passing
     with pytest.raises(NotImplementedError):
-        f = BayesianSampler(num_walkers=100,
+        f = BayesianSampler(some_function=test_fcn,
+                            num_walkers=100,
                             use_ml_guess=True,
                             num_steps=100,
                             burn_in=0.1,
                             num_threads=0)
         
     with pytest.raises(NotImplementedError):
-        f = BayesianSampler(num_walkers=100,
+        f = BayesianSampler(some_function=test_fcn,
+                            num_walkers=100,
                             use_ml_guess=True,
                             num_steps=100,
                             burn_in=0.1,
@@ -53,15 +58,20 @@ def test_BayesianSampler__init__():
     
     # Pass bad value into each kwarg to make sure checker is running
     with pytest.raises(ValueError):
-        f = BayesianSampler(num_walkers=0)        
+        f = BayesianSampler(some_function=test_fcn,
+                            num_walkers=0)        
     with pytest.raises(ValueError):
-        f = BayesianSampler(use_ml_guess="not a bool")
+        f = BayesianSampler(some_function=test_fcn,
+                            use_ml_guess="not a bool")
     with pytest.raises(ValueError):
-        f = BayesianSampler(num_steps=1.2)
+        f = BayesianSampler(some_function=test_fcn,
+                            num_steps=1.2)
     with pytest.raises(ValueError):
-        f = BayesianSampler(burn_in=0.0)
+        f = BayesianSampler(some_function=test_fcn,
+                            burn_in=0.0)
     with pytest.raises(ValueError):
-        f = BayesianSampler(num_threads=-2)
+        f = BayesianSampler(some_function=test_fcn,
+                            num_threads=-2)
 
 def test__setup_priors():
 
@@ -71,7 +81,7 @@ def test__setup_priors():
     # ----------------------------------------------------------------------
     # basic functionality with a uniform and gaussian prior
 
-    f = BayesianSampler()
+    f = BayesianSampler(some_function=test_fcn)
     assert not hasattr(f,"_prior_frozen_rv")
     assert not hasattr(f,"_uniform_priors")
     assert not hasattr(f,"_gauss_prior_means")
@@ -82,7 +92,6 @@ def test__setup_priors():
     assert not hasattr(f,"_upper_bounds")
 
     # Load model and set priors & bounds
-    f.model = ModelWrapper(test_fcn)
     f.param_df["prior_mean"] = [0,np.nan]
     f.param_df["prior_std"] = [1,np.nan]
     f.param_df["lower_bound"] = [-np.inf,-np.inf]
@@ -109,8 +118,7 @@ def test__setup_priors():
     # No gaussian priors
 
     # Load model and set priors & bounds
-    f = BayesianSampler()
-    f.model = ModelWrapper(test_fcn)
+    f = BayesianSampler(some_function=test_fcn)
     f.param_df["prior_mean"] = [np.nan,np.nan]
     f.param_df["prior_std"] = [np.nan,np.nan]
     f.param_df["lower_bound"] = [-np.inf,-np.inf]
@@ -128,8 +136,7 @@ def test__setup_priors():
     # No uniform priors
 
     # Load model and set priors & bounds
-    f = BayesianSampler()
-    f.model = ModelWrapper(test_fcn)
+    f = BayesianSampler(some_function=test_fcn)
     f.param_df["prior_mean"] = [1.0,2.0]
     f.param_df["prior_std"] = [3.0,4.0]
     f.param_df["lower_bound"] = [-np.inf,-np.inf]
@@ -148,10 +155,10 @@ def test__setup_priors():
     # ----------------------------------------------------------------------
     # Two gauss, two uniform, one of each fixed
 
-    # Load model and set priors & bounds
-    f = BayesianSampler()
     def four_param(a,b,c,d): return a*b*c*d
-    f.model = ModelWrapper(four_param)
+
+    # Load model and set priors & bounds
+    f = BayesianSampler(some_function=four_param)
     f.param_df["prior_mean"] = [1.0,2.0,np.nan,np.nan]
     f.param_df["prior_std"] = [3.0,4.0,np.nan,np.nan]
     f.param_df["lower_bound"] = [-np.inf,-np.inf,-np.inf,-np.inf]
@@ -172,9 +179,8 @@ def test__setup_priors():
     # check internal bounds calculation adjustment calculation
 
     # Load model and set priors & bounds
-    f = BayesianSampler()
     def single_param(a): return a
-    f.model = ModelWrapper(single_param)
+    f = BayesianSampler(some_function=single_param)
     f.param_df["prior_mean"] = [10.0]
     f.param_df["prior_std"] = [5.0]
     f.param_df["lower_bound"] = [0.0]
@@ -209,9 +215,8 @@ def test_BayesianSampler__ln_prior():
     # single parameter priors, bounded, numerical test
 
     # Load model and set priors & bounds
-    f = BayesianSampler()
     def single_param(a): return a
-    f.model = ModelWrapper(single_param)
+    f = BayesianSampler(some_function=single_param)
     f.param_df["prior_mean"] = [0]
     f.param_df["prior_std"] = [1]
     f.param_df["lower_bound"] = [-1]
@@ -239,13 +244,16 @@ def test_BayesianSampler__ln_prior():
     value = f._ln_prior(param=np.array([2]))
     assert np.isclose(expected,value)
 
+    expected = -np.inf
+    value = f._ln_prior(param=np.array([-2]))
+    assert np.isclose(expected,value)
+
     # ----------------------------------------------------------------------
     # Now set up two priors, one gauss with one infinite bound, one uniform with
     # infinte bound
 
-    f = BayesianSampler()
     def two_parameter(a=1,b=2): return a*b
-    f.model = ModelWrapper(two_parameter)
+    f = BayesianSampler(some_function=two_parameter)
     f.param_df["guess"] = [-5,-5]
     f.param_df["prior_mean"] = [2,np.nan]
     f.param_df["prior_std"] = [10,np.nan]
@@ -281,18 +289,13 @@ def test_BayesianSampler_ln_prior(linear_fit):
     
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
     coeff = linear_fit["coeff"]
     param = np.array([coeff["m"],coeff["b"]])
 
-    f = BayesianSampler()
+    f = BayesianSampler(some_function=fcn,
+                        non_fit_kwargs={"x":df.x})
     
-    # should not work -- no model loaded
-    with pytest.raises(RuntimeError):
-        f.ln_prior(param)
 
-    f.model = linear_mw
     v = f.ln_prior(param)
     assert v < 0
 
@@ -313,13 +316,11 @@ def test_BayesianSampler__ln_prob(linear_fit):
     
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
     coeff = linear_fit["coeff"]
     param = np.array([coeff["m"],coeff["b"]])
 
-    f = BayesianSampler()
-    f.model = linear_mw
+    f = BayesianSampler(some_function=fcn,
+                        non_fit_kwargs={"x":df.x})
     f.y_obs = df.y_obs
     f.y_std = 0.1
 
@@ -343,19 +344,17 @@ def test_BayesianSampler_ln_prob(linear_fit):
     
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
     coeff = linear_fit["coeff"]
     param = np.array([coeff["m"],coeff["b"]])
 
-    f = BayesianSampler()
+    f = BayesianSampler(some_function=fcn,
+                        non_fit_kwargs={"x":df.x})
     
     # should not work -- no model, y_obs, y_std loaded
     with pytest.raises(RuntimeError):
         f.ln_prob(param)
 
     # should not work -- no y_obs, y_std loaded
-    f.model = linear_mw
     with pytest.raises(RuntimeError):
         f.ln_prob(param)
     
@@ -382,21 +381,19 @@ def test_BayesianSampler__fit(linear_fit):
     
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
 
     # -------------------------------------------------------------------------
     # basic run; checking use_ml_guess = True effect
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -423,14 +420,15 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; checking use_ml_guess = False effect
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=False,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -459,14 +457,15 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; checking effects of altered num_steps and num_walkers
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=9,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=9,
                         use_ml_guess=True,
                         num_steps=20,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -493,14 +492,15 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; altered burn in
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.5,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -527,17 +527,20 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; fixed parameter; no ml
 
     # Very small analysis, starting from no ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=False,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.param_df.loc["b","fixed"] = True
-    linear_mw.param_df.loc["m","prior_mean"] = 2
-    linear_mw.param_df.loc["m","prior_std"] = 5
-    linear_mw.x = df.x
-    f.model = linear_mw
+    
+    
+    f.param_df.loc["b","fixed"] = True
+    f.param_df.loc["m","prior_mean"] = 2
+    f.param_df.loc["m","prior_std"] = 5
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -566,15 +569,17 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; fixed parameter; ml
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.param_df.loc["b","fixed"] = True
-    linear_mw.x = df.x
-    f.model = linear_mw
+
+    f.param_df.loc["b","fixed"] = True
+
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -603,14 +608,15 @@ def test_BayesianSampler__fit(linear_fit):
     # run twice in a row to check for sample appending
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         use_ml_guess=True,
                         num_steps=10,
                         burn_in=0.1,
                         num_threads=1)
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-    f.model = linear_mw
+
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -648,9 +654,9 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     
     # Create a BayesianSampler with a model loaded (and _fit_df implicitly 
     # created)
-    f = BayesianSampler()
+    
     def test_fcn(a=1,b=2): return a*b
-    f.model = ModelWrapper(test_fcn)
+    f = BayesianSampler(some_function=test_fcn)
 
     # add some fake samples
     f._samples = np.random.normal(loc=0,scale=1,size=(10000,2))
@@ -675,14 +681,15 @@ def test_BayesianSampler__update_fit_df(linear_fit):
 
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-
+    
     # super small sampler
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         num_steps=10,
                         use_ml_guess=False)
-    f.model = linear_mw
+
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -729,14 +736,15 @@ def test_BayesianSampler__update_fit_df(linear_fit):
 
     df = linear_fit["df"]
     fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    linear_mw = ModelWrapper(fcn,fittable_params=["m","b"])
-    linear_mw.x = df.x
-
+    
     # super small sampler
-    f = BayesianSampler(num_walkers=10,
+    f = BayesianSampler(some_function=fcn,
+                        fit_parameters=["m","b"],
+                        non_fit_kwargs={"x":df.x},
+                        num_walkers=10,
                         num_steps=10,
                         use_ml_guess=False)
-    f.model = linear_mw
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -755,7 +763,9 @@ def test_BayesianSampler__update_fit_df(linear_fit):
 
 def test_BayesianSampler_fit_info():
     
-    f = BayesianSampler()
+    def test_fcn(a,b): return a*b
+
+    f = BayesianSampler(some_function=test_fcn)
     assert f.fit_info["Num walkers"] == f._num_walkers
     assert f.fit_info["Use ML guess"] == f._use_ml_guess
     assert f.fit_info["Num steps"] == f._num_steps
@@ -771,11 +781,10 @@ def test_BayesianSampler___repr__():
     
     # Stupidly simple fitting problem. find slope
     def model_to_wrap(m=1,x=np.array([1,2,3])): return m*x
-    mw = ModelWrapper(model_to_fit=model_to_wrap)
-
+    
     # Run _fit_has_been_run, success branch
-    f = BayesianSampler(num_steps=10)
-    f.model = mw
+    f = BayesianSampler(some_function=model_to_wrap,
+                        num_steps=10)
     f.fit(y_obs=np.array([2,4,6]),
           y_std=[0.1,0.1,0.1])
 
@@ -789,76 +798,9 @@ def test_BayesianSampler___repr__():
     assert len(out) == 18 
 
     # Run not _fit_has_been_run
-    f = BayesianSampler(num_steps=10)
-    f.model = mw
-
+    f = BayesianSampler(some_function=model_to_wrap,
+                        num_steps=10)
+    
     out = f.__repr__().split("\n")
     assert len(out) == 14
 
-
-@pytest.mark.slow
-def xtest_fit(binding_curve_test_data,fit_tolerance_fixture):
-    """
-    Test the ability to fit the test data in binding_curve_test_data.
-    """
-
-    # Do fit using a generic unwrapped model and then creating and using a
-    # ModelWrapper model instance
-
-    for model_key in ["generic_model","wrappable_model"]:
-
-        f = BayesianSampler()
-        model = binding_curve_test_data[model_key]
-        guesses = binding_curve_test_data["guesses"]
-        df = binding_curve_test_data["df"]
-        input_params = np.array(binding_curve_test_data["input_params"])
-
-        if model_key == "wrappable_model":
-            model = ModelWrapper(model)
-            model.df = df
-            model.K.bounds = [0,10]
-        else:
-            f.bounds = [[0],[10]]
-
-        f.fit(model=model,guesses=guesses,y_obs=df.Y,y_stdev=df.Y_stdev)
-
-        # Assert that we succesfully passed in bounds
-        assert np.allclose(f.bounds,np.array([[0],[10]]))
-
-        # Make sure fit worked
-        assert f.success
-
-        # Make sure fit gave right answer
-        assert np.allclose(f.estimate,
-                           input_params,
-                           rtol=fit_tolerance_fixture,
-                           atol=fit_tolerance_fixture*input_params)
-
-        # Make sure mean of sampled uncertainty gives right answer
-        sampled = np.mean(f.samples,axis=0)
-        assert np.allclose(f.estimate,
-                           sampled,
-                           rtol=fit_tolerance_fixture,
-                           atol=fit_tolerance_fixture*input_params)
-
-        # Make sure corner plot call works and generates a plot
-        corner_fig = f.corner_plot()
-        assert corner_fig is not None
-
-        # Make sure data frame that comes out is correct
-        df = f.fit_df
-
-        assert isinstance(df,pd.DataFrame)
-        assert np.allclose(df["estimate"].iloc[:],
-                           input_params,
-                           rtol=fit_tolerance_fixture,
-                           atol=fit_tolerance_fixture*input_params)
-        assert np.array_equal(df["param"],f.names)
-        assert np.array_equal(df["estimate"],f.estimate)
-        assert np.array_equal(df["stdev"],f.stdev)
-        assert np.array_equal(df["low_95"],f.ninetyfive[0,:])
-        assert np.array_equal(df["high_95"],f.ninetyfive[1,:])
-        assert np.array_equal(df["guess"],f.guesses)
-        assert np.array_equal(df["lower_bound"],f.bounds[0,:])
-        assert np.array_equal(df["upper_bound"],f.bounds[1,:])
-        assert np.array_equal(f.samples.shape,(9000,1))

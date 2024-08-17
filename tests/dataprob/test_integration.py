@@ -19,15 +19,11 @@ def _integrated_binding_curve_fit(fitter,
     df = binding_curve_test_data["df"]
     model_to_wrap = binding_curve_test_data["wrappable_model"]
 
-    mw = ModelWrapper(model_to_wrap)
-    assert mw.df is None
-    mw.df = df
-    mw.param_df.loc["K","lower_bound"] = 0
-
-    f = fitter()
-    f.fit(mw,
-        y_obs=df.Y,
-        y_std=df.Y_stdev)
+    f = fitter(some_function=model_to_wrap,
+               non_fit_kwargs={"df":df})
+    f.param_df.loc["K","lower_bound"] = 0
+    f.fit(y_obs=df.Y,
+          y_std=df.Y_stdev)
     assert f.success
 
     # Make sure fit gave right answer

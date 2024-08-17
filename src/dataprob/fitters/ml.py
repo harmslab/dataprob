@@ -16,21 +16,42 @@ class MLFitter(Fitter):
 
     Standard deviation and ninety-five percent confidence intervals on parameter
     estimates are determined using the covariance matrix (Jacobian * residual
-    variance)  See:
-    # http://stackoverflow.com/questions/14854339/in-scipy-how-and-why-does-curve-fit-calculate-the-covariance-of-the-parameter-es
-    # http://stackoverflow.com/questions/14581358/getting-standard-errors-on-fitted-parameters-using-the-optimize-leastsq-method-i
+    variance) 
     """
-    def __init__(self,num_samples=100000):
+    def __init__(self,
+                 some_function,
+                 fit_parameters=None,
+                 non_fit_kwargs=None,
+                 vector_first_arg=False,
+                 num_samples=100000):
         """
         Initialize the fitter.
 
         Parameters
         ----------
+        some_function : callable
+            A function that takes at least one argument and returns a float numpy
+            array. Compare the outputs of this function against y_obs when doing
+            the analysis. 
+        fit_parameters : list, dict, str, pandas.DataFrame; optional
+            fit_parameters lets the user specify information about the parameters 
+            in the fit. 
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for some_function that should not
+            be fit but need to be specified to non-default values. 
+        vector_first_arg : bool, default=False
+            If True, the first argument of the function is taken as a vector of 
+            parameters to fit. All other arguments to some_function are treated as 
+            non-fittable parameters. fit_parameters must then specify the names of
+            each vector element. 
         num_samples : int
             number of samples for generating corner plot
         """
 
-        super().__init__()
+        super().__init__(some_function=some_function,
+                         fit_parameters=fit_parameters,
+                         non_fit_kwargs=non_fit_kwargs,
+                         vector_first_arg=vector_first_arg)
 
         self._fit_type = "maximum likelihood"
         self._num_samples = num_samples

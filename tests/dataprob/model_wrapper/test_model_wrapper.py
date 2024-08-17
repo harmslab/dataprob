@@ -532,6 +532,35 @@ def test_ModelWrapper_model():
     # and now mw_observable should be too
     assert mw._mw_observable([2,3]) == 10*2*3
     
+def test_ModelWrapper_fast_model():
+
+    # light wrapper for _mw_observable (tested elsewhere). Make sure finalize
+    # runs and that it works as advertised but do not test deeply
+
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    mw = ModelWrapper(model_to_test_wrap)
+    
+    # Make sure it is callable and takes arguments
+    assert mw.fast_model([10,20,30]) == 10*20*30
+
+    # Make sure it calls finalize. 
+    # Run model and fast_model
+    assert mw.fast_model([1,2,3]) == 1*2*3
+    assert mw._mw_observable([1,2,3]) == 1*2*3
+
+    # fix and change "a"
+    mw.param_df.loc["a","fixed"] = True
+    mw.param_df.loc["a","guess"] = 10
+
+    # fast_model is not aware of this 
+    assert mw.fast_model([1,2,3]) == 1*2*3
+
+    mw.finalize_params()
+
+    # but now fast_model is because we finalized parameters
+    assert mw.fast_model([2,3]) == 10*2*3
+
+
 def test_ModelWrapper_param_df():
 
     # test setter/getter

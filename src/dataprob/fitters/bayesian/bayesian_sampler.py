@@ -21,14 +21,16 @@ import numpy as np
 from scipy import stats
 
 import multiprocessing
-import copy
-
 
 class BayesianSampler(Fitter):
     """
     Use Bayesian MCMC to sample parameter space. 
     """
     def __init__(self,
+                 some_function,
+                 fit_parameters=None,
+                 non_fit_kwargs=None,
+                 vector_first_arg=False,
                  num_walkers=100,
                  use_ml_guess=True,
                  num_steps=100,
@@ -53,7 +55,10 @@ class BayesianSampler(Fitter):
             [NOT YET IMPLEMENTED]
         """
 
-        super().__init__()
+        super().__init__(some_function=some_function,
+                         fit_parameters=fit_parameters,
+                         non_fit_kwargs=non_fit_kwargs,
+                         vector_first_arg=vector_first_arg)
 
         # Set keywords, validating as we go
         self._num_walkers = check_int(value=num_walkers,
@@ -270,8 +275,7 @@ class BayesianSampler(Fitter):
         # parameters. 
         if self._use_ml_guess:
 
-            ml_fit = MLFitter()
-            ml_fit.model = copy.deepcopy(self._model)
+            ml_fit = MLFitter(some_function=self._model)
             ml_fit.y_obs = self.y_obs
             ml_fit.y_std = self.y_std
             ml_fit.fit()

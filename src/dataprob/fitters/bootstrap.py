@@ -16,7 +16,12 @@ class BootstrapFitter(Fitter):
     Perform the fit many times, sampling from uncertainty in each measurement.
     """
 
-    def __init__(self,num_bootstrap=100):
+    def __init__(self,
+                 some_function,
+                 fit_parameters=None,
+                 non_fit_kwargs=None,
+                 vector_first_arg=False,
+                 num_bootstrap=100):
         """
         Perform the fit many times, sampling from uncertainty in each
         measurement.
@@ -27,7 +32,10 @@ class BootstrapFitter(Fitter):
             Number of bootstrap samples to do
         """
 
-        super().__init__()
+        super().__init__(some_function=some_function,
+                         fit_parameters=fit_parameters,
+                         non_fit_kwargs=non_fit_kwargs,
+                         vector_first_arg=vector_first_arg)
 
         self._num_bootstrap = check_int(value=num_bootstrap,
                                         variable_name="num_bootstrap",
