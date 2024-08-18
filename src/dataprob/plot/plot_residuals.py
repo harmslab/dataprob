@@ -1,8 +1,11 @@
+"""
+Function to plot the fit residuals.
+"""
 
 from dataprob.plot._plot_utils import get_plot_features
-from dataprob.plot._plot_utils import get_styling
+from dataprob.plot._plot_utils import get_style
 from dataprob.plot._plot_utils import get_vectors
-from dataprob.plot._plot_utils import validate_and_load_style
+from dataprob.plot._plot_utils import get_plot_dimensions
 from dataprob.check import check_bool
 
 import matplotlib
@@ -10,7 +13,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 def plot_residuals(f,
-                   is_right_side=False,
                    x_axis=None,
                    x_label=None,
                    y_label=None,
@@ -18,34 +20,43 @@ def plot_residuals(f,
                    y_obs_style=None,
                    y_std_style=None,
                    y_calc_style=None,
-                   sample_style=None,
+                   sample_point_style=None,
+                   plot_y_residuals=False,
                    plot_unweighted=False,
                    ax=None):
     """
-    Plot the fit residuals.
+    Plot the fit residuals. 
 
     Parameters
     ----------
     f : dataprob.Fitter
         dataprob.Fitter instance for which .fit() has been run
-    plot_unweighted : bool, False
-        plot unweighted (rather than weighted) residuals
+    x_axis : list-like, optional
+        plot y_obs, y_std, and y_calc, against these x-axis values. If this
+        is not specified, plot against 0 -> len(y_obs)-1
     x_label : str, default="x"
         label for the x-axis. to omit, set to None
     y_label : str, default="y"
         label for the y-axis. to omit, set to None
+    num_samples : int, default=50
+        number of samples to plot. To not plot samples, set to 0. 
     y_obs_style : dict, optional
-        set matplotlib plot style keys here to override the defaults for y_obs.
-        sent to plt.plot
+        matplotlib plot style keys to override the defaults for y_obs. Used via
+        plt.plot(**y_obs_style). 
     y_std_style : dict, optional
-        set matplotlib plot style keys here to override the defaults for y_std.
-        sent to plt.errorbar
+        matplotlib plot style keys to override the defaults for y_std. Used via
+        plt.errorbar(**y_std_style). 
     y_calc_style : dict, optional
-        set matplotlib plot style keys here to override the defaults for y_calc.
-        sent to plt.plot
-    sample_style : dict, optional
-        set matplotlib plot style keys here to override the defaults for samples.
-        sent to plt.plot
+        matplotlib plot style here to override the defaults for y_calc. Used via
+        plt.plot(**y_calc_style). 
+    sample_point_style : dict, optional
+        matplotlib plot style keys to override the defaults for samples points 
+        plt.plot(**sample_point_style). 
+    plot_y_residuals : bool, default=False
+        the default plots residual vs. x-axis. if True, this plots y-obs vs. 
+        residual
+    plot_unweighted : bool, default=False
+        plot unweighted (rather than weighted) residuals
     ax : matplotlib.Axes, optional
         plot on the pre-defined axes
 
@@ -60,34 +71,21 @@ def plot_residuals(f,
                                                       y_label,
                                                       num_samples)
     
-    y_obs_style, y_std_style, y_calc_style, _ = get_styling(y_obs_style,
-                                                            y_std_style,
-                                                            y_calc_style,
-                                                            None)
+    # Get styles for series
+    y_obs_style = get_style(y_obs_style,"y_obs")
+    y_std_style = get_style(y_std_style,"y_std")
+    y_calc_style = get_style(y_calc_style,"y_calc")
+    sample_point_style = get_style(sample_point_style,"sample_point")
     
-    # default sample style should be points for this kind of plot. Validate 
-    # independently from the normal "get_styling call"
-    sample_style_default = {"marker":"o",
-                            "alpha":0.1,
-                            "markeredgecolor":"black",
-                            "markerfacecolor":"gray",
-                            "linewidth":0,
-                            "zorder":0}
-
-    sample_style = validate_and_load_style(some_style=sample_style,
-                                           some_style_name="sample_style",
-                                           default_style=sample_style_default)
-    
-
     x_axis, y_obs, y_std, _ = get_vectors(f,x_axis=x_axis)
 
+    plot_y_residuals = check_bool(value=plot_y_residuals,
+                                  variable_name="plot_y_residuals")
+    
     plot_unweighted = check_bool(value=plot_unweighted,
                                  variable_name="plot_unweighted")
 
-    is_right_side = check_bool(value=is_right_side,
-                               variable_name="is_right_side")
-    
-
+    # Get residual samples
     if num_samples > 0:
 
         sample_df = f.get_sample_df(num_samples=num_samples)
@@ -97,7 +95,8 @@ def plot_residuals(f,
         else:
             denominator = y_std
 
-        for c in sample_df.columns[3:]:
+        for c in sample_df.columns:
+            if c[0] == "y": continue # skip y_obs, etc. 
             sample_df[c] = (sample_df[c] - y_obs)/denominator
 
     
@@ -116,29 +115,44 @@ def plot_residuals(f,
     else:
         residual = f.data_df["weighted_residuals"]
 
-    if is_right_side:
+    x_left, x_right, y_bottom, y_top = get_plot_dimensions(x_axis,y_obs)
+    mean_r = np.mean(residual)
 
-        ax.plot(residual,y_obs,**y_obs_style,label="y_obs")
-        ax.errorbar(x=residual,y=y_obs,yerr=y_std,**y_std_style)
-        
-        m = np.mean(f.data_df["weighted_residuals"])
-        ax.plot(m*np.ones(y_obs.shape[0]),
-                f.data_df["y_obs"],'--',lw=1,color='gray',zorder=0)
-        
-        if num_samples > 0:
-            for c in sample_df.columns[3:]:
-                ax.plot(sample_df[c],y_obs,**sample_style)
-        
+    if plot_y_residuals:
+
+        main_x = residual
+        main_y = y_obs
+        mean_x = [mean_r,mean_r]
+        mean_y = [y_bottom,y_top]
+        sample_is_x = True
+
     else:
-        ax.plot(x_axis,residual,**y_obs_style,label="y_obs")
-        ax.errorbar(x=x_axis,y=residual,yerr=y_std,**y_std_style)
-        m = np.mean(f.data_df["weighted_residuals"])
-        ax.plot(x_axis,
-                m*np.ones(y_obs.shape[0]),'--',lw=1,color='gray',zorder=0)
+
+        main_x = x_axis
+        main_y = residual
+        mean_x = [x_left,x_right]
+        mean_y = [mean_r,mean_r]
+        sample_is_x = False
         
-        if num_samples > 0:
-            for c in sample_df.columns[3:]:
-                ax.plot(x_axis,sample_df[c],**sample_style)
+
+    ax.plot(main_x,main_y,**y_obs_style)
+    ax.errorbar(x=main_x,
+                y=main_y,
+                yerr=y_std,
+                **y_std_style)
+    ax.plot(mean_x,mean_y,**y_calc_style)
+
+    if num_samples > 0:
+        
+        for c in sample_df.columns:
+
+            if c[0] == "y": continue # skip y_obs, etc. 
+            
+            if sample_is_x:
+                ax.plot(sample_df[c],main_y,**sample_point_style)
+            else:
+                ax.plot(main_x,sample_df[c],**sample_point_style) 
+
     
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)

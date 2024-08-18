@@ -42,11 +42,11 @@ def test_plot_residuals():
     plt.close(fig)
     
     with pytest.raises(ValueError):
-        plot_residuals(f,is_right_side="not_a_bool")
+        plot_residuals(f,plot_y_residuals="not_a_bool")
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=True,
-                             is_right_side=True,
+                             plot_y_residuals=True,
                              num_samples=10)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -54,7 +54,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=True,
-                             is_right_side=True,
+                             plot_y_residuals=True,
                              num_samples=0)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -62,7 +62,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=True,
-                             is_right_side=False,
+                             plot_y_residuals=False,
                              num_samples=10)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -70,7 +70,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=True,
-                             is_right_side=False,
+                             plot_y_residuals=False,
                              num_samples=0)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -78,7 +78,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=False,
-                             is_right_side=True,
+                             plot_y_residuals=True,
                              num_samples=10)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -86,7 +86,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=False,
-                             is_right_side=True,
+                             plot_y_residuals=True,
                              num_samples=0)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -94,7 +94,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=False,
-                             is_right_side=False,
+                             plot_y_residuals=False,
                              num_samples=10)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
@@ -102,7 +102,7 @@ def test_plot_residuals():
 
     fig, ax = plot_residuals(f,
                              plot_unweighted=False,
-                             is_right_side=False,
+                             plot_y_residuals=False,
                              num_samples=0)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)

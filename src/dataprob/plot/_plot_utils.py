@@ -1,4 +1,5 @@
 from dataprob.check import check_int
+from dataprob.plot import appearance
 
 import numpy as np
 
@@ -58,9 +59,7 @@ def get_plot_features(f,
 
     return x_label, y_label, num_samples
 
-def validate_and_load_style(some_style,
-                            some_style_name,
-                            default_style):
+def get_style(user_style,style_name):
     """
     Validate and load some style dictionary.
     
@@ -79,90 +78,27 @@ def validate_and_load_style(some_style,
         dictionary with final style
     """
 
-    default_style = copy.deepcopy(default_style)
+    if style_name not in appearance.default_styles:
+        err = f"style_name {style_name} was not found in appearance.default_styles\n"
+        err += "It should be one of:\n"
+        for k in appearance.default_styles:
+            err += f"    {k}\n"
+        raise ValueError(err)
+
+    output_style = copy.deepcopy(appearance.default_styles[style_name])
     
-    if some_style is None:
-        return default_style
+    if user_style is None:
+        return output_style
         
-    if not issubclass(type(some_style),dict):
-        err = f"{some_style_name} should be a dictionary of matplotlib plot styles\n"
+    if not issubclass(type(user_style),dict):
+        err = f"{user_style} should be a dictionary of matplotlib plot styles\n"
         raise ValueError(err)
     
-    for k in some_style:
-        default_style[k] = some_style[k]
+    for k in user_style:
+        output_style[k] = user_style[k]
     
-    return default_style
+    return output_style
 
-def get_styling(y_obs_style=None,
-                y_std_style=None,
-                y_calc_style=None,
-                sample_style=None):
-    """
-    Return styles to use for plotting features on the plot. Any key in these
-    dictionaries overwrites keys in the default style, but does not alter other
-    values in the default. 
-    
-    Parameters
-    ----------
-    y_obs_style : dict, optional
-        styling dictionary for y_obs
-    y_std_style : dict, optional
-        styling dictionary for y_std
-    y_calc_style : dict, optional
-        styling dictionary for y_calc
-    sample_style : dict, optional
-        styling dictionary for samples
-    
-    Returns
-    -------
-    y_obs_style, y_std_style, y_calc_style, sample_style : dict
-        dictionaries with appropriate styles assembled from defaults and user
-        inputs
-    """
-
-    # In the future, these should probably be broken out into json or something
-    # elsewhere in the code base... 
-
-    # y_obs
-    y_obs_style_default = {"marker":"o",
-                           "markeredgecolor":"black",
-                           "markerfacecolor":"none",
-                           "markersize":4,
-                           "lw":0,
-                           "zorder":5}
-    y_obs_style = validate_and_load_style(y_obs_style,
-                                          "y_obs_style",
-                                          y_obs_style_default)
-
-    # y_std
-    y_std_style_default = {"lw":0,
-                           "ecolor":"black",
-                           "elinewidth":1,
-                           "capsize":3,
-                           "zorder":4}
-    y_std_style = validate_and_load_style(y_std_style,
-                                          "y_std_style",
-                                          y_std_style_default)
-
-    # y_calc
-    y_calc_style_default = {"linestyle":"-",
-                            "color":"red",
-                            "lw":2,
-                            "zorder":10}
-    y_calc_style = validate_and_load_style(y_calc_style,
-                                           "y_calc_style",
-                                           y_calc_style_default)
-
-    # samples    
-    sample_style_default = {"linestyle":"-",
-                            "alpha":0.1,
-                            "color":"gray",
-                            "zorder":0}
-    sample_style = validate_and_load_style(sample_style,
-                                           "sample_style",
-                                           sample_style_default)
-    
-    return y_obs_style, y_std_style, y_calc_style, sample_style
 
 def get_vectors(f,x_axis=None):
     """
@@ -258,3 +194,32 @@ def get_plot_dimensions(x_values,
     y_bottom, y_top = _get_edges(y_values,scalar=scalar)
     
     return x_left, x_right, y_bottom, y_top
+
+
+def sync_axes(ax1,ax2,sync_axis):
+    """
+    Synchronize the limits of two matplotlib.Axes objects. Sets to maximum 
+    extent that covers both current axes. Update the axis objects in place. 
+    
+    Parameters
+    ----------
+    ax1, ax2: matplotlib.Axes, matplotlib.Axes
+        axes objects to sync
+    sync_axis : str
+        'x' or 'y' -- which axis to synchronize between. 
+
+    Returns
+    -------
+    None
+    """
+
+    getter = f"get_{sync_axis}lim"
+    lim1 = ax1.__getattribute__(getter)()
+    lim2 = ax2.__getattribute__(getter)()
+
+    new_lim = [np.min([lim1[0],lim2[0]]),
+                np.max([lim1[1],lim2[1]])]
+
+    setter = f"set_{sync_axis}lim"
+    ax1.__getattribute__(setter)(new_lim)
+    ax2.__getattribute__(setter)(new_lim)

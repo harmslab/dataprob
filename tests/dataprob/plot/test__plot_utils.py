@@ -4,13 +4,14 @@ import pytest
 from dataprob.fitters.ml import MLFitter
 
 from dataprob.plot._plot_utils import get_plot_features
-from dataprob.plot._plot_utils import validate_and_load_style
-from dataprob.plot._plot_utils import get_styling
+from dataprob.plot._plot_utils import get_style
 from dataprob.plot._plot_utils import get_vectors
 from dataprob.plot._plot_utils import _get_edges
 from dataprob.plot._plot_utils import get_plot_dimensions
+from dataprob.plot._plot_utils import sync_axes
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 def test_get_plot_features():
 
@@ -72,90 +73,40 @@ def test_get_plot_features():
                       num_samples=8)
 
 
-def test__validate_and_load_style():
+def test_get_style():
 
-    default_style = {"x":10}
-    out = validate_and_load_style(some_style=None,
-                                  some_style_name="x",
-                                  default_style=default_style)
-    assert len(out) == 1
-    assert out["x"] == 10
-    assert out is not default_style
-
+    # Get default styles from plot.appearance
+    from dataprob.plot.appearance import default_styles
     
+    # Go through every default style
+    for s in default_styles:
+
+        # Make sure it's copied in properly and that a user_style of None does
+        # not alter it
+        out = get_style(user_style=None,
+                        style_name=s)  
+        assert default_styles is not out
+        assert len(default_styles[s]) == len(out)
+        for k in default_styles[s]:
+            assert default_styles[s][k] == out[k]
+
+        # Now make sure a correct pass updates a single field and leaves others
+        # intact
+        out = get_style(user_style={"some_cool_style":10},
+                        style_name=s)
+        assert len(default_styles[s]) + 1 == len(out)
+        for k in default_styles[s]:
+            assert default_styles[s][k] == out[k]
+        assert out["some_cool_style"] == 10
+
+        # bad user_style
+        with pytest.raises(ValueError):
+            get_style(user_style="not_a_dict",style_name=s)
+
+    # bad style_name
     with pytest.raises(ValueError):
-        validate_and_load_style(some_style="not_a_dict",
-                                some_style_name="x",
-                                default_style=default_style)
-    
-    out = validate_and_load_style(some_style={"not_x":5},
-                                  some_style_name="x",
-                                  default_style=default_style)
-    assert len(out) == 2
-    assert out["x"] == 10
-    assert out["not_x"] == 5
-    assert out is not default_style
+            get_style(user_style=None,style_name="not_a_style")
 
-    out = validate_and_load_style(some_style={"not_x":5,"x":20},
-                                  some_style_name="x",
-                                  default_style=default_style)
-    assert len(out) == 2
-    assert out["x"] == 20
-    assert out["not_x"] == 5
-    assert out is not default_style
-
-def test_get_styling():
-
-    # do not test extensively, just make sure copying and sanity checking
-    # are working. this is because default styles could change and testing 
-    # was done in test__validate_and_load_style
-
-    # make sure data is being sent in, output dictionary has more than just 
-    # what we sent in, and that the correct order is maintained (we didn't)
-    # mix up return order or make some wacky copy-paste error in names
-    y_obs_style = {"w":1}
-    y_std_style = {"x":2}
-    y_calc_style = {"y":3}
-    sample_style = {"z":4}
-    a, b, c, d = get_styling(y_obs_style=y_obs_style,
-                             y_std_style=y_std_style,
-                             y_calc_style=y_calc_style,
-                             sample_style=sample_style)
-    assert len(a) > 1
-    assert a["w"] == 1
-
-    assert len(b) > 1
-    assert b["x"] == 2
-
-    assert len(c) > 1
-    assert c["y"] == 3
-
-    assert len(d) > 1
-    assert d["z"] == 4
-
-    with pytest.raises(ValueError):
-        get_styling(y_obs_style="not_a_dict",
-                    y_std_style=y_std_style,
-                    y_calc_style=y_calc_style,
-                    sample_style=sample_style)
-        
-    with pytest.raises(ValueError):
-        get_styling(y_obs_style=y_obs_style,
-                    y_std_style="not_a_dict",
-                    y_calc_style=y_calc_style,
-                    sample_style=sample_style)
-        
-    with pytest.raises(ValueError):
-        get_styling(y_obs_style=y_obs_style,
-                    y_std_style=y_std_style,
-                    y_calc_style="not_a_dict",
-                    sample_style=sample_style)
-
-    with pytest.raises(ValueError):
-        get_styling(y_obs_style=y_obs_style,
-                    y_std_style=y_std_style,
-                    y_calc_style=y_calc_style,
-                    sample_style="not_a_dict")
         
 def test_get_vectors():
 
@@ -234,5 +185,33 @@ def test_get_plot_dimensions():
     assert right == 14
     assert bottom == -7
     assert top == 7
+
+def test_sync_axes():
+
+    _, ax1 = plt.subplots(1,figsize=(6,6))
+    _, ax2 = plt.subplots(1,figsize=(6,6))
+
+    ax1.set_xlim((-1,1))
+    ax1.set_ylim((-1,1))
+    ax2.set_xlim((0,2))
+    ax2.set_ylim((0,2))
+
+    sync_axes(ax1,ax2,'x')
+    assert ax1.get_xlim() == (-1,2)
+    assert ax2.get_xlim() == (-1,2)
+    assert ax1.get_ylim() == (-1,1)
+    assert ax2.get_ylim() == (0,2)
+
+    ax1.set_xlim((-1,1))
+    ax1.set_ylim((-1,1))
+    ax2.set_xlim((0,2))
+    ax2.set_ylim((0,2))
+
+    sync_axes(ax1,ax2,'y')
+    assert ax1.get_xlim() == (-1,1)
+    assert ax2.get_xlim() == (0,2)
+    assert ax1.get_ylim() == (-1,2)
+    assert ax2.get_ylim() == (-1,2)
+    
 
     

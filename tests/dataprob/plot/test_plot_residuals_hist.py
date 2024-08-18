@@ -51,25 +51,17 @@ def test_plot_residuals_hist():
     # to matplotlib.pyplot.fill because it's not a real style. nice (but implicit)
     # test
     with pytest.raises(AttributeError):
-        fig, ax = plot_residuals_hist(f,bar_style={"not_real_style":10})
+        fig, ax = plot_residuals_hist(f,hist_bar_style={"not_real_style":10})
 
     # But this should now work
-    fig, ax = plot_residuals_hist(f,bar_style={"edgecolor":"pink"})
+    fig, ax = plot_residuals_hist(f,hist_bar_style={"edgecolor":"pink"})
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
     plt.close(fig)
 
     with pytest.raises(ValueError):
-        plot_residuals_hist(f,bar_style="not_a_dict")
+        plot_residuals_hist(f,hist_bar_style="not_a_dict")
     
-    fig, ax = plot_residuals_hist(f,stats_as_text=False)
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-    assert issubclass(type(ax),matplotlib.axes.Axes)
-    plt.close(fig)
-    
-    with pytest.raises(ValueError):
-        plot_residuals_hist(f,stats_as_text="not_a_bool")
-
     fig, ax = plt.subplots(1,figsize=(6,6))
     fig_out, ax_out = plot_residuals_hist(f,ax=ax)
     assert fig_out is fig
@@ -89,28 +81,13 @@ def test_plot_residuals_hist():
     assert issubclass(type(ax),matplotlib.axes.Axes)
     plt.close(fig)
 
-    fig, ax = plot_residuals_hist(f,stats_as_text=False)
+    # amke sure we can send in hist bins
+    fig, ax = plot_residuals_hist(f,hist_bins=20)
     assert issubclass(type(fig),matplotlib.figure.Figure)
     assert issubclass(type(ax),matplotlib.axes.Axes)
     plt.close(fig)
 
-    fig, ax = plot_residuals_hist(f,stats_as_text=True)
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-    assert issubclass(type(ax),matplotlib.axes.Axes)
-    plt.close(fig)
+    with pytest.raises(ValueError):
+        plot_residuals_hist(f,hist_bins="stupid_bins")
 
-    # to test p-value formatting, we need a not-normal fit residual. 
-    def test_fcn(m,b): return m*np.arange(100) + b
-    y_obs = np.arange(100)**3 # not linear...
-    y_std = np.ones(100)*0.1
-
-    f = MLFitter(some_function=test_fcn)
-    f.fit(y_obs=y_obs,
-          y_std=y_std)
-    
-    # This should send a very high p-value into the text formatter
-    fig, ax = plot_residuals_hist(f,stats_as_text=True)
-    assert issubclass(type(fig),matplotlib.figure.Figure)
-    assert issubclass(type(ax),matplotlib.axes.Axes)
-    plt.close(fig)
 

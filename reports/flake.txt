@@ -746,74 +746,92 @@
 ./build/lib/dataprob/model_wrapper/wrap_function.py:206:1: W293 blank line contains whitespace
 ./build/lib/dataprob/model_wrapper/wrap_function.py:207:1: W293 blank line contains whitespace
 ./build/lib/dataprob/model_wrapper/wrap_function.py:207:9: W292 no newline at end of file
-./build/lib/dataprob/plot/__init__.py:2:1: F401 'dataprob.plot.plot_fit.plot_fit' imported but unused
+./build/lib/dataprob/plot/__init__.py:2:1: F401 'dataprob.plot.plot_summary.plot_summary' imported but unused
 ./build/lib/dataprob/plot/__init__.py:3:1: F401 'dataprob.plot.plot_corner.plot_corner' imported but unused
-./build/lib/dataprob/plot/__init__.py:4:1: F401 'dataprob.plot.plot_residuals.plot_residuals' imported but unused
-./build/lib/dataprob/plot/__init__.py:5:1: F401 'dataprob.plot.plot_residuals_hist.plot_residuals_hist' imported but unused
-./build/lib/dataprob/plot/__init__.py:5:66: W292 no newline at end of file
-./build/lib/dataprob/plot/_plot_utils.py:7:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:32:36: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:34:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:45:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:49:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:53:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:61:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:66:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:75:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:83:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:86:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:87:39: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:90:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:93:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:96:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:103:27: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:104:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:115:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:124:36: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:127:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:128:45: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:129:45: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:130:40: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:131:32: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:132:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:138:32: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:139:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:140:40: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:141:37: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:142:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:148:40: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:149:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:150:33: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:151:37: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:156:14: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:157:40: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:158:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:159:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:160:37: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/_plot_utils.py:164:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:167:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:167:18: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:170:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:187:40: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:188:40: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:189:42: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:190:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:193:38: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:200:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:201:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:201:27: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:204:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:229:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:235:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/_plot_utils.py:240:34: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:241:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:250:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:254:70: W291 trailing whitespace
-./build/lib/dataprob/plot/_plot_utils.py:256:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:257:42: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:258:42: E231 missing whitespace after ','
-./build/lib/dataprob/plot/_plot_utils.py:259:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/_plot_utils.py:260:44: W292 no newline at end of file
+./build/lib/dataprob/plot/__init__.py:5:1: F401 'dataprob.plot.plot_fit.plot_fit' imported but unused
+./build/lib/dataprob/plot/__init__.py:6:1: F401 'dataprob.plot.plot_residuals.plot_residuals' imported but unused
+./build/lib/dataprob/plot/__init__.py:7:1: F401 'dataprob.plot.plot_residuals_hist.plot_residuals_hist' imported but unused
+./build/lib/dataprob/plot/_plot_utils.py:8:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/_plot_utils.py:33:36: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:35:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:46:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:50:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:54:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:62:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/_plot_utils.py:62:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:65:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:74:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:89:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:92:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:93:39: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:96:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:99:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:103:18: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:106:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:123:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:124:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:125:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:126:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:129:38: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:136:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:137:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/_plot_utils.py:137:27: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:140:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:165:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:171:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/_plot_utils.py:176:34: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:177:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:186:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:190:70: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:192:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:193:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:194:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:195:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:199:18: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:199:22: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:201:75: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:202:76: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:203:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/_plot_utils.py:209:57: W291 trailing whitespace
+./build/lib/dataprob/plot/_plot_utils.py:220:31: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:221:17: E127 continuation line over-indented for visual indent
+./build/lib/dataprob/plot/_plot_utils.py:221:32: E231 missing whitespace after ','
+./build/lib/dataprob/plot/_plot_utils.py:225:42: W292 no newline at end of file
+./build/lib/dataprob/plot/appearance.py:4:13: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:5:20: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:6:16: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:7:13: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:8:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:10:12: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:11:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:12:26: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:13:26: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:14:21: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:15:13: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:16:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:18:12: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:19:13: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:20:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:21:21: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:22:18: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:23:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:25:18: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:26:20: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:27:16: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:28:16: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:29:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:31:19: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:32:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:33:16: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:34:21: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:35:26: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:36:26: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:37:20: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:38:17: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:40:15: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:41:13: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:42:20: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/appearance.py:43:20: E231 missing whitespace after ':'
 ./build/lib/dataprob/plot/plot_corner.py:7:1: C901 'plot_corner' is too complex (11)
 ./build/lib/dataprob/plot/plot_corner.py:7:1: E302 expected 2 blank lines, found 1
 ./build/lib/dataprob/plot/plot_corner.py:7:18: E231 missing whitespace after ','
@@ -840,139 +858,162 @@
 ./build/lib/dataprob/plot/plot_corner.py:102:18: W291 trailing whitespace
 ./build/lib/dataprob/plot/plot_corner.py:103:32: E231 missing whitespace after ','
 ./build/lib/dataprob/plot/plot_corner.py:105:15: W292 no newline at end of file
-./build/lib/dataprob/plot/plot_fit.py:9:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/plot_fit.py:60:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:66:49: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:68:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:69:5: E303 too many blank lines (2)
-./build/lib/dataprob/plot/plot_fit.py:73:33: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:73:44: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:75:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:78:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:79:19: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:79:25: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:79:39: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:80:25: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:80:33: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:80:44: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:81:19: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:81:26: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:81:41: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:82:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:86:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:87:32: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:88:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:93:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:94:28: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:94:30: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_fit.py:94:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:12:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/plot_fit.py:38:66: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:41:33: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:44:37: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:47:34: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:49:78: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:50:39: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:67:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_fit.py:69:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:70:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:71:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:72:52: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:74:47: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:75:49: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:79:33: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:79:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:81:31: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:84:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_fit.py:86:19: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:86:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:86:39: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:87:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:87:33: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:87:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:88:19: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:88:26: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:88:41: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:89:1: W293 blank line contains whitespace
 ./build/lib/dataprob/plot/plot_fit.py:99:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_fit.py:102:19: W292 no newline at end of file
-./build/lib/dataprob/plot/plot_residuals.py:12:1: C901 'plot_residuals' is too complex (12)
-./build/lib/dataprob/plot/plot_residuals.py:12:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/plot_residuals.py:62:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:67:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:68:76: W291 trailing whitespace
-./build/lib/dataprob/plot/plot_residuals.py:70:37: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals.py:71:36: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals.py:72:46: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals.py:73:46: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals.py:74:37: E231 missing whitespace after ':'
+./build/lib/dataprob/plot/plot_fit.py:105:32: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:107:26: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_fit.py:108:27: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:108:29: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:108:41: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_fit.py:121:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_fit.py:124:19: W292 no newline at end of file
+./build/lib/dataprob/plot/plot_residuals.py:15:1: C901 'plot_residuals' is too complex (13)
+./build/lib/dataprob/plot/plot_residuals.py:15:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/plot_residuals.py:28:28: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:42:66: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:45:33: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:48:37: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:51:34: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:53:79: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:54:40: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:56:77: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:73:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:75:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:76:40: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:77:42: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:78:54: E231 missing whitespace after ','
 ./build/lib/dataprob/plot/plot_residuals.py:79:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:81:5: E303 too many blank lines (2)
-./build/lib/dataprob/plot/plot_residuals.py:81:44: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:88:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:90:5: E303 too many blank lines (2)
-./build/lib/dataprob/plot/plot_residuals.py:93:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:80:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:84:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:92:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:99:27: E701 multiple statements on one line (colon)
+./build/lib/dataprob/plot/plot_residuals.py:99:37: E261 at least two spaces before inline comment
+./build/lib/dataprob/plot/plot_residuals.py:99:56: W291 trailing whitespace
 ./build/lib/dataprob/plot/plot_residuals.py:102:1: W293 blank line contains whitespace
 ./build/lib/dataprob/plot/plot_residuals.py:103:5: E303 too many blank lines (2)
 ./build/lib/dataprob/plot/plot_residuals.py:107:33: E231 missing whitespace after ','
 ./build/lib/dataprob/plot/plot_residuals.py:107:44: E231 missing whitespace after ','
 ./build/lib/dataprob/plot/plot_residuals.py:109:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:120:25: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:120:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:120:45: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:121:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:121:39: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:121:50: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:122:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:125:35: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:125:40: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:125:45: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:125:58: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:126:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:129:37: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:129:43: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:130:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:132:23: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:132:32: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:132:46: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:133:29: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:133:40: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:133:51: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:136:42: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:136:47: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:136:52: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:136:65: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:137:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:140:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:140:44: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals.py:141:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:144:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:148:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals.py:148:5: W292 no newline at end of file
-./build/lib/dataprob/plot/plot_residuals_hist.py:10:1: C901 'plot_residuals_hist' is too complex (13)
-./build/lib/dataprob/plot/plot_residuals_hist.py:10:1: E302 expected 2 blank lines, found 1
-./build/lib/dataprob/plot/plot_residuals_hist.py:51:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:60:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:63:38: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:67:23: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals_hist.py:68:30: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals_hist.py:69:30: E231 missing whitespace after ':'
-./build/lib/dataprob/plot/plot_residuals_hist.py:72:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:73:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:74:5: E303 too many blank lines (2)
-./build/lib/dataprob/plot/plot_residuals_hist.py:82:33: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:82:44: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:84:31: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:99:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:100:26: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:100:35: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:100:46: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:101:19: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:101:29: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:101:39: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:102:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:103:22: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:103:28: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:104:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:106:58: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:16: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:19: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:22: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:29: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:34: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:111:39: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:116:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:132:37: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:132:48: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:132:55: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:132:65: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:133:37: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:133:48: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:133:54: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:133:64: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:134:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:136:37: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:136:48: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:136:71: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:136:81: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:137:37: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:137:48: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:137:54: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:137:64: E231 missing whitespace after ','
-./build/lib/dataprob/plot/plot_residuals_hist.py:138:1: W293 blank line contains whitespace
-./build/lib/dataprob/plot/plot_residuals_hist.py:141:19: W292 no newline at end of file
+./build/lib/dataprob/plot/plot_residuals.py:118:66: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:125:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:126:27: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:133:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:134:25: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:136:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:138:5: E303 too many blank lines (2)
+./build/lib/dataprob/plot/plot_residuals.py:138:19: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:138:26: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:143:19: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:143:26: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:146:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:149:27: E701 multiple statements on one line (colon)
+./build/lib/dataprob/plot/plot_residuals.py:149:37: E261 at least two spaces before inline comment
+./build/lib/dataprob/plot/plot_residuals.py:149:56: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:150:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:152:37: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:152:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:154:31: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:154:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals.py:154:66: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals.py:156:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:157:5: E303 too many blank lines (2)
+./build/lib/dataprob/plot/plot_residuals.py:159:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:163:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals.py:163:5: W292 no newline at end of file
+./build/lib/dataprob/plot/plot_residuals_hist.py:2:43: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:14:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/plot_residuals_hist.py:23:35: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:33:31: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:35:52: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:38:34: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:41:61: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:54:5: E303 too many blank lines (2)
+./build/lib/dataprob/plot/plot_residuals_hist.py:59:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:62:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:67:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:73:33: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:73:44: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:75:31: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:87:46: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:93:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:94:26: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:94:35: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:94:46: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:95:19: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:95:29: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:95:39: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:96:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:97:22: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:97:28: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:98:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:100:65: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:104:15: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:104:18: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:104:28: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:104:35: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_residuals_hist.py:109:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_residuals_hist.py:112:19: W292 no newline at end of file
+./build/lib/dataprob/plot/plot_summary.py:8:1: F401 'dataprob.plot._plot_utils.get_vectors' imported but unused
+./build/lib/dataprob/plot/plot_summary.py:13:1: E302 expected 2 blank lines, found 1
+./build/lib/dataprob/plot/plot_summary.py:17:33: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:26:66: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:27:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:40:66: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:43:33: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:46:37: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:49:34: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:51:78: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:52:39: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:54:79: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:55:40: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:58:61: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:68:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:69:5: E303 too many blank lines (2)
+./build/lib/dataprob/plot/plot_summary.py:69:33: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_summary.py:70:34: E231 missing whitespace after ','
+./build/lib/dataprob/plot/plot_summary.py:71:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:77:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:87:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:98:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:108:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:114:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:119:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:124:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:129:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:136:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:141:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:143:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:150:23: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:152:15: W291 trailing whitespace
+./build/lib/dataprob/plot/plot_summary.py:153:1: W293 blank line contains whitespace
+./build/lib/dataprob/plot/plot_summary.py:153:5: W292 no newline at end of file
 ./docs/conf.py:55:31: W292 no newline at end of file
 ./src/dataprob/__init__.py:2:1: E122 continuation line missing indentation or outdented
 ./src/dataprob/__init__.py:6:1: F401 '.fitters.ml.MLFitter' imported but unused
@@ -1722,74 +1763,92 @@
 ./src/dataprob/model_wrapper/wrap_function.py:206:1: W293 blank line contains whitespace
 ./src/dataprob/model_wrapper/wrap_function.py:207:1: W293 blank line contains whitespace
 ./src/dataprob/model_wrapper/wrap_function.py:207:9: W292 no newline at end of file
-./src/dataprob/plot/__init__.py:2:1: F401 'dataprob.plot.plot_fit.plot_fit' imported but unused
+./src/dataprob/plot/__init__.py:2:1: F401 'dataprob.plot.plot_summary.plot_summary' imported but unused
 ./src/dataprob/plot/__init__.py:3:1: F401 'dataprob.plot.plot_corner.plot_corner' imported but unused
-./src/dataprob/plot/__init__.py:4:1: F401 'dataprob.plot.plot_residuals.plot_residuals' imported but unused
-./src/dataprob/plot/__init__.py:5:1: F401 'dataprob.plot.plot_residuals_hist.plot_residuals_hist' imported but unused
-./src/dataprob/plot/__init__.py:5:66: W292 no newline at end of file
-./src/dataprob/plot/_plot_utils.py:7:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:32:36: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:34:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:45:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:49:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:53:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:61:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:66:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:75:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:83:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:86:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:87:39: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:90:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:93:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:96:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:103:27: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:104:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:115:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:124:36: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:127:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:128:45: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:129:45: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:130:40: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:131:32: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:132:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:138:32: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:139:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:140:40: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:141:37: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:142:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:148:40: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:149:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:150:33: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:151:37: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:156:14: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:157:40: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:158:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:159:36: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:160:37: E231 missing whitespace after ':'
-./src/dataprob/plot/_plot_utils.py:164:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:167:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:167:18: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:170:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:187:40: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:188:40: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:189:42: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:190:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:193:38: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:200:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:201:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:201:27: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:204:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:229:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:235:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/_plot_utils.py:240:34: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:241:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:250:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:254:70: W291 trailing whitespace
-./src/dataprob/plot/_plot_utils.py:256:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:257:42: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:258:42: E231 missing whitespace after ','
-./src/dataprob/plot/_plot_utils.py:259:1: W293 blank line contains whitespace
-./src/dataprob/plot/_plot_utils.py:260:44: W292 no newline at end of file
+./src/dataprob/plot/__init__.py:5:1: F401 'dataprob.plot.plot_fit.plot_fit' imported but unused
+./src/dataprob/plot/__init__.py:6:1: F401 'dataprob.plot.plot_residuals.plot_residuals' imported but unused
+./src/dataprob/plot/__init__.py:7:1: F401 'dataprob.plot.plot_residuals_hist.plot_residuals_hist' imported but unused
+./src/dataprob/plot/_plot_utils.py:8:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/_plot_utils.py:33:36: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:35:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:46:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:50:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:54:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:62:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/_plot_utils.py:62:25: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:65:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:74:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:89:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:92:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:93:39: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:96:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:99:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:103:18: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:106:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:123:40: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:124:40: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:125:42: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:126:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:129:38: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:136:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:137:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/_plot_utils.py:137:27: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:140:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:165:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:171:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/_plot_utils.py:176:34: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:177:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:186:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:190:70: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:192:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:193:42: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:194:42: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:195:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:199:18: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:199:22: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:201:75: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:202:76: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:203:1: W293 blank line contains whitespace
+./src/dataprob/plot/_plot_utils.py:209:57: W291 trailing whitespace
+./src/dataprob/plot/_plot_utils.py:220:31: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:221:17: E127 continuation line over-indented for visual indent
+./src/dataprob/plot/_plot_utils.py:221:32: E231 missing whitespace after ','
+./src/dataprob/plot/_plot_utils.py:225:42: W292 no newline at end of file
+./src/dataprob/plot/appearance.py:4:13: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:5:20: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:6:16: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:7:13: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:8:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:10:12: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:11:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:12:26: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:13:26: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:14:21: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:15:13: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:16:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:18:12: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:19:13: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:20:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:21:21: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:22:18: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:23:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:25:18: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:26:20: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:27:16: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:28:16: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:29:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:31:19: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:32:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:33:16: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:34:21: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:35:26: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:36:26: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:37:20: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:38:17: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:40:15: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:41:13: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:42:20: E231 missing whitespace after ':'
+./src/dataprob/plot/appearance.py:43:20: E231 missing whitespace after ':'
 ./src/dataprob/plot/plot_corner.py:7:1: C901 'plot_corner' is too complex (11)
 ./src/dataprob/plot/plot_corner.py:7:1: E302 expected 2 blank lines, found 1
 ./src/dataprob/plot/plot_corner.py:7:18: E231 missing whitespace after ','
@@ -1816,139 +1875,162 @@
 ./src/dataprob/plot/plot_corner.py:102:18: W291 trailing whitespace
 ./src/dataprob/plot/plot_corner.py:103:32: E231 missing whitespace after ','
 ./src/dataprob/plot/plot_corner.py:105:15: W292 no newline at end of file
-./src/dataprob/plot/plot_fit.py:9:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/plot_fit.py:60:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:66:49: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:68:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:69:5: E303 too many blank lines (2)
-./src/dataprob/plot/plot_fit.py:73:33: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:73:44: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:75:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:78:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:79:19: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:79:25: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:79:39: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:80:25: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:80:33: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:80:44: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:81:19: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:81:26: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:81:41: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:82:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:86:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:87:32: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:88:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:93:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:94:28: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:94:30: E231 missing whitespace after ','
-./src/dataprob/plot/plot_fit.py:94:42: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:12:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/plot_fit.py:38:66: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:41:33: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:44:37: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:47:34: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:49:78: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:50:39: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:67:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_fit.py:69:40: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:70:40: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:71:42: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:72:52: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:74:47: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:75:49: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:79:33: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:79:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:81:31: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:84:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_fit.py:86:19: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:86:25: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:86:39: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:87:25: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:87:33: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:87:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:88:19: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:88:26: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:88:41: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:89:1: W293 blank line contains whitespace
 ./src/dataprob/plot/plot_fit.py:99:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_fit.py:102:19: W292 no newline at end of file
-./src/dataprob/plot/plot_residuals.py:12:1: C901 'plot_residuals' is too complex (12)
-./src/dataprob/plot/plot_residuals.py:12:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/plot_residuals.py:62:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:67:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:68:76: W291 trailing whitespace
-./src/dataprob/plot/plot_residuals.py:70:37: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals.py:71:36: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals.py:72:46: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals.py:73:46: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals.py:74:37: E231 missing whitespace after ':'
+./src/dataprob/plot/plot_fit.py:105:32: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:107:26: W291 trailing whitespace
+./src/dataprob/plot/plot_fit.py:108:27: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:108:29: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:108:41: E231 missing whitespace after ','
+./src/dataprob/plot/plot_fit.py:121:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_fit.py:124:19: W292 no newline at end of file
+./src/dataprob/plot/plot_residuals.py:15:1: C901 'plot_residuals' is too complex (13)
+./src/dataprob/plot/plot_residuals.py:15:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/plot_residuals.py:28:28: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:42:66: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:45:33: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:48:37: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:51:34: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:53:79: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:54:40: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:56:77: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:73:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:75:40: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:76:40: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:77:42: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:78:54: E231 missing whitespace after ','
 ./src/dataprob/plot/plot_residuals.py:79:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:81:5: E303 too many blank lines (2)
-./src/dataprob/plot/plot_residuals.py:81:44: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:88:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:90:5: E303 too many blank lines (2)
-./src/dataprob/plot/plot_residuals.py:93:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:80:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:84:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:92:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:99:27: E701 multiple statements on one line (colon)
+./src/dataprob/plot/plot_residuals.py:99:37: E261 at least two spaces before inline comment
+./src/dataprob/plot/plot_residuals.py:99:56: W291 trailing whitespace
 ./src/dataprob/plot/plot_residuals.py:102:1: W293 blank line contains whitespace
 ./src/dataprob/plot/plot_residuals.py:103:5: E303 too many blank lines (2)
 ./src/dataprob/plot/plot_residuals.py:107:33: E231 missing whitespace after ','
 ./src/dataprob/plot/plot_residuals.py:107:44: E231 missing whitespace after ','
 ./src/dataprob/plot/plot_residuals.py:109:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:120:25: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:120:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:120:45: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:121:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:121:39: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:121:50: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:122:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:125:35: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:125:40: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:125:45: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:125:58: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:126:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:129:37: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:129:43: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:130:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:132:23: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:132:32: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:132:46: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:133:29: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:133:40: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:133:51: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:136:42: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:136:47: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:136:52: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:136:65: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:137:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:140:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:140:44: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals.py:141:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:144:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:148:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals.py:148:5: W292 no newline at end of file
-./src/dataprob/plot/plot_residuals_hist.py:10:1: C901 'plot_residuals_hist' is too complex (13)
-./src/dataprob/plot/plot_residuals_hist.py:10:1: E302 expected 2 blank lines, found 1
-./src/dataprob/plot/plot_residuals_hist.py:51:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:60:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:63:38: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:67:23: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals_hist.py:68:30: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals_hist.py:69:30: E231 missing whitespace after ':'
-./src/dataprob/plot/plot_residuals_hist.py:72:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:73:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:74:5: E303 too many blank lines (2)
-./src/dataprob/plot/plot_residuals_hist.py:82:33: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:82:44: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:84:31: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:99:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:100:26: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:100:35: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:100:46: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:101:19: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:101:29: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:101:39: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:102:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:103:22: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:103:28: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:104:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:106:58: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:16: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:19: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:22: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:29: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:34: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:111:39: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:116:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:132:37: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:132:48: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:132:55: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:132:65: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:133:37: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:133:48: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:133:54: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:133:64: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:134:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:136:37: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:136:48: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:136:71: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:136:81: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:137:37: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:137:48: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:137:54: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:137:64: E231 missing whitespace after ','
-./src/dataprob/plot/plot_residuals_hist.py:138:1: W293 blank line contains whitespace
-./src/dataprob/plot/plot_residuals_hist.py:141:19: W292 no newline at end of file
+./src/dataprob/plot/plot_residuals.py:118:66: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:125:25: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:126:27: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:133:25: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:134:25: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:136:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:138:5: E303 too many blank lines (2)
+./src/dataprob/plot/plot_residuals.py:138:19: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:138:26: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:143:19: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:143:26: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:146:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:149:27: E701 multiple statements on one line (colon)
+./src/dataprob/plot/plot_residuals.py:149:37: E261 at least two spaces before inline comment
+./src/dataprob/plot/plot_residuals.py:149:56: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:150:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:152:37: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:152:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:154:31: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:154:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals.py:154:66: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals.py:156:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:157:5: E303 too many blank lines (2)
+./src/dataprob/plot/plot_residuals.py:159:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:163:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals.py:163:5: W292 no newline at end of file
+./src/dataprob/plot/plot_residuals_hist.py:2:43: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:14:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/plot_residuals_hist.py:23:35: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:33:31: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:35:52: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:38:34: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:41:61: W291 trailing whitespace
+./src/dataprob/plot/plot_residuals_hist.py:54:5: E303 too many blank lines (2)
+./src/dataprob/plot/plot_residuals_hist.py:59:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:62:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:67:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:73:33: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:73:44: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:75:31: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:87:46: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:93:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:94:26: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:94:35: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:94:46: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:95:19: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:95:29: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:95:39: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:96:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:97:22: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:97:28: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:98:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:100:65: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:104:15: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:104:18: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:104:28: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:104:35: E231 missing whitespace after ','
+./src/dataprob/plot/plot_residuals_hist.py:109:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_residuals_hist.py:112:19: W292 no newline at end of file
+./src/dataprob/plot/plot_summary.py:8:1: F401 'dataprob.plot._plot_utils.get_vectors' imported but unused
+./src/dataprob/plot/plot_summary.py:13:1: E302 expected 2 blank lines, found 1
+./src/dataprob/plot/plot_summary.py:17:33: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:26:66: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:27:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:40:66: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:43:33: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:46:37: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:49:34: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:51:78: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:52:39: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:54:79: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:55:40: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:58:61: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:68:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:69:5: E303 too many blank lines (2)
+./src/dataprob/plot/plot_summary.py:69:33: E231 missing whitespace after ','
+./src/dataprob/plot/plot_summary.py:70:34: E231 missing whitespace after ','
+./src/dataprob/plot/plot_summary.py:71:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:77:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:87:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:98:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:108:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:114:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:119:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:124:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:129:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:136:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:141:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:143:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:150:23: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:152:15: W291 trailing whitespace
+./src/dataprob/plot/plot_summary.py:153:1: W293 blank line contains whitespace
+./src/dataprob/plot/plot_summary.py:153:5: W292 no newline at end of file
 ./tests/conftest.py:13:1: E302 expected 2 blank lines, found 1
 ./tests/conftest.py:44:63: E231 missing whitespace after ','
 ./tests/conftest.py:58:49: E231 missing whitespace after ','
@@ -4772,79 +4854,97 @@
 ./tests/dataprob/model_wrapper/test_wrap_function.py:300:39: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_wrap_function.py:302:72: W291 trailing whitespace
 ./tests/dataprob/model_wrapper/test_wrap_function.py:310:18: W292 no newline at end of file
-./tests/dataprob/plot/test__plot_utils.py:15:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/plot/test__plot_utils.py:17:19: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:19:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:21:30: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:21:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:36:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:51:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:59:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:61:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:61:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:77:25: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:85:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:86:5: E303 too many blank lines (2)
-./tests/dataprob/plot/test__plot_utils.py:90:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:91:54: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:99:54: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:99:56: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:99:60: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:107:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/plot/test__plot_utils.py:110:75: W291 trailing whitespace
-./tests/dataprob/plot/test__plot_utils.py:113:76: W291 trailing whitespace
-./tests/dataprob/plot/test__plot_utils.py:116:23: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:117:23: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:118:24: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:119:24: E231 missing whitespace after ':'
-./tests/dataprob/plot/test__plot_utils.py:141:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:147:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:159:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:160:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/plot/test__plot_utils.py:162:19: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:168:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:171:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:172:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:173:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:175:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:175:44: E261 at least two spaces before inline comment
-./tests/dataprob/plot/test__plot_utils.py:179:22: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:180:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:182:29: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:182:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:185:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:186:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:187:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:189:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:189:44: E261 at least two spaces before inline comment
-./tests/dataprob/plot/test__plot_utils.py:191:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/plot/test__plot_utils.py:193:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:193:37: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:194:27: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:195:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:197:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:197:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:198:27: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:199:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:16:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test__plot_utils.py:18:19: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:20:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:22:30: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:22:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:37:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:52:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:60:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:62:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:62:31: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:80:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:87:38: W291 trailing whitespace
+./tests/dataprob/plot/test__plot_utils.py:95:54: E231 missing whitespace after ':'
+./tests/dataprob/plot/test__plot_utils.py:104:46: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:108:13: E117 over-indented
+./tests/dataprob/plot/test__plot_utils.py:108:38: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:110:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:113:19: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:119:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:122:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:123:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:124:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:126:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:126:44: E261 at least two spaces before inline comment
+./tests/dataprob/plot/test__plot_utils.py:130:22: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:131:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:133:29: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:133:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:136:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:137:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:138:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:140:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:140:44: E261 at least two spaces before inline comment
+./tests/dataprob/plot/test__plot_utils.py:142:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test__plot_utils.py:144:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:144:37: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:145:27: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:146:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:148:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:148:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:149:27: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:150:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:152:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:152:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:153:27: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:154:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:156:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:156:35: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:157:27: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:158:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:160:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:160:35: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:161:27: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:162:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:165:22: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:165:25: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:167:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test__plot_utils.py:170:29: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:171:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:189:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test__plot_utils.py:191:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:191:39: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:192:28: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:192:39: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:194:21: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:195:21: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:196:20: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:197:20: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:199:18: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:199:22: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:200:33: E231 missing whitespace after ','
 ./tests/dataprob/plot/test__plot_utils.py:201:33: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:201:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:202:27: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:203:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:205:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:205:35: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:206:27: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:207:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:209:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:209:35: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:210:27: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:211:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:214:22: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:214:25: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:216:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/plot/test__plot_utils.py:219:29: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:220:28: E231 missing whitespace after ','
-./tests/dataprob/plot/test__plot_utils.py:238:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test__plot_utils.py:238:5: W292 no newline at end of file
+./tests/dataprob/plot/test__plot_utils.py:202:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:203:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:205:21: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:206:21: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:207:20: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:208:20: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:210:18: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:210:22: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:211:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:212:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:213:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:214:33: E231 missing whitespace after ','
+./tests/dataprob/plot/test__plot_utils.py:215:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:217:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test__plot_utils.py:217:5: W292 no newline at end of file
+./tests/dataprob/plot/test_appearance.py:4:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test_appearance.py:6:76: W291 trailing whitespace
+./tests/dataprob/plot/test_appearance.py:7:14: W291 trailing whitespace
+./tests/dataprob/plot/test_appearance.py:10:33: W292 no newline at end of file
 ./tests/dataprob/plot/test_corner.py:13:1: W293 blank line contains whitespace
 ./tests/dataprob/plot/test_corner.py:14:74: W291 trailing whitespace
 ./tests/dataprob/plot/test_corner.py:15:71: W291 trailing whitespace
@@ -4975,42 +5075,37 @@
 ./tests/dataprob/plot/test_plot_residuals_hist.py:46:32: E231 missing whitespace after ','
 ./tests/dataprob/plot/test_plot_residuals_hist.py:47:31: E231 missing whitespace after ','
 ./tests/dataprob/plot/test_plot_residuals_hist.py:54:40: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:54:68: E231 missing whitespace after ':'
+./tests/dataprob/plot/test_plot_residuals_hist.py:54:73: E231 missing whitespace after ':'
 ./tests/dataprob/plot/test_plot_residuals_hist.py:57:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:57:59: E231 missing whitespace after ':'
+./tests/dataprob/plot/test_plot_residuals_hist.py:57:64: E231 missing whitespace after ':'
 ./tests/dataprob/plot/test_plot_residuals_hist.py:58:32: E231 missing whitespace after ','
 ./tests/dataprob/plot/test_plot_residuals_hist.py:59:31: E231 missing whitespace after ','
 ./tests/dataprob/plot/test_plot_residuals_hist.py:63:30: E231 missing whitespace after ','
 ./tests/dataprob/plot/test_plot_residuals_hist.py:64:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test_plot_residuals_hist.py:65:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:66:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:67:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:69:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test_plot_residuals_hist.py:71:30: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:73:29: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:73:40: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:74:44: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:80:30: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:82:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:83:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:84:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:87:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:88:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:89:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:92:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:93:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:94:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:97:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:98:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:99:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:102:69: W291 trailing whitespace
-./tests/dataprob/plot/test_plot_residuals_hist.py:103:19: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:104:30: E261 at least two spaces before inline comment
-./tests/dataprob/plot/test_plot_residuals_hist.py:110:1: W293 blank line contains whitespace
-./tests/dataprob/plot/test_plot_residuals_hist.py:112:36: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:113:32: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:114:31: E231 missing whitespace after ','
-./tests/dataprob/plot/test_plot_residuals_hist.py:116:1: W391 blank line at end of file
+./tests/dataprob/plot/test_plot_residuals_hist.py:65:29: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:65:40: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:66:44: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:72:30: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:74:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:75:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:76:31: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:79:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:80:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:81:31: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:85:36: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:86:32: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:87:31: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:91:30: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_residuals_hist.py:93:1: W391 blank line at end of file
+./tests/dataprob/plot/test_plot_summary.py:1:1: F401 'pytest' imported but unused
+./tests/dataprob/plot/test_plot_summary.py:9:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/plot/test_plot_summary.py:12:74: W291 trailing whitespace
+./tests/dataprob/plot/test_plot_summary.py:14:78: W291 trailing whitespace
+./tests/dataprob/plot/test_plot_summary.py:15:78: W291 trailing whitespace
+./tests/dataprob/plot/test_plot_summary.py:19:19: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_summary.py:20:25: E231 missing whitespace after ','
+./tests/dataprob/plot/test_plot_summary.py:25:1: W293 blank line contains whitespace
+./tests/dataprob/plot/test_plot_summary.py:28:32: E231 missing whitespace after ','
 ./tests/dataprob/test_check.py:11:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_check.py:13:24: E231 missing whitespace after ','
 ./tests/dataprob/test_check.py:13:28: E231 missing whitespace after ','
@@ -5231,31 +5326,33 @@
 ./tests/dataprob/test_integration.py:55:1: W293 blank line contains whitespace
 ./tests/dataprob/test_integration.py:63:1: W391 blank line at end of file
 ./tests/dataprob/test_package.py:4:1: E302 expected 2 blank lines, found 1
-27    C901 'check_float' is too complex (18)
+25    C901 'check_float' is too complex (18)
 2     E111 indentation is not a multiple of 4
 1     E114 indentation is not a multiple of 4 (comment)
+1     E117 over-indented
 2     E122 continuation line missing indentation or outdented
-53    E127 continuation line over-indented for visual indent
+55    E127 continuation line over-indented for visual indent
 30    E128 continuation line under-indented for visual indent
 23    E222 multiple spaces after operator
 1     E225 missing whitespace around operator
-3313  E231 missing whitespace after ','
-14    E261 at least two spaces before inline comment
+3312  E231 missing whitespace after ','
+17    E261 at least two spaces before inline comment
 3     E262 inline comment should start with '# '
 4     E265 block comment should start with '# '
 1     E266 too many leading '#' for block comment
-140   E302 expected 2 blank lines, found 1
-87    E303 too many blank lines (2)
+139   E302 expected 2 blank lines, found 1
+86    E303 too many blank lines (2)
 6     E306 expected 1 blank line before a nested definition, found 0
+4     E701 multiple statements on one line (colon)
 1     E702 multiple statements on one line (semicolon)
 1     E711 comparison to None should be 'if cond is None:'
 1     E712 comparison to True should be 'if cond is True:' or 'if cond:'
 1     E714 test for object identity should be 'is not'
-32    F401 '.fitters.ml.MLFitter' imported but unused
+37    F401 '.fitters.ml.MLFitter' imported but unused
 17    F541 f-string is missing placeholders
 3     F841 local variable 'patterns' is assigned to but never used
-635   W291 trailing whitespace
-32    W292 no newline at end of file
-794   W293 blank line contains whitespace
+712   W291 trailing whitespace
+33    W292 no newline at end of file
+801   W293 blank line contains whitespace
 9     W391 blank line at end of file
-5233
+5328
