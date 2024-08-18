@@ -102,6 +102,7 @@ def plot_residuals_hist(f,
     # Plot mean
     m = np.mean(residual)
     ax.plot([m,m],[y_bottom,y_top],**y_calc_style)
+    ax.plot([0,0],[y_bottom,y_top],'--',color="gray",zorder=6)
 
     # Set axis labels
     ax.set_xlabel(x_label)

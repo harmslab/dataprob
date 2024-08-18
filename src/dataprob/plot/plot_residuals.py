@@ -124,7 +124,12 @@ def plot_residuals(f,
         main_y = y_obs
         mean_x = [mean_r,mean_r]
         mean_y = [y_bottom,y_top]
+        zero_x = [0,0]
+        zero_y = [y_bottom,y_top]
+        
         sample_is_x = True
+
+
 
     else:
 
@@ -132,6 +137,8 @@ def plot_residuals(f,
         main_y = residual
         mean_x = [x_left,x_right]
         mean_y = [mean_r,mean_r]
+        zero_x = [x_left,x_right]
+        zero_y = [0,0]
         sample_is_x = False
         
 
@@ -141,6 +148,7 @@ def plot_residuals(f,
                 yerr=y_std,
                 **y_std_style)
     ax.plot(mean_x,mean_y,**y_calc_style)
+    ax.plot(zero_x,zero_y,'--',color="gray",zorder=0)
 
     if num_samples > 0:
         

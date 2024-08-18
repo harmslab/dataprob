@@ -40,7 +40,8 @@ default_styles = {
     "hist_bar":{
         "lw":1,
         "edgecolor":"black",
-        "facecolor":"gray"
+        "facecolor":"lightgray",
+        "zorder":5
     }
 
 }
