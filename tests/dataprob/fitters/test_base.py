@@ -77,7 +77,7 @@ def test_Fitter__init__():
     assert issubclass(type(f._model),VectorModelWrapper)
     assert len(f.param_df) == 3
     assert np.array_equal(f.param_df["name"],["q","r","s"])
-    assert len(f._model._other_arguments) == 2
+    assert len(f._model._non_fit_kwargs) == 2
     assert f._model.b is None
     assert np.array_equal(f._model.x,np.arange(10))
 
@@ -532,6 +532,28 @@ def test_Fitter_param_df():
     
     assert len(f.param_df) == 2
     assert np.array_equal(f.param_df["name"],["a","b"])
+
+
+def test_Fitter_non_fit_kwargs():
+
+    def test_fcn(a=1,b=2,c="test"): return a*b
+    f = Fitter(some_function=test_fcn)
+    assert len(f.non_fit_kwargs) == 1
+    assert f.non_fit_kwargs["c"] == "test"
+    f.non_fit_kwargs["c"] = "something_else"
+    assert f.non_fit_kwargs["c"] == "something_else"
+    
+    # should work
+    f._model.finalize_params()
+    
+    # should fail
+    f.non_fit_kwargs.pop("c")
+    with pytest.raises(ValueError):
+        f._model.finalize_params()
+
+    # should work
+    f.non_fit_kwargs["c"] = 14
+    f._model.finalize_params()
 
 
 def test_Fitter_data_df():

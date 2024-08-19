@@ -149,8 +149,14 @@ class VectorModelWrapper(ModelWrapper):
             raise ValueError(err)
         
         # Store the non fit parameter values. 
+        self._non_fit_kwargs_keys = []
         for p in other_args:
-            self._other_arguments[p] = other_args[p]
+            self._non_fit_kwargs[p] = other_args[p]
+            self._non_fit_kwargs_keys.append(p)
+        
+        # This set holds the expected set of kwargs keys. This allows us to 
+        # make sure the user does not add or remove a key with the setter. 
+        self._non_fit_kwargs_keys = set(self._non_fit_kwargs_keys)
 
         # Finalize -- read to run the model
         self.finalize_params()
@@ -176,6 +182,9 @@ class VectorModelWrapper(ModelWrapper):
         # Create all param vector
         self._all_param_vector = np.array(self._param_df["guess"],dtype=float)
 
+        # Make sure the user has not altered non_fit_kwargs keys
+        self._validate_non_fit_kwargs()
+
     def _mw_observable(self,params=None):
         """
         Actual function called by the fitter.
@@ -198,7 +207,7 @@ class VectorModelWrapper(ModelWrapper):
 
         try:
             return self._model_to_fit(compiled_params,
-                                      **self._other_arguments)
+                                      **self._non_fit_kwargs)
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
             raise RuntimeError(err) from e
@@ -234,4 +243,4 @@ class VectorModelWrapper(ModelWrapper):
 
         self._all_param_vector[self._unfixed_mask] = params
         return self._model_to_fit(self._all_param_vector,
-                                  **self._other_arguments)
+                                  **self._non_fit_kwargs)

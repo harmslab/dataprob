@@ -31,7 +31,7 @@ class ModelWrapper:
     # to hijack __getattr__ and __setattr__ and need to look inside this as soon
     # as we start setting attributes.
     _param_df = pd.DataFrame({"name":[]})
-    _other_arguments = {}
+    _non_fit_kwargs = {}
 
     def __init__(self,
                  model_to_fit,
@@ -77,8 +77,8 @@ class ModelWrapper:
         # instance-level (__dict__) attributes rather than class-level
         # attributes.
         self._param_df = pd.DataFrame({"name":[]})
-        self._other_arguments = {}
-
+        self._non_fit_kwargs = {}
+    
         self._load_model(model_to_fit=model_to_fit,
                          fittable_params=fittable_params,
                          non_fit_kwargs=non_fit_kwargs)
@@ -87,7 +87,7 @@ class ModelWrapper:
     def _load_model(self,model_to_fit,fittable_params,non_fit_kwargs):
         """
         Load a model into the wrapper. Fittable arguments are put into param_df.
-        Non-fittable arguments are placed in the other_arguments dictionary.
+        Non-fittable arguments are placed in the _non_fit_kwargs dictionary.
 
         Parameters
         ----------
@@ -159,10 +159,11 @@ class ModelWrapper:
                                             default_guess=self._default_guess)
 
         # Go through non-fittable parameters and record their keyword arguments
-        # in _other_arguments. Look in 'can_be_fit', then 'cannot_be_fit'. If
+        # in _non_fit_kwargs. Look in 'can_be_fit', then 'cannot_be_fit'. If
         # no default argument from either of those, set to 'None'. Finally, 
         # look in 'non_fit_kwargs.' If defined here, it will take precedence 
         # over the default values. 
+        self._non_fit_kwargs_keys = []
         for p in not_fittable_parameters:
             
             if p in can_be_fit:
@@ -175,8 +176,13 @@ class ModelWrapper:
             if p in non_fit_kwargs:
                 non_fit_param_value = non_fit_kwargs[p]
                 
-            self._other_arguments[p] = non_fit_param_value
-          
+            self._non_fit_kwargs[p] = non_fit_param_value
+            self._non_fit_kwargs_keys.append(p)
+
+        # This set holds the expected set of kwargs keys. This allows us to 
+        # make sure the user does not add or remove a key with the setter. 
+        self._non_fit_kwargs_keys = set(self._non_fit_kwargs_keys)
+
         # Finalize -- read to run the model
         self.finalize_params()
 
@@ -198,8 +204,8 @@ class ModelWrapper:
                                                 default_guess=self._default_guess)
 
         # We're setting another argument
-        elif key in self._other_arguments.keys():
-            self._other_arguments[key] = value
+        elif key in self._non_fit_kwargs.keys():
+            self._non_fit_kwargs[key] = value
 
         # Otherwise, just set it like normal
         else:
@@ -216,8 +222,8 @@ class ModelWrapper:
             return self._param_df.loc[key,"guess"]
 
         # We're getting another argument
-        if key in self._other_arguments.keys():
-            return self._other_arguments[key]
+        if key in self._non_fit_kwargs.keys():
+            return self._non_fit_kwargs[key]
 
         # Otherwise, get like normal
         else:
@@ -228,6 +234,33 @@ class ModelWrapper:
 
             # if not there, fall back to base __getattribute__
             return super().__getattribute__(key)
+
+    def _validate_non_fit_kwargs(self):
+        """
+        Validate the current state of non_fit_kwargs
+        """
+        
+        # Current state
+        current_non_fit_kwargs_keys = set(self._non_fit_kwargs)
+
+        # If different from expected...
+        if current_non_fit_kwargs_keys != self._non_fit_kwargs_keys:
+
+            err = "The keys in non_fit_kwargs have changed since initialization.\n"
+            err += "This is not allowed. Users can update the values passed\n"
+            err += "to the function by non_fit_kwargs, but not the keyword\n"
+            err += "arguments themselves.\n\n"
+            
+            extra_keys = current_non_fit_kwargs_keys.difference(self._non_fit_kwargs_keys)
+            if len(extra_keys) > 0:
+                err += f"extra keywords: {extra_keys}\n"
+            
+            missing_keys = self._non_fit_kwargs_keys.difference(current_non_fit_kwargs_keys)
+            if len(missing_keys) > 0:
+                err += f"missing keywords: {missing_keys}\n"
+            
+            raise ValueError(err)
+
 
     def finalize_params(self):
         """
@@ -251,7 +284,10 @@ class ModelWrapper:
         self._mw_kwargs = {}
         for p in self._fit_params_in_order:
             self._mw_kwargs[p] = self._param_df.loc[p,"guess"]
-        self._mw_kwargs.update(self._other_arguments)
+
+        self._validate_non_fit_kwargs()
+            
+        self._mw_kwargs.update(self._non_fit_kwargs)
 
     def _mw_observable(self,params=None):
         """
@@ -418,12 +454,13 @@ class ModelWrapper:
                                             param_in_order=self._fit_params_in_order)
         
     @property
-    def other_arguments(self):
+    def non_fit_kwargs(self):
         """
-        A dictionary with every model argument that is not a fit parameter.
+        A dictionary with the function keyword arguments that are not fit 
+        paramters. 
         """
 
-        return self._other_arguments
+        return self._non_fit_kwargs
     
     @property
     def unfixed_mask(self):
@@ -448,11 +485,11 @@ class ModelWrapper:
 
         # Non fittable arguments
         out.append(f"  non-fittable arguments:\n")
-        for p in self._other_arguments:
+        for p in self._non_fit_kwargs:
             out.append(f"    {p}:")
 
             # See if there are multiple lines on this repr...
-            variable_lines = repr(self._other_arguments[p]).split("\n")
+            variable_lines = repr(self._non_fit_kwargs[p]).split("\n")
             if len(variable_lines) > 6:
                 to_add = variable_lines[:3]
                 to_add.append("...")

@@ -44,9 +44,9 @@ def test_ModelWrapper___init__():
     assert mw._param_df.loc["b","guess"] == 2
     assert mw._param_df.loc["c","guess"] == 3
     
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
 
     # make sure fittable_params are being passed 
     mw = ModelWrapper(model_to_test_wrap,
@@ -57,11 +57,11 @@ def test_ModelWrapper___init__():
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["a","guess"] == 0
     
-    assert len(mw._other_arguments) == 4
-    assert mw._other_arguments["b"] == 2
-    assert mw._other_arguments["c"] == 3
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 4
+    assert mw._non_fit_kwargs["b"] == 2
+    assert mw._non_fit_kwargs["c"] == 3
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
 
     # make sure non_fit_kwargs are being passed 
     mw = ModelWrapper(model_to_test_wrap,non_fit_kwargs={"a":20})
@@ -72,10 +72,10 @@ def test_ModelWrapper___init__():
     assert mw._param_df.loc["b","guess"] == 2
     assert mw._param_df.loc["c","guess"] == 3
     
-    assert len(mw._other_arguments) == 3
-    assert mw._other_arguments["a"] == 20
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 3
+    assert mw._non_fit_kwargs["a"] == 20
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
 
     # make sure default_guess is being passed
     mw = ModelWrapper(model_to_test_wrap,default_guess=1.0)
@@ -92,7 +92,7 @@ def test_ModelWrapper__load_model():
         def __init__(self):
             self._default_guess = 0.0
             self._param_df = pd.DataFrame({"name":[]})
-            self._other_arguments = {}
+            self._non_fit_kwargs = {}
             
     mw = TestModelWrapper()
     assert len(mw.__dict__) == 3
@@ -114,9 +114,10 @@ def test_ModelWrapper__load_model():
     assert mw._param_df.loc["b","guess"] == 2
     assert mw._param_df.loc["c","guess"] == 3
     
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
+    assert mw._non_fit_kwargs_keys == set(["d","e"])
 
     # This makes sure that the finalize_params() call is happening. only 
     # test here because the logic of that call is tested in its own method call. 
@@ -138,11 +139,12 @@ def test_ModelWrapper__load_model():
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["a","guess"] == 0
     
-    assert len(mw._other_arguments) == 4
-    assert mw._other_arguments["b"] == 2
-    assert mw._other_arguments["c"] == 3
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 4
+    assert mw._non_fit_kwargs["b"] == 2
+    assert mw._non_fit_kwargs["c"] == 3
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
+    assert mw._non_fit_kwargs_keys == set(["b","c","d","e"])
 
     # Now validate interaction with input function and fittable_params. Add 
     # argument that would not normally be grabbed. 
@@ -155,10 +157,11 @@ def test_ModelWrapper__load_model():
     assert mw._param_df.loc["a","guess"] == 0
     assert mw._param_df.loc["e","guess"] == 3
     
-    assert len(mw._other_arguments) == 3
-    assert mw._other_arguments["b"] == 2
-    assert mw._other_arguments["c"] == 3
-    assert mw._other_arguments["d"] == "test"
+    assert len(mw._non_fit_kwargs) == 3
+    assert mw._non_fit_kwargs["b"] == 2
+    assert mw._non_fit_kwargs["c"] == 3
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs_keys == set(["b","c","d"])
 
     # Add argument not thought to be fittable by the parser.
     mw = TestModelWrapper()
@@ -199,7 +202,7 @@ def test_ModelWrapper__load_model():
                    non_fit_kwargs=None)
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["a","guess"] == 0
-    assert len(mw._other_arguments) == 0
+    assert len(mw._non_fit_kwargs) == 0
 
     # Test non_fit_kwargs on non-fittable argument with no default
     def model_to_test_wrap(a,b=1,c="test"): return a*b
@@ -209,9 +212,10 @@ def test_ModelWrapper__load_model():
                    non_fit_kwargs={"a":42})
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["b","guess"] == 1
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["a"] == 42
-    assert mw._other_arguments["c"] == "test"
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["a"] == 42
+    assert mw._non_fit_kwargs["c"] == "test"
+    assert mw._non_fit_kwargs_keys == set(["a","c"])
     
     # Test non_fit_kwargs on fittable argument with default
     mw = TestModelWrapper()
@@ -220,9 +224,10 @@ def test_ModelWrapper__load_model():
                    non_fit_kwargs={"b":17})
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["a","guess"] == 0
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] == 17
-    assert mw._other_arguments["c"] == "test"
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] == 17
+    assert mw._non_fit_kwargs["c"] == "test"
+    assert mw._non_fit_kwargs_keys == set(["b","c"])
 
     # Test non_fit_kwargs on non-fittable argument with default
     mw = TestModelWrapper()
@@ -232,8 +237,9 @@ def test_ModelWrapper__load_model():
     assert len(mw._param_df) == 2
     assert mw._param_df.loc["a","guess"] == 0
     assert mw._param_df.loc["b","guess"] == 1
-    assert len(mw._other_arguments) == 1
-    assert mw._other_arguments["c"] == (1,3)
+    assert len(mw._non_fit_kwargs) == 1
+    assert mw._non_fit_kwargs["c"] == (1,3)
+    assert mw._non_fit_kwargs_keys == set(["c"])
 
     # Test reasonable fittable_params and non_fit_kwargs
     mw = TestModelWrapper()
@@ -243,9 +249,10 @@ def test_ModelWrapper__load_model():
                                         "c":"rocket"})
     assert len(mw._param_df) == 1
     assert mw._param_df.loc["b","guess"] == 1
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["a"] == 10
-    assert mw._other_arguments["c"] == "rocket"
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["a"] == 10
+    assert mw._non_fit_kwargs["c"] == "rocket"
+    assert mw._non_fit_kwargs_keys == set(["a","c"])
 
     # Send in conflicting fittable and non_fit_kwargs
     mw = TestModelWrapper()
@@ -270,9 +277,10 @@ def test_ModelWrapper__load_model():
     assert len(mw._param_df) == 2
     assert mw._param_df.loc["a","guess"] == 0
     assert mw._param_df.loc["b","guess"] == 0
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["c"] == 5
-    assert mw._other_arguments["d"] == 13
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["c"] == 5
+    assert mw._non_fit_kwargs["d"] == 13
+    assert mw._non_fit_kwargs_keys == set(["c","d"])
 
     # kwargs -- should take anything, gracefully handle empty dict of non_fit_kwargs
     def model_to_test_wrap(**kwargs): pass
@@ -283,12 +291,10 @@ def test_ModelWrapper__load_model():
     assert len(mw._param_df) == 2
     assert mw._param_df.loc["a","guess"] == 0
     assert mw._param_df.loc["b","guess"] == 0
-    assert len(mw._other_arguments) == 0
+    assert len(mw._non_fit_kwargs) == 0
+    assert mw._non_fit_kwargs_keys == set([])
 
 
-
-
-    
 
 def test_ModelWrapper__setattr__():
 
@@ -301,9 +307,9 @@ def test_ModelWrapper__setattr__():
     assert mw._param_df.loc["a","guess"] == 10
 
     # test setting other parameter
-    assert mw._other_arguments["d"] == "test"
+    assert mw._non_fit_kwargs["d"] == "test"
     mw.__setattr__("d", 4)
-    assert mw._other_arguments["d"] == 4
+    assert mw._non_fit_kwargs["d"] == 4
 
     # test setting __dict__ parameter
     assert "something_else" not in mw.__dict__
@@ -319,7 +325,7 @@ def test_ModelWrapper___getattr__():
 
     # test getting on fit and other  parameters
     assert mw.__getattr__("a") == mw._param_df.loc["a","guess"]
-    assert mw.__getattr__("e") == mw._other_arguments["e"]
+    assert mw.__getattr__("e") == mw._non_fit_kwargs["e"]
 
     # test __dict__ get
     assert mw.__getattr__("blah") == "non_fit_attribute"
@@ -335,17 +341,44 @@ def test_ModelWrapper___getattr__():
         mw.__getattr__("not_an_attribute")
 
     
+def test_ModelWrapper__validate_non_fit_kwargs():
 
-def test_ModelWrapper__finalize_params():
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw._non_fit_kwargs_keys == set(["d","e"])
+
+    # Set value, should work
+    assert mw._non_fit_kwargs["e"] == 3
+    mw.non_fit_kwargs["e"] = 5
+    assert mw._non_fit_kwargs["e"] == 5
+    mw._validate_non_fit_kwargs()
+
+    # add extra value, should fail
+    assert len(mw._non_fit_kwargs) == 2
+    mw.non_fit_kwargs["f"] = 11
+    with pytest.raises(ValueError):
+        mw._validate_non_fit_kwargs()
+    
+    # remove needed value
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    mw = ModelWrapper(model_to_test_wrap)
+    assert mw._non_fit_kwargs_keys == set(["d","e"])
+    assert len(mw._non_fit_kwargs) == 2
+    mw.non_fit_kwargs.pop("e")
+    with pytest.raises(ValueError):
+        mw._validate_non_fit_kwargs()
+
+
+def test_ModelWrapper_finalize_params():
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
     
     # Check initial configuration after __init__
     assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
     assert len(mw._mw_kwargs) == 5
     assert mw._mw_kwargs["a"] == 1
     assert mw._mw_kwargs["b"] == 2
@@ -359,9 +392,9 @@ def test_ModelWrapper__finalize_params():
 
     # Make sure no change
     assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
     assert len(mw._mw_kwargs) == 5
     assert mw._mw_kwargs["a"] == 1
     assert mw._mw_kwargs["b"] == 2
@@ -376,9 +409,9 @@ def test_ModelWrapper__finalize_params():
 
     # Check for expected output
     assert np.array_equal(mw._fit_params_in_order,["a","b","c"])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["d"] == "test"
-    assert mw._other_arguments["e"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["d"] == "test"
+    assert mw._non_fit_kwargs["e"] == 3
     assert len(mw._mw_kwargs) == 5
     assert mw._mw_kwargs["a"] == 10
     assert mw._mw_kwargs["b"] == 2
@@ -393,6 +426,26 @@ def test_ModelWrapper__finalize_params():
     assert np.array_equal(mw.param_df.index,["a","b","c","not_a_param"])
     with pytest.raises(ValueError):
         mw.finalize_params()
+
+    # make sure it's running _validate_non_fit_kwargs
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
+    mw = ModelWrapper(model_to_test_wrap)
+    
+    # works fine
+    mw.finalize_params()
+    
+    # add extra parameter
+    mw.non_fit_kwargs["f"] = "extra_kwarg"
+    with pytest.raises(ValueError):
+        mw.finalize_params()
+
+    # remove offending parameter
+    mw.non_fit_kwargs.pop("f")
+    mw.finalize_params()
+    
+
+
+    
 
 
 def test_ModelWrapper__mw_observable():
@@ -586,13 +639,13 @@ def test_ModelWrapper_param_df():
     assert np.array_equal(mw.param_df["name"],["a","b","c"])    
     assert np.array_equal(mw.param_df["guess"],[10,20,30])
 
-def test_ModelWrapper_other_arguments():
+def test_ModelWrapper_non_fit_kwargs():
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
-    assert mw._other_arguments is mw.other_arguments
-    assert mw.other_arguments["d"] == "test"
-    assert mw.other_arguments["e"] == 3
+    assert mw._non_fit_kwargs is mw.non_fit_kwargs
+    assert mw.non_fit_kwargs["d"] == "test"
+    assert mw.non_fit_kwargs["e"] == 3
 
 def test_ModelWrapper_unfixed_mask():
     

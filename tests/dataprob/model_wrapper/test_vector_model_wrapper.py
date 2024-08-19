@@ -17,8 +17,8 @@ def test_VectorModelWrapper__init__():
     assert mw.param_df.loc["x","guess"] == 1
     assert mw.param_df.loc["y","guess"] == 2
     assert mw.param_df.loc["z","guess"] == 3
-    assert mw.other_arguments["a"] is None
-    assert mw.other_arguments["b"] == "test"
+    assert mw.non_fit_kwargs["a"] is None
+    assert mw.non_fit_kwargs["b"] == "test"
     assert mw._mw_observable() == 6
 
 def test_VectorModelWrapper__load_model():
@@ -29,7 +29,7 @@ def test_VectorModelWrapper__load_model():
         def __init__(self):
             self._default_guess = 0.0
             self._param_df = pd.DataFrame({"name":[]})
-            self._other_arguments = {}
+            self._non_fit_kwargs = {}
             
 
     mw = TestVectorModelWrapper()
@@ -113,9 +113,9 @@ def test_VectorModelWrapper__load_model():
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 6
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 6
 
     # fittable_param dict, good value, extra args in function, with kwargs. 
     # kwargs ignored because no new non_fit_kwargs
@@ -126,9 +126,9 @@ def test_VectorModelWrapper__load_model():
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 6
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 6
 
     # fittable_param dict, good value, extra args in function, with kwargs. 
     # new non_fit_kwargs in kwarg
@@ -139,10 +139,10 @@ def test_VectorModelWrapper__load_model():
                    non_fit_kwargs={"c":16,"d":17}) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
-    assert len(mw._other_arguments) == 3
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 16
-    assert mw._other_arguments["d"] == 17
+    assert len(mw._non_fit_kwargs) == 3
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 16
+    assert mw._non_fit_kwargs["d"] == 17
 
     # Should not work if first arg is in non_fit_kwargs
     mw = TestVectorModelWrapper()
@@ -181,9 +181,9 @@ def test_ModelWrapper__finalize_params():
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 1
     assert np.array_equal(mw._unfixed_mask,[True,True])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 3
     
     # Edit parameters
     mw.x = 10
@@ -192,9 +192,9 @@ def test_ModelWrapper__finalize_params():
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 10
     assert np.array_equal(mw._unfixed_mask,[True,True])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 3
 
     # Run function
     mw.finalize_params()
@@ -203,9 +203,9 @@ def test_ModelWrapper__finalize_params():
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 10
     assert np.array_equal(mw._unfixed_mask,[False,True])
-    assert len(mw._other_arguments) == 2
-    assert mw._other_arguments["b"] is None
-    assert mw._other_arguments["c"] == 3
+    assert len(mw._non_fit_kwargs) == 2
+    assert mw._non_fit_kwargs["b"] is None
+    assert mw._non_fit_kwargs["c"] == 3
 
     # send in bad edit -- finalize should catch it
     mw.param_df.loc["a","fixed"] = True
@@ -225,7 +225,7 @@ def test_VectorModelWrapper__mw_observable():
     assert mw.param_df.loc["a","guess"] == 20
     assert mw.param_df.loc["b","guess"] == 30
     assert mw.param_df.loc["c","guess"] == 50
-    assert mw.other_arguments["z"] == "test"
+    assert mw.non_fit_kwargs["z"] == "test"
 
     # not enough
     with pytest.raises(ValueError):

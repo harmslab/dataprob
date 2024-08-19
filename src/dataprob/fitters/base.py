@@ -380,7 +380,15 @@ class Fitter:
         """
 
         return self._model.param_df
+    
+    @property
+    def non_fit_kwargs(self):
+        """
+        Return a dictionary with the keyword arguments to pass to the function
+        that are not fit parameters.
+        """
         
+        return self._model.non_fit_kwargs
         
     @property
     def data_df(self):
