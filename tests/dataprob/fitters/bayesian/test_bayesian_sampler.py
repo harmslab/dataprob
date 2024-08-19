@@ -20,58 +20,7 @@ def test_BayesianSampler__init__():
 
     # default args work. check to make sure super().__init__ actually ran.
     f = BayesianSampler(some_function=test_fcn)
-    assert f.fit_type == "bayesian"
     assert f.num_obs is None
-
-    # args are being set
-    f = BayesianSampler(some_function=test_fcn,
-                        num_walkers=100,
-                        use_ml_guess=True,
-                        num_steps=100,
-                        burn_in=0.1,
-                        num_threads=1)
-
-    assert f._num_walkers == 100
-    assert f._use_ml_guess is True
-    assert f._num_steps == 100
-    assert np.isclose(f._burn_in,0.1)
-    assert f._num_threads == 1
-    assert f._success is None
-    assert f.fit_type == "bayesian"
-
-    # check num threads passing
-    with pytest.raises(NotImplementedError):
-        f = BayesianSampler(some_function=test_fcn,
-                            num_walkers=100,
-                            use_ml_guess=True,
-                            num_steps=100,
-                            burn_in=0.1,
-                            num_threads=0)
-        
-    with pytest.raises(NotImplementedError):
-        f = BayesianSampler(some_function=test_fcn,
-                            num_walkers=100,
-                            use_ml_guess=True,
-                            num_steps=100,
-                            burn_in=0.1,
-                            num_threads=10)
-    
-    # Pass bad value into each kwarg to make sure checker is running
-    with pytest.raises(ValueError):
-        f = BayesianSampler(some_function=test_fcn,
-                            num_walkers=0)        
-    with pytest.raises(ValueError):
-        f = BayesianSampler(some_function=test_fcn,
-                            use_ml_guess="not a bool")
-    with pytest.raises(ValueError):
-        f = BayesianSampler(some_function=test_fcn,
-                            num_steps=1.2)
-    with pytest.raises(ValueError):
-        f = BayesianSampler(some_function=test_fcn,
-                            burn_in=0.0)
-    with pytest.raises(ValueError):
-        f = BayesianSampler(some_function=test_fcn,
-                            num_threads=-2)
 
 def test__setup_priors():
 
@@ -377,6 +326,76 @@ def test_BayesianSampler_ln_prob(linear_fit):
     with pytest.raises(ValueError):
         f.ln_prob([1,2,3])
 
+def test_BayesianSampler_fit():
+
+    def test_fcn(m,b,x): return m*x + b
+
+    f = BayesianSampler(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+    y_obs = np.arange(10)*1 + 2
+    y_std = 1.0
+
+    f.fit(y_obs=y_obs,
+          y_std=y_std,
+          num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
+
+    assert f._num_walkers == 10
+    assert f._use_ml_guess is True
+    assert f._num_steps == 10
+    assert np.isclose(f._burn_in,0.1)
+    assert f._num_threads == 1
+    
+    # check num threads passing
+    with pytest.raises(NotImplementedError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_walkers=10,
+              use_ml_guess=True,
+              num_steps=10,
+              burn_in=0.1,
+              num_threads=0)
+        
+    with pytest.raises(NotImplementedError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_walkers=10,
+              use_ml_guess=True,
+              num_steps=10,
+              burn_in=0.1,
+              num_threads=10)
+    
+    # Pass bad value into each kwarg to make sure checker is running
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_walkers=0)        
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              use_ml_guess="not a bool")
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_steps=1.2)
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              burn_in=0.0)
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_threads=-2)
+        
+    with pytest.raises(TypeError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              not_an_emcee_kwarg="five")
+
+
 def test_BayesianSampler__fit(linear_fit):
     
     df = linear_fit["df"]
@@ -388,12 +407,8 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=True,
-                        num_steps=10,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
+    
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -405,7 +420,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -422,12 +441,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=False,
-                        num_steps=10,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
     
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -442,7 +456,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=False,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # look for non-ML guess
@@ -459,12 +477,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=9,
-                        use_ml_guess=True,
-                        num_steps=20,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
     
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -477,7 +490,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=9,
+          use_ml_guess=True,
+          num_steps=20,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -494,12 +511,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=True,
-                        num_steps=10,
-                        burn_in=0.5,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
     
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -512,7 +524,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.5,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -529,12 +545,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from no ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=False,
-                        num_steps=10,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
     
     
     f.param_df.loc["b","fixed"] = True
@@ -553,7 +564,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=False,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -571,12 +586,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=True,
-                        num_steps=10,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
 
     f.param_df.loc["b","fixed"] = True
 
@@ -592,7 +602,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -610,12 +624,7 @@ def test_BayesianSampler__fit(linear_fit):
     # Very small analysis, starting from ML
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        use_ml_guess=True,
-                        num_steps=10,
-                        burn_in=0.1,
-                        num_threads=1)
+                        non_fit_kwargs={"x":df.x})
 
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -628,7 +637,11 @@ def test_BayesianSampler__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -640,7 +653,11 @@ def test_BayesianSampler__fit(linear_fit):
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
     # now run again
-    f.fit()
+    f.fit(num_walkers=10,
+          use_ml_guess=True,
+          num_steps=10,
+          burn_in=0.1,
+          num_threads=1)
 
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert f._initial_state.shape == (10,2)
@@ -685,10 +702,7 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     # super small sampler
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        num_steps=10,
-                        use_ml_guess=False)
+                        non_fit_kwargs={"x":df.x})
 
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -719,7 +733,9 @@ def test_BayesianSampler__update_fit_df(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit()
+    f.fit(num_walkers=10,
+          num_steps=10,
+          use_ml_guess=False)
     assert f._fit_has_been_run is True
 
     # now fit_df should have been updated with guesses etc. 
@@ -740,10 +756,7 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     # super small sampler
     f = BayesianSampler(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_walkers=10,
-                        num_steps=10,
-                        use_ml_guess=False)
+                        non_fit_kwargs={"x":df.x})
     
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -752,27 +765,46 @@ def test_BayesianSampler__update_fit_df(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit()
+    f.fit(num_walkers=10,
+          num_steps=10,
+          use_ml_guess=False)
     assert f._fit_has_been_run is True
 
     assert f.samples.shape == (90,2)
     f._samples = f._samples[:5,:]
     f._update_fit_df()
 
+    with pytest.raises(TypeError):
+        f.fit(num_walkers=10,
+              num_steps=10,
+              use_ml_guess=False,
+              not_an_emcee_kwarg=5)
 
 
 def test_BayesianSampler_fit_info():
     
-    def test_fcn(a,b): return a*b
+    def test_fcn(m,b,x): return m*x + b
+    f = BayesianSampler(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+    y_obs = 2*np.arange(10) + 1
+    y_std = 0.1
 
-    f = BayesianSampler(some_function=test_fcn)
+    assert len(f.fit_info) == 1
+    assert f.fit_info["Final sample number"] is None
+
+    f.fit(y_obs=y_obs,
+          y_std=y_std,
+          num_walkers=10,
+          num_steps=10,
+          burn_in=0.1)
+
     assert f.fit_info["Num walkers"] == f._num_walkers
     assert f.fit_info["Use ML guess"] == f._use_ml_guess
     assert f.fit_info["Num steps"] == f._num_steps
     assert f.fit_info["Burn in"] == f._burn_in
     assert f.fit_info["Num threads"] == f._num_threads
 
-    assert f.fit_info["Final sample number"] is None
+    assert f.fit_info["Final sample number"] == 90
     f._samples = np.zeros((100,2))
     assert f.fit_info["Final sample number"] == 100
     
@@ -783,10 +815,10 @@ def test_BayesianSampler___repr__():
     def model_to_wrap(m=1,x=np.array([1,2,3])): return m*x
     
     # Run _fit_has_been_run, success branch
-    f = BayesianSampler(some_function=model_to_wrap,
-                        num_steps=10)
+    f = BayesianSampler(some_function=model_to_wrap)
     f.fit(y_obs=np.array([2,4,6]),
-          y_std=[0.1,0.1,0.1])
+          y_std=[0.1,0.1,0.1],
+          num_steps=10)
 
     out = f.__repr__().split("\n")
     assert len(out) == 23
@@ -798,9 +830,8 @@ def test_BayesianSampler___repr__():
     assert len(out) == 18 
 
     # Run not _fit_has_been_run
-    f = BayesianSampler(some_function=model_to_wrap,
-                        num_steps=10)
+    f = BayesianSampler(some_function=model_to_wrap)
     
     out = f.__repr__().split("\n")
-    assert len(out) == 14
+    assert len(out) == 9
 

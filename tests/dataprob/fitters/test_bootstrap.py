@@ -13,20 +13,55 @@ def test_BootstrapFitter__init():
     def test_fcn(a,b): return None
 
     f = BootstrapFitter(some_function=test_fcn)
-    assert f.fit_type == "bootstrap"
     assert f.num_obs is None
 
-    f = BootstrapFitter(some_function=test_fcn,
-                        num_bootstrap=5)
-    assert f._num_bootstrap == 5
 
-    # check value checking
+def test_BootstrapFitter_fit():
+
+    def test_fcn(m,b,x): return m*x + b
+
+    f = BootstrapFitter(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+    y_obs = np.arange(10)*1 + 2
+    y_std = 1.0
+
+    f.fit(y_obs=y_obs,
+          y_std=y_std,
+          num_bootstrap=3)
+
+    assert f._num_bootstrap == 3
+
+    # This will only warn because the fitter will catch the failure and record
+    # it as a failure. It will stick 3 nan values into the samples array
+    with pytest.warns():
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_bootstrap=3,
+              not_real_scipy_optimize_kwarg=5)
+    assert f.samples.shape == (6,2)
+    assert np.sum(np.isnan(f.samples[:3,:])) == 0
+    assert np.sum(np.isnan(f.samples[3:,:])) == 6
+        
+    # Make a new fitter because of wackiness above
+    f = BootstrapFitter(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+
     with pytest.raises(ValueError):
-        BootstrapFitter(some_function=test_fcn,
-                        num_bootstrap=0)
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_bootstrap="not_an_integer")
+        
+    # Need at least two to work
     with pytest.raises(ValueError):
-        BootstrapFitter(some_function=test_fcn,
-                        num_bootstrap="a")
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_bootstrap=1)
+        
+    f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_bootstrap=2)
+
+
 
 def test_BootstrapFitter__fit(linear_fit):
     
@@ -38,8 +73,7 @@ def test_BootstrapFitter__fit(linear_fit):
 
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_bootstrap=10)
+                        non_fit_kwargs={"x":df.x})
 
     f.y_obs = df.y_obs
     f.y_std = df.y_std
@@ -51,7 +85,7 @@ def test_BootstrapFitter__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_bootstrap=10)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -68,7 +102,7 @@ def test_BootstrapFitter__fit(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit()
+    f.fit(num_bootstrap=10)
     assert f._fit_has_been_run is True
 
     assert np.array_equal(f.samples.shape,[20,2]) 
@@ -80,8 +114,7 @@ def test_BootstrapFitter__fit(linear_fit):
     # success == False
 
     def bad_model(a,b): return np.ones(10)*np.nan
-    f = BootstrapFitter(some_function=bad_model,
-                        num_bootstrap=10)
+    f = BootstrapFitter(some_function=bad_model)
     f.y_obs = df.y_obs
     f.y_std = df.y_std
     
@@ -93,7 +126,7 @@ def test_BootstrapFitter__fit(linear_fit):
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely.
     with pytest.warns(): 
-        f.fit()
+        f.fit(num_bootstrap=10)
     assert f._fit_has_been_run is True
     
     # Should not succeed and should not update fit_df
@@ -106,8 +139,7 @@ def test_BootstrapFitter__fit(linear_fit):
 
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_bootstrap=10)
+                        non_fit_kwargs={"x":df.x})
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -119,7 +151,8 @@ def test_BootstrapFitter__fit(linear_fit):
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
     with pytest.warns():
-        f.fit(max_nfev=1)
+        f.fit(num_bootstrap=10,
+              max_nfev=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -133,7 +166,7 @@ def test_BootstrapFitter__fit(linear_fit):
     # because lots of samples are nan from last runs. 
 
     with pytest.warns():
-        f.fit()
+        f.fit(num_bootstrap=10)
     assert f._fit_has_been_run is True
 
     assert np.array_equal(f.samples.shape,[20,2]) 
@@ -214,8 +247,7 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     # super small sampler
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_bootstrap=5)
+                        non_fit_kwargs={"x":df.x})
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -245,7 +277,7 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit()
+    f.fit(num_bootstrap=5)
     assert f._fit_has_been_run is True
 
     # now fit_df should have been updated with guesses etc. 
@@ -266,8 +298,7 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     # super small sampler
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x},
-                        num_bootstrap=5)
+                        non_fit_kwargs={"x":df.x})
     f.y_obs = df.y_obs
     f.y_std = df.y_std
 
@@ -275,7 +306,7 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit()
+    f.fit(num_bootstrap=5)
     assert f._fit_has_been_run is True
 
     assert f.samples.shape == (5,2)
@@ -305,4 +336,4 @@ def test_BootstrapFitter___repr__():
     f = BootstrapFitter(some_function=model_to_wrap)
 
     out = f.__repr__().split("\n")
-    assert len(out) == 9
+    assert len(out) == 8

@@ -57,7 +57,6 @@ def test_Fitter__init__():
     assert issubclass(type(f._model),ModelWrapper)
 
     assert f._fit_has_been_run is False
-    assert f._fit_type == ""
 
     # Make sure fit_parameters, non_fit_kwargs are being passed
     def test_model(m,b,x): return m*x + b
@@ -101,7 +100,10 @@ def test_Fitter__sanity_check():
     kwargs = copy.deepcopy(base_kwargs)
     f = Fitter(**kwargs)
 
-    f._sanity_check("some error",["fit_type"])
+    # should always work
+    f._sanity_check("some error",["fit_has_been_run"])
+
+    # Won't work
     with pytest.raises(RuntimeError):
         f._sanity_check("some error",["not_an_attribute"])
 
@@ -957,15 +959,6 @@ def test_Fitter_num_obs():
     f = Fitter(some_function=test_fcn)
     f.y_obs = np.array([])
     assert f.num_obs == 0
-
-
-def test_Fitter_fit_type():
-    
-    def test_fcn(a=2,b=3,c=4): return a*b*c
-    f = Fitter(some_function=test_fcn)
-    assert f.fit_type == ""
-    f._fit_type = "something"
-    assert f.fit_type == "something"
 
 def test_Fitter_success():
     

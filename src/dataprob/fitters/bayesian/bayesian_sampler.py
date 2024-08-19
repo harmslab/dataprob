@@ -26,72 +26,6 @@ class BayesianSampler(Fitter):
     """
     Use Bayesian MCMC to sample parameter space. 
     """
-    def __init__(self,
-                 some_function,
-                 fit_parameters=None,
-                 non_fit_kwargs=None,
-                 vector_first_arg=False,
-                 num_walkers=100,
-                 use_ml_guess=True,
-                 num_steps=100,
-                 burn_in=0.1,
-                 num_threads=1):
-        """
-        Initialize the bayesian sampler.
-
-        Parameters
-        ----------
-        num_walkers : int, default=100
-            number of markov chains to use in the analysis
-        use_ml_guess : bool, default=True
-            if true, do a maximum likelihood maximization then sample from the
-            fit parameter covariance matrix to get the initial chain positions
-        num_steps: int, default=100
-            number of steps to run each markov chain
-        burn_in : float, default = 0.1
-            fraction of samples to discard from the start of the run
-        num_threads : int
-            number of threads to use.  if `0`, use the total number of cpus. 
-            [NOT YET IMPLEMENTED]
-        """
-
-        super().__init__(some_function=some_function,
-                         fit_parameters=fit_parameters,
-                         non_fit_kwargs=non_fit_kwargs,
-                         vector_first_arg=vector_first_arg)
-
-        # Set keywords, validating as we go
-        self._num_walkers = check_int(value=num_walkers,
-                                      variable_name="num_walkers",
-                                      minimum_allowed=1)    
-        self._use_ml_guess = check_bool(value=use_ml_guess,
-                                        variable_name="use_ml_guess")
-        self._num_steps = check_int(value=num_steps,
-                                    variable_name="num_steps",
-                                    minimum_allowed=1)
-        self._burn_in = check_float(value=burn_in,
-                                    variable_name="burn_in",
-                                    minimum_allowed=0,
-                                    maximum_allowed=1,
-                                    minimum_inclusive=False,
-                                    maximum_inclusive=False)
-
-        # Deal with number of threads
-        num_threads = check_int(value=num_threads,
-                                variable_name="num_threads",
-                                minimum_allowed=0)                
-        if num_threads == 0:
-            num_threads = multiprocessing.cpu_count()
-
-        if num_threads != 1:
-            err = "multithreading has not yet been implemented (yet!).\n"
-            raise NotImplementedError(err)
-        
-        self._num_threads = num_threads
-
-        # Finalize initialization
-        self._success = None
-        self._fit_type = "bayesian"
 
     def _setup_priors(self):
         """
@@ -256,6 +190,77 @@ class BayesianSampler(Fitter):
         
         return self._ln_prob(param)
 
+    def fit(self,
+            y_obs=None,
+            y_std=None,
+            num_walkers=100,
+            use_ml_guess=True,
+            num_steps=100,
+            burn_in=0.1,
+            num_threads=1,
+            **emcee_kwargs):
+        """
+        Perform Bayesian MCMC sampling of parameter values. 
+
+        Parameters
+        ----------
+        y_obs : numpy.ndarray
+            observations in a numpy array of floats that matches the shape
+            of the output of some_function set when initializing the fitter. 
+            nan values are not allowed. y_obs must either be specified here 
+            or in the data_df dataframe. 
+        y_std : numpy.ndarray
+            standard deviation of each observation. nan values are not allowed.
+            If not specified, all points are assigned an uncertainty of
+            0.1*mean(y_obs). 
+        num_walkers : int, default=100
+            number of markov chains to use in the analysis
+        use_ml_guess : bool, default=True
+            if true, do a maximum likelihood maximization then sample from the
+            fit parameter covariance matrix to get the initial chain positions
+        num_steps: int, default=100
+            number of steps to run each markov chain
+        burn_in : float, default = 0.1
+            fraction of samples to discard from the start of the run
+        num_threads : int
+            number of threads to use.  if `0`, use the total number of cpus. 
+            [NOT YET IMPLEMENTED]
+        """
+        
+        # Set keywords, validating as we go
+        self._num_walkers = check_int(value=num_walkers,
+                                      variable_name="num_walkers",
+                                      minimum_allowed=1)    
+        self._use_ml_guess = check_bool(value=use_ml_guess,
+                                        variable_name="use_ml_guess")
+        self._num_steps = check_int(value=num_steps,
+                                    variable_name="num_steps",
+                                    minimum_allowed=1)
+        self._burn_in = check_float(value=burn_in,
+                                    variable_name="burn_in",
+                                    minimum_allowed=0,
+                                    maximum_allowed=1,
+                                    minimum_inclusive=False,
+                                    maximum_inclusive=False)
+
+        # Deal with number of threads
+        num_threads = check_int(value=num_threads,
+                                variable_name="num_threads",
+                                minimum_allowed=0)                
+        if num_threads == 0:
+            num_threads = multiprocessing.cpu_count()
+
+        if num_threads != 1:
+            err = "multithreading has not yet been implemented (yet!).\n"
+            raise NotImplementedError(err)
+        
+        self._num_threads = num_threads
+
+        super().fit(y_obs=y_obs,
+                    y_std=y_std,
+                    **emcee_kwargs)     
+
+
     def _fit(self,**kwargs):
         """
         Fit the parameters.
@@ -367,10 +372,19 @@ class BayesianSampler(Fitter):
         """
 
         output = {}
-        output["Num walkers"] = self._num_walkers
-        output["Use ML guess"] = self._use_ml_guess
-        output["Num steps"] = self._num_steps
-        output["Burn in"] = self._burn_in
+
+        if hasattr(self,"_num_walkers"):
+            output["Num walkers"] = self._num_walkers
+        
+        if hasattr(self,"_use_ml_guess"):
+            output["Use ML guess"] = self._use_ml_guess
+        
+        if hasattr(self,"_num_steps"):
+            output["Num steps"] = self._num_steps
+        
+        if hasattr(self,"_burn_in"):
+            output["Burn in"] = self._burn_in
+
 
         if self.samples is not None:
             num_samples = self.samples.shape[0]
@@ -379,7 +393,8 @@ class BayesianSampler(Fitter):
 
         output["Final sample number"] = num_samples
         
-        output["Num threads"] = self._num_threads
+        if hasattr(self,"_num_threads"):
+            output["Num threads"] = self._num_threads
 
         return output
     

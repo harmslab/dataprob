@@ -16,31 +16,40 @@ class BootstrapFitter(Fitter):
     Perform the fit many times, sampling from uncertainty in each measurement.
     """
 
-    def __init__(self,
-                 some_function,
-                 fit_parameters=None,
-                 non_fit_kwargs=None,
-                 vector_first_arg=False,
-                 num_bootstrap=100):
+    def fit(self,
+            y_obs=None,
+            y_std=None,
+            num_bootstrap=100,
+            **least_squares_kwargs):
         """
-        Perform the fit many times, sampling from uncertainty in each
-        measurement.
+        Fit the model parameters to the data by maximum likelihood, sampling 
+        uncertainty in observation values by bootstrap. 
 
         Parameters
         ----------
+        y_obs : numpy.ndarray
+            observations in a numpy array of floats that matches the shape
+            of the output of some_function set when initializing the fitter. 
+            nan values are not allowed. y_obs must either be specified here 
+            or in the data_df dataframe. 
+        y_std : numpy.ndarray
+            standard deviation of each observation. nan values are not allowed.
+            If not specified, all points are assigned an uncertainty of
+            0.1*mean(y_obs). 
         num_bootstrap : int
-            Number of bootstrap samples to do
+            Number of bootstrap samples to run
+        **least_squares_kwargs : 
+            any remaining keyword arguments are passed as **kwargs to
+            scipy.optimize.least_squares
         """
-
-        super().__init__(some_function=some_function,
-                         fit_parameters=fit_parameters,
-                         non_fit_kwargs=non_fit_kwargs,
-                         vector_first_arg=vector_first_arg)
-
+        
         self._num_bootstrap = check_int(value=num_bootstrap,
                                         variable_name="num_bootstrap",
                                         minimum_allowed=2)
-        self._fit_type = "bootstrap"
+
+        super().fit(y_obs=y_obs,
+                    y_std=y_std,
+                    **least_squares_kwargs)    
 
     def _fit(self,**kwargs):
         """
@@ -191,7 +200,8 @@ class BootstrapFitter(Fitter):
 
         output = {}
 
-        output["Num bootstrap"] = self._num_bootstrap
+        if hasattr(self,"_num_bootstrap"):
+            output["Num bootstrap"] = self._num_bootstrap
 
         return output
     

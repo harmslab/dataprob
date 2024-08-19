@@ -28,7 +28,7 @@ def test_plot_corner():
     f._success = False
     f._samples = fake_samples
 
-    # no fit_type specified
+    # no success
     with pytest.raises(RuntimeError):
         plot_corner(f=f)
 

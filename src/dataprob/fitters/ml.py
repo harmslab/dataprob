@@ -2,7 +2,8 @@
 Fitter subclass for performing maximum likelihood fits.
 """
 
-from .base import Fitter
+from dataprob.fitters.base import Fitter
+from dataprob.check import check_int
 
 import numpy as np
 import scipy.stats
@@ -18,43 +19,40 @@ class MLFitter(Fitter):
     estimates are determined using the covariance matrix (Jacobian * residual
     variance) 
     """
-    def __init__(self,
-                 some_function,
-                 fit_parameters=None,
-                 non_fit_kwargs=None,
-                 vector_first_arg=False,
-                 num_samples=100000):
+    
+    def fit(self,
+            y_obs=None,
+            y_std=None,
+            num_samples=100000,
+            **least_squares_kwargs):
         """
-        Initialize the fitter.
+        Fit the model parameters to the data by maximum likelihood.
 
         Parameters
         ----------
-        some_function : callable
-            A function that takes at least one argument and returns a float numpy
-            array. Compare the outputs of this function against y_obs when doing
-            the analysis. 
-        fit_parameters : list, dict, str, pandas.DataFrame; optional
-            fit_parameters lets the user specify information about the parameters 
-            in the fit. 
-        non_fit_kwargs : dict
-            non_fit_kwargs are keyword arguments for some_function that should not
-            be fit but need to be specified to non-default values. 
-        vector_first_arg : bool, default=False
-            If True, the first argument of the function is taken as a vector of 
-            parameters to fit. All other arguments to some_function are treated as 
-            non-fittable parameters. fit_parameters must then specify the names of
-            each vector element. 
+        y_obs : numpy.ndarray
+            observations in a numpy array of floats that matches the shape
+            of the output of some_function set when initializing the fitter. 
+            nan values are not allowed. y_obs must either be specified here 
+            or in the data_df dataframe. 
+        y_std : numpy.ndarray
+            standard deviation of each observation. nan values are not allowed.
+            If not specified, all points are assigned an uncertainty of
+            0.1*mean(y_obs). 
         num_samples : int
             number of samples for generating corner plot
+        **least_squares_kwargs : 
+            any remaining keyword arguments are passed as **kwargs to
+            scipy.optimize.least_squares
         """
+        
+        self._num_samples = check_int(value=num_samples,
+                                      variable_name="num_samples",
+                                      minimum_allowed=0)
 
-        super().__init__(some_function=some_function,
-                         fit_parameters=fit_parameters,
-                         non_fit_kwargs=non_fit_kwargs,
-                         vector_first_arg=vector_first_arg)
-
-        self._fit_type = "maximum likelihood"
-        self._num_samples = num_samples
+        super().fit(y_obs=y_obs,
+                    y_std=y_std,
+                    **least_squares_kwargs)                         
 
     def _fit(self,**kwargs):
         """

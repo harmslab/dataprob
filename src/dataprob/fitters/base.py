@@ -36,7 +36,25 @@ class Fitter:
                  non_fit_kwargs=None,
                  vector_first_arg=False):
         """
-        Init function for the class.
+        Initialize the fitter.
+
+        Parameters
+        ----------
+        some_function : callable
+            A function that takes at least one argument and returns a float numpy
+            array. Compare the outputs of this function against y_obs when doing
+            the analysis. 
+        fit_parameters : list, dict, str, pandas.DataFrame; optional
+            fit_parameters lets the user specify information about the parameters 
+            in the fit. 
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for some_function that should not
+            be fit but need to be specified to non-default values. 
+        vector_first_arg : bool, default=False
+            If True, the first argument of the function is taken as a vector of 
+            parameters to fit. All other arguments to some_function are treated as 
+            non-fittable parameters. fit_parameters must then specify the names of
+            each vector element. 
         """
 
         # Load the model. Copy in ModelWrapper if passed in; otherwise, create
@@ -56,7 +74,6 @@ class Fitter:
         # the setter functions like guesses, etc. that would influence the
         # fit results.
         self._fit_has_been_run = False
-        self._fit_type = ""
 
     def _sanity_check(self,call_string,attributes_to_check):
         """
@@ -614,13 +631,6 @@ class Fitter:
             return self._y_obs.shape[0]
         except AttributeError:
             return None
-        
-    @property
-    def fit_type(self):
-        """
-        Fit type as a string. 
-        """
-        return self._fit_type
 
     @property
     def success(self):

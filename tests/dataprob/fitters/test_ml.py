@@ -10,10 +10,38 @@ def test_MLFitter___init__():
 
     def test_fcn(a,b): return a*b
 
+    f = MLFitter(some_function=test_fcn)
+    assert f.num_obs is None
+
+def test_MLFitter_fit():
+
+    def test_fcn(m,b,x): return m*x + b
+
     f = MLFitter(some_function=test_fcn,
-                 num_samples=100)
-    assert f.fit_type == "maximum likelihood"
+                 non_fit_kwargs={"x":np.arange(10)})
+    y_obs = np.arange(10)*1 + 2
+    y_std = 1.0
+
+    f.fit(y_obs=y_obs,
+          y_std=y_std,
+          num_samples=100)
+
     assert f._num_samples == 100
+
+    # This tests that the scipy.optimize.least_squares pass is happening 
+    # correctly.
+    with pytest.raises(TypeError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_samples=100,
+              not_real_scipy_optimize_kwarg=5)
+        
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              num_samples="not_an_integer")
+
+
 
 def test_MLFitter__fit(linear_fit):
 
