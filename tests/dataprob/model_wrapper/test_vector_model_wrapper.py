@@ -171,7 +171,7 @@ def test_VectorModelWrapper__load_model():
 
 
     
-def test_ModelWrapper__finalize_params():
+def test_VectorModelWrapper__finalize_params():
 
     def model_to_test_wrap(a,b,c=3): return a[0]*a[1]*b*c
     mw = VectorModelWrapper(model_to_test_wrap,
@@ -186,7 +186,7 @@ def test_ModelWrapper__finalize_params():
     assert mw._non_fit_kwargs["c"] == 3
     
     # Edit parameters
-    mw.x = 10
+    mw.param_df.loc["x","guess"] = 10
     mw.param_df.loc["x","fixed"] = True
 
     assert np.array_equal(mw._fit_params_in_order,["x","y"])

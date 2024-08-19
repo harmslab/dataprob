@@ -294,52 +294,6 @@ def test_ModelWrapper__load_model():
     assert len(mw._non_fit_kwargs) == 0
     assert mw._non_fit_kwargs_keys == set([])
 
-
-
-def test_ModelWrapper__setattr__():
-
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    mw = ModelWrapper(model_to_test_wrap)
-    
-    # test setting fit parameter
-    assert mw._param_df.loc["a","guess"] == 1
-    mw.__setattr__("a",10)
-    assert mw._param_df.loc["a","guess"] == 10
-
-    # test setting other parameter
-    assert mw._non_fit_kwargs["d"] == "test"
-    mw.__setattr__("d", 4)
-    assert mw._non_fit_kwargs["d"] == 4
-
-    # test setting __dict__ parameter
-    assert "something_else" not in mw.__dict__
-    mw.__setattr__("something_else",10)
-    assert mw.__dict__["something_else"] == 10
-
-
-def test_ModelWrapper___getattr__():
-
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    mw = ModelWrapper(model_to_test_wrap)
-    mw.blah = "non_fit_attribute"
-
-    # test getting on fit and other  parameters
-    assert mw.__getattr__("a") == mw._param_df.loc["a","guess"]
-    assert mw.__getattr__("e") == mw._non_fit_kwargs["e"]
-
-    # test __dict__ get
-    assert mw.__getattr__("blah") == "non_fit_attribute"
-
-    # test __getattribute__ fallback got @property getter
-    assert mw.__getattr__("param_df") is mw._param_df
-    
-    # test __getattribute__ fallback for built in method
-    assert mw.__getattr__("__init__") == mw.__init__
-
-    # Final fail
-    with pytest.raises(AttributeError):
-        mw.__getattr__("not_an_attribute")
-
     
 def test_ModelWrapper__validate_non_fit_kwargs():
 
@@ -387,7 +341,7 @@ def test_ModelWrapper_finalize_params():
     assert mw._mw_kwargs["e"] == 3
 
     # Edit parameters
-    mw.a = 10
+    mw.param_df.loc["a","guess"] = 10
     mw.param_df.loc["a","fixed"] = True
 
     # Make sure no change
@@ -489,48 +443,48 @@ def test_ModelWrapper_update_params(spreadsheets):
     # read from spreadsheet
     def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
     mw = ModelWrapper(model_to_test_wrap)
-    assert mw.K1 == 1
-    assert mw.K2 == 2
-    assert mw.K3 == 3
+    assert mw.param_df.loc["K1","guess"] == 1
+    assert mw.param_df.loc["K2","guess"] == 2
+    assert mw.param_df.loc["K3","guess"] == 3
 
     xlsx = spreadsheets["basic-spreadsheet.xlsx"]
     mw.update_params(xlsx)
-    assert np.isclose(mw.K1,1.00E+07)
-    assert np.isclose(mw.K2,1.00E-06)
-    assert np.isclose(mw.K3,1.00E+00)
+    assert np.isclose(mw.param_df.loc["K1","guess"],1.00E+07)
+    assert np.isclose(mw.param_df.loc["K2","guess"],1.00E-06)
+    assert np.isclose(mw.param_df.loc["K3","guess"],1.00E+00)
 
     # read from df
     def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
     mw = ModelWrapper(model_to_test_wrap)
-    assert mw.K1 == 1
-    assert mw.K2 == 2
-    assert mw.K3 == 3
+    assert mw.param_df.loc["K1","guess"] == 1
+    assert mw.param_df.loc["K2","guess"] == 2
+    assert mw.param_df.loc["K3","guess"] == 3
 
     input_df = pd.read_excel(xlsx)
     mw.update_params(input_df)
-    assert np.isclose(mw.K1,1.00E+07)
-    assert np.isclose(mw.K2,1.00E-06)
-    assert np.isclose(mw.K3,1.00E+00)
+    assert np.isclose(mw.param_df.loc["K1","guess"],1.00E+07)
+    assert np.isclose(mw.param_df.loc["K2","guess"],1.00E-06)
+    assert np.isclose(mw.param_df.loc["K3","guess"],1.00E+00)
 
     # read from dict
     def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
     mw = ModelWrapper(model_to_test_wrap)
-    assert mw.K1 == 1
-    assert mw.K2 == 2
-    assert mw.K3 == 3
+    assert mw.param_df.loc["K1","guess"] == 1
+    assert mw.param_df.loc["K2","guess"] == 2
+    assert mw.param_df.loc["K3","guess"] == 3
 
     input_dict = {"K1":{"guess":20}}
     mw.update_params(input_dict)
-    assert mw.K1 == 20
-    assert mw.K2 == 2
-    assert mw.K3 == 3
+    assert mw.param_df.loc["K1","guess"] == 20
+    assert mw.param_df.loc["K2","guess"] == 2
+    assert mw.param_df.loc["K3","guess"] == 3
 
     # bad input
     def model_to_test_wrap(K1=1,K2=2,K3=3,d="test",e=3): return K1*K2*K3
     mw = ModelWrapper(model_to_test_wrap)
-    assert mw.K1 == 1
-    assert mw.K2 == 2
-    assert mw.K3 == 3
+    assert mw.param_df.loc["K1","guess"] == 1
+    assert mw.param_df.loc["K2","guess"] == 2
+    assert mw.param_df.loc["K3","guess"] == 3
 
     input_dict = {"K1":20}
     with pytest.raises(ValueError):
@@ -674,7 +628,7 @@ def test_ModelWrapper___repr__():
 
     # This will force truncated variable lines to run by making super huge
     # c fixed argument
-    mw.c = pd.DataFrame({"out":np.arange(1000)})
+    mw.non_fit_kwargs["c"] = pd.DataFrame({"out":np.arange(1000)})
     out = mw.__repr__().split("\n")
     assert len(out) == 27
 

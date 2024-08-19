@@ -595,66 +595,61 @@
 ./build/lib/dataprob/model_wrapper/model_wrapper.py:178:1: W293 blank line contains whitespace
 ./build/lib/dataprob/model_wrapper/model_wrapper.py:182:76: W291 trailing whitespace
 ./build/lib/dataprob/model_wrapper/model_wrapper.py:183:75: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:190:5: E303 too many blank lines (2)
-./build/lib/dataprob/model_wrapper/model_wrapper.py:200:33: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:214:25: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:222:42: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:233:16: E111 indentation is not a multiple of 4
-./build/lib/dataprob/model_wrapper/model_wrapper.py:242:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:253:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:257:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:261:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:265:5: E303 too many blank lines (2)
-./build/lib/dataprob/model_wrapper/model_wrapper.py:268:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:269:28: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:271:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:272:76: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:277:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:279:65: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:280:83: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:283:18: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:286:54: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:289:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:292:28: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:294:46: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:300:58: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:302:37: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:319:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:320:27: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:322:39: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:338:68: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:343:79: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:345:57: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:349:40: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:355:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:364:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:365:33: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:371:75: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:372:26: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:381:24: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:383:60: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:389:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:193:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:204:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:208:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:212:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:216:5: E303 too many blank lines (2)
+./build/lib/dataprob/model_wrapper/model_wrapper.py:219:74: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:220:28: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:222:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:223:76: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:228:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:230:65: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:231:83: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:234:18: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:237:54: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:240:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:243:28: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:245:46: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:251:58: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:253:37: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:270:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:271:27: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:273:39: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:289:68: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:294:79: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:296:57: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:300:40: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:306:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:315:74: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:316:33: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:322:75: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:323:26: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:332:24: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:334:60: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:340:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:350:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:354:5: E303 too many blank lines (2)
+./build/lib/dataprob/model_wrapper/model_wrapper.py:357:80: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:358:73: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:360:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:363:55: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:366:72: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:390:77: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:394:75: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:395:70: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:397:1: W293 blank line contains whitespace
 ./build/lib/dataprob/model_wrapper/model_wrapper.py:399:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:403:5: E303 too many blank lines (2)
-./build/lib/dataprob/model_wrapper/model_wrapper.py:406:80: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:407:73: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:409:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:412:55: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:415:72: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:439:77: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:443:75: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:444:70: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:446:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:448:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:450:22: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/model_wrapper.py:455:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:459:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:460:19: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:464:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:472:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:477:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/model_wrapper.py:487:20: F541 f-string is missing placeholders
-./build/lib/dataprob/model_wrapper/model_wrapper.py:506:20: F541 f-string is missing placeholders
+./build/lib/dataprob/model_wrapper/model_wrapper.py:401:22: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/model_wrapper.py:406:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:410:74: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:411:19: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:415:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:423:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:428:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/model_wrapper.py:438:20: F541 f-string is missing placeholders
+./build/lib/dataprob/model_wrapper/model_wrapper.py:457:20: F541 f-string is missing placeholders
 ./build/lib/dataprob/model_wrapper/vector_model_wrapper.py:4:28: W291 trailing whitespace
 ./build/lib/dataprob/model_wrapper/vector_model_wrapper.py:19:1: E302 expected 2 blank lines, found 1
 ./build/lib/dataprob/model_wrapper/vector_model_wrapper.py:21:71: W291 trailing whitespace
@@ -1642,66 +1637,61 @@
 ./src/dataprob/model_wrapper/model_wrapper.py:178:1: W293 blank line contains whitespace
 ./src/dataprob/model_wrapper/model_wrapper.py:182:76: W291 trailing whitespace
 ./src/dataprob/model_wrapper/model_wrapper.py:183:75: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:190:5: E303 too many blank lines (2)
-./src/dataprob/model_wrapper/model_wrapper.py:200:33: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:214:25: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:222:42: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:233:16: E111 indentation is not a multiple of 4
-./src/dataprob/model_wrapper/model_wrapper.py:242:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:253:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:257:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:261:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:265:5: E303 too many blank lines (2)
-./src/dataprob/model_wrapper/model_wrapper.py:268:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:269:28: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:271:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:272:76: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:277:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:279:65: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:280:83: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:283:18: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:286:54: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:289:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:292:28: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:294:46: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:300:58: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:302:37: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:319:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:320:27: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:322:39: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:338:68: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:343:79: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:345:57: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:349:40: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:355:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:364:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:365:33: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:371:75: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:372:26: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:381:24: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:383:60: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:389:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:193:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:204:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:208:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:212:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:216:5: E303 too many blank lines (2)
+./src/dataprob/model_wrapper/model_wrapper.py:219:74: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:220:28: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:222:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:223:76: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:228:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:230:65: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:231:83: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:234:18: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:237:54: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:240:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:243:28: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:245:46: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:251:58: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:253:37: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:270:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:271:27: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:273:39: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:289:68: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:294:79: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:296:57: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:300:40: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:306:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:315:74: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:316:33: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:322:75: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:323:26: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:332:24: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:334:60: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:340:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:350:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:354:5: E303 too many blank lines (2)
+./src/dataprob/model_wrapper/model_wrapper.py:357:80: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:358:73: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:360:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:363:55: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:366:72: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:390:77: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:394:75: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:395:70: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:397:1: W293 blank line contains whitespace
 ./src/dataprob/model_wrapper/model_wrapper.py:399:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:403:5: E303 too many blank lines (2)
-./src/dataprob/model_wrapper/model_wrapper.py:406:80: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:407:73: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:409:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:412:55: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:415:72: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:439:77: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:443:75: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:444:70: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:446:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:448:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:450:22: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/model_wrapper.py:455:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:459:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:460:19: W291 trailing whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:464:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:472:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:477:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/model_wrapper.py:487:20: F541 f-string is missing placeholders
-./src/dataprob/model_wrapper/model_wrapper.py:506:20: F541 f-string is missing placeholders
+./src/dataprob/model_wrapper/model_wrapper.py:401:22: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/model_wrapper.py:406:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:410:74: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:411:19: W291 trailing whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:415:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:423:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:428:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/model_wrapper.py:438:20: F541 f-string is missing placeholders
+./src/dataprob/model_wrapper/model_wrapper.py:457:20: F541 f-string is missing placeholders
 ./src/dataprob/model_wrapper/vector_model_wrapper.py:4:28: W291 trailing whitespace
 ./src/dataprob/model_wrapper/vector_model_wrapper.py:19:1: E302 expected 2 blank lines, found 1
 ./src/dataprob/model_wrapper/vector_model_wrapper.py:21:71: W291 trailing whitespace
@@ -2870,14 +2860,14 @@
 ./tests/dataprob/fitters/test_base.py:66:45: E231 missing whitespace after ':'
 ./tests/dataprob/fitters/test_base.py:68:30: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:69:30: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:70:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:70:55: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:75:36: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:75:40: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:77:37: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:79:45: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:79:50: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:79:54: E231 missing whitespace after ','
-./tests/dataprob/fitters/test_base.py:82:37: E231 missing whitespace after ','
+./tests/dataprob/fitters/test_base.py:82:55: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:85:24: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:85:28: E231 missing whitespace after ','
 ./tests/dataprob/fitters/test_base.py:87:42: E231 missing whitespace after ':'
@@ -4339,233 +4329,239 @@
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:290:21: E127 continuation line over-indented for visual indent
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:292:32: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:293:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:299:1: E303 too many blank lines (3)
-./tests/dataprob/model_wrapper/test_model_wrapper.py:301:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:301:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:301:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:301:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:303:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:305:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:306:23: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:307:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:316:36: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:322:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:322:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:322:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:322:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:327:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:335:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:343:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:346:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:346:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:346:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:346:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:348:47: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:361:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:363:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:363:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:363:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:363:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:365:47: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:374:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:374:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:374:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:374:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:376:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:378:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:378:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:378:59: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:391:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:394:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:394:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:394:59: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:404:43: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:404:49: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:404:54: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:405:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:405:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:405:59: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:411:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:411:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:411:59: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:421:43: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:421:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:421:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:422:50: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:422:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:423:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:425:34: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:426:44: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:426:49: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:426:53: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:426:57: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:297:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:300:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:300:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:300:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:300:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:302:47: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:315:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:317:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:317:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:317:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:317:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:319:47: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:328:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:328:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:328:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:328:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:330:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:332:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:332:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:332:59: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:344:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:345:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:348:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:348:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:348:59: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:358:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:358:49: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:358:54: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:359:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:359:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:359:59: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:365:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:365:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:365:59: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:375:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:375:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:375:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:376:50: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:376:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:377:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:379:34: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:380:44: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:380:49: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:380:53: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:380:57: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:385:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:385:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:385:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:385:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:387:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:390:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:399:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:402:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:405:1: E303 too many blank lines (6)
+./tests/dataprob/model_wrapper/test_model_wrapper.py:408:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:408:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:408:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:408:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:410:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:413:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:416:29: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:417:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:419:29: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:419:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:419:33: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:422:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:422:34: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:425:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:427:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:427:45: E261 at least two spaces before inline comment
+./tests/dataprob/model_wrapper/test_model_wrapper.py:427:46: E262 inline comment should start with '# '
+./tests/dataprob/model_wrapper/test_model_wrapper.py:431:29: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:431:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:431:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:431:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:431:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:433:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:436:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:445:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:448:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:451:1: E303 too many blank lines (6)
-./tests/dataprob/model_wrapper/test_model_wrapper.py:454:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:454:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:454:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:454:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:456:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:459:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:462:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:463:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:465:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:465:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:465:33: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:468:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:468:34: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:471:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:433:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:433:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:433:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:433:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:438:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/model_wrapper/test_model_wrapper.py:441:55: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:444:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:444:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:444:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:444:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:446:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:447:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:448:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:452:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:452:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:453:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:453:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:454:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:454:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:457:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:457:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:457:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:457:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:459:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:460:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:461:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:465:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:465:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:466:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:466:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:467:43: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:467:52: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:470:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:470:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:470:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:470:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:472:32: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:473:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:473:45: E261 at least two spaces before inline comment
-./tests/dataprob/model_wrapper/test_model_wrapper.py:473:46: E262 inline comment should start with '# '
-./tests/dataprob/model_wrapper/test_model_wrapper.py:477:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:477:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:479:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:479:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:479:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:479:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:484:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/model_wrapper/test_model_wrapper.py:487:55: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:490:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:490:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:490:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:490:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:498:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:499:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:500:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:503:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:503:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:503:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:503:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:511:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:512:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:513:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:516:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:516:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:516:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:516:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:522:23: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:522:32: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:529:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:529:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:529:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:529:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:535:23: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:474:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:476:23: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:476:32: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:478:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:479:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:480:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:483:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:483:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:483:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:483:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:485:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:486:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:487:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:489:23: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:494:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:494:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:494:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:494:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:496:23: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:501:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:501:37: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:501:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:501:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:503:23: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:503:32: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:504:38: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:507:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:508:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/model_wrapper/test_model_wrapper.py:513:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:513:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:513:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:513:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:516:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:518:21: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:520:17: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:520:20: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:522:35: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:524:23: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:524:25: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:525:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:525:34: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:528:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:529:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:531:41: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:532:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:532:34: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:536:27: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:536:29: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:537:23: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:540:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:540:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:540:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:540:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:542:23: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:547:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:547:37: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:547:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:547:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:549:23: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:549:32: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:550:38: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:553:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:554:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/model_wrapper/test_model_wrapper.py:559:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:559:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:559:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:559:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:562:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:564:21: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:566:17: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:566:20: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:568:35: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:570:23: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:570:25: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:571:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:571:34: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:574:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:575:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:577:41: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:578:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:578:34: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:582:27: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:541:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:542:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/model_wrapper/test_model_wrapper.py:547:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:547:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:547:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:547:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:549:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:551:29: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:551:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:553:35: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:555:28: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:555:30: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:556:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:556:34: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:559:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:560:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:562:38: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:563:28: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:563:30: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:568:28: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:574:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:575:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:575:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:575:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:575:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:577:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:579:46: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:579:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:579:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:580:1: W293 blank line contains whitespace
 ./tests/dataprob/model_wrapper/test_model_wrapper.py:582:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:583:23: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:586:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:587:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:588:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/model_wrapper/test_model_wrapper.py:593:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:593:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:593:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:593:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:595:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:597:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:597:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:599:35: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:601:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:601:30: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:602:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:602:34: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:605:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:606:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:608:38: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:609:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:609:30: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:614:28: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:620:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:621:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:621:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:621:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:621:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:623:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:625:46: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:625:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:625:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:626:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:628:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:628:32: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:630:47: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:630:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:630:54: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:634:29: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:634:33: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:639:46: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:639:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:639:55: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:639:61: W291 trailing whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:640:47: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:640:51: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:640:54: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:642:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/model_wrapper/test_model_wrapper.py:644:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:644:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:644:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:644:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:650:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/model_wrapper/test_model_wrapper.py:651:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:652:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:652:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:652:39: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:652:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:654:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:654:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:654:53: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:655:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:657:24: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:658:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:658:48: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:658:53: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:660:42: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:660:49: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:660:54: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:665:31: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:665:35: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:665:44: E231 missing whitespace after ','
-./tests/dataprob/model_wrapper/test_model_wrapper.py:677:31: E231 missing whitespace after ':'
-./tests/dataprob/model_wrapper/test_model_wrapper.py:681:1: W293 blank line contains whitespace
-./tests/dataprob/model_wrapper/test_model_wrapper.py:682:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:582:32: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:584:47: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:584:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:584:54: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:588:29: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:588:33: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:593:46: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:593:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:593:55: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:593:61: W291 trailing whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:594:47: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:594:51: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:594:54: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:596:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/model_wrapper/test_model_wrapper.py:598:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:598:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:598:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:598:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:604:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/model_wrapper/test_model_wrapper.py:605:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:606:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:606:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:606:39: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:606:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:608:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:608:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:608:53: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:609:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:611:24: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:612:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:612:48: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:612:53: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:614:42: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:614:49: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:614:54: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:619:31: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:619:35: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:619:44: E231 missing whitespace after ','
+./tests/dataprob/model_wrapper/test_model_wrapper.py:631:49: E231 missing whitespace after ':'
+./tests/dataprob/model_wrapper/test_model_wrapper.py:635:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_model_wrapper.py:636:1: W293 blank line contains whitespace
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:8:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:11:28: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:11:30: E231 missing whitespace after ','
@@ -4673,6 +4669,7 @@
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:183:43: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:183:49: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:187:1: W293 blank line contains whitespace
+./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:189:24: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:190:24: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:192:50: E231 missing whitespace after ','
 ./tests/dataprob/model_wrapper/test_vector_model_wrapper.py:192:55: E231 missing whitespace after ','
@@ -5417,7 +5414,6 @@
 ./tests/dataprob/test_integration.py:63:1: W391 blank line at end of file
 ./tests/dataprob/test_package.py:4:1: E302 expected 2 blank lines, found 1
 25    C901 'check_float' is too complex (18)
-2     E111 indentation is not a multiple of 4
 1     E114 indentation is not a multiple of 4 (comment)
 1     E117 over-indented
 2     E122 continuation line missing indentation or outdented
@@ -5425,13 +5421,13 @@
 30    E128 continuation line under-indented for visual indent
 23    E222 multiple spaces after operator
 1     E225 missing whitespace around operator
-3367  E231 missing whitespace after ','
+3371  E231 missing whitespace after ','
 16    E261 at least two spaces before inline comment
 3     E262 inline comment should start with '# '
 4     E265 block comment should start with '# '
 1     E266 too many leading '#' for block comment
 139   E302 expected 2 blank lines, found 1
-88    E303 too many blank lines (2)
+85    E303 too many blank lines (2)
 6     E306 expected 1 blank line before a nested definition, found 0
 4     E701 multiple statements on one line (colon)
 1     E702 multiple statements on one line (semicolon)
@@ -5443,6 +5439,6 @@
 3     F841 local variable 'patterns' is assigned to but never used
 724   W291 trailing whitespace
 33    W292 no newline at end of file
-823   W293 blank line contains whitespace
+821   W293 blank line contains whitespace
 9     W391 blank line at end of file
-5418
+5415

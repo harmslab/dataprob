@@ -67,7 +67,7 @@ def test_Fitter__init__():
     f = Fitter(**kwargs)
     assert f.param_df.loc["m","guess"] == 10
     assert f.param_df.loc["b","guess"] == 20
-    assert np.array_equal(f._model.x,np.arange(10))
+    assert np.array_equal(f._model.non_fit_kwargs["x"],np.arange(10))
 
     # make sure vector_first_arg is being passed
     kwargs = copy.deepcopy(base_kwargs)
@@ -78,8 +78,8 @@ def test_Fitter__init__():
     assert len(f.param_df) == 3
     assert np.array_equal(f.param_df["name"],["q","r","s"])
     assert len(f._model._non_fit_kwargs) == 2
-    assert f._model.b is None
-    assert np.array_equal(f._model.x,np.arange(10))
+    assert f._model.non_fit_kwargs["b"] is None
+    assert np.array_equal(f._model.non_fit_kwargs["x"],np.arange(10))
 
     # Send in pre-wrapped model
     def test_model(m=10,b=1,x=[]): return m*x + b

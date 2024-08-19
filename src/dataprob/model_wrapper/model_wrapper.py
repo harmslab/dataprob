@@ -186,55 +186,6 @@ class ModelWrapper:
         # Finalize -- read to run the model
         self.finalize_params()
 
-
-    def __setattr__(self, key, value):
-        """
-        Hijack __setattr__ so setting the value for fit parameters
-        updates the fit guess.
-        """
-
-        # We're setting the guess of the fit parameter
-        if key in self._param_df.name:
-
-            tmp_param_df = self._param_df.copy()
-            tmp_param_df.loc[key,"guess"] = check_float(value=value,
-                                                        variable_name="guess")
-            self._param_df = validate_dataframe(tmp_param_df,
-                                                param_in_order=self._fit_params_in_order,
-                                                default_guess=self._default_guess)
-
-        # We're setting another argument
-        elif key in self._non_fit_kwargs.keys():
-            self._non_fit_kwargs[key] = value
-
-        # Otherwise, just set it like normal
-        else:
-            super().__setattr__(key, value)
-
-    def __getattr__(self,key):
-        """
-        Define __getattr__ to get fit parameters and other arguments
-        appropriately.
-        """
-
-        # We're getting a fit parameter
-        if key in self._param_df.name:
-            return self._param_df.loc[key,"guess"]
-
-        # We're getting another argument
-        if key in self._non_fit_kwargs.keys():
-            return self._non_fit_kwargs[key]
-
-        # Otherwise, get like normal
-        else:
-
-            # Look in dict for something set manually in instance
-            if key in self.__dict__:
-               return self.__dict__[key]
-
-            # if not there, fall back to base __getattribute__
-            return super().__getattribute__(key)
-
     def _validate_non_fit_kwargs(self):
         """
         Validate the current state of non_fit_kwargs
