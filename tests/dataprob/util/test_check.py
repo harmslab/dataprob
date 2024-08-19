@@ -1,8 +1,8 @@
 
-from dataprob.check import check_bool
-from dataprob.check import check_float
-from dataprob.check import check_int
-from dataprob.check import check_array
+from dataprob.util.check import check_bool
+from dataprob.util.check import check_float
+from dataprob.util.check import check_int
+from dataprob.util.check import check_array
 
 import pytest
 import numpy as np

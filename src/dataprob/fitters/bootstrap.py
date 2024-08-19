@@ -3,7 +3,7 @@ Fitter subclass for performing bootstrap analyses.
 """
 
 from dataprob.fitters.base import Fitter
-from dataprob.check import check_int
+from dataprob.util.check import check_int
 
 import numpy as np
 import scipy

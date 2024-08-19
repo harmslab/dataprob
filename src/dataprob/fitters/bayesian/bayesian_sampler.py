@@ -10,10 +10,10 @@ from dataprob.fitters.bayesian._prior_processing import find_uniform_value
 from dataprob.fitters.bayesian._prior_processing import reconcile_bounds_and_priors
 from dataprob.fitters.bayesian._prior_processing import create_walkers
 
-from dataprob.check import check_int
-from dataprob.check import check_float
-from dataprob.check import check_bool
-from dataprob.check import check_array
+from dataprob.util.check import check_int
+from dataprob.util.check import check_float
+from dataprob.util.check import check_bool
+from dataprob.util.check import check_array
 
 import emcee
 

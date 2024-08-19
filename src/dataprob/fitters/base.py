@@ -2,22 +2,21 @@
 Fitter base class allowing different classes of fits.
 """
 
+from dataprob.util.check import check_array
+from dataprob.util.check import check_float
+from dataprob.util.check import check_int
+
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
+from dataprob.model_wrapper.wrap_function import wrap_function
+from dataprob.util.read_spreadsheet import read_spreadsheet
+
 import numpy as np
 import pandas as pd
-import corner
 
-import re
 import pickle
 import os
 import warnings
 import copy
-
-from dataprob.check import check_array
-from dataprob.check import check_float
-from dataprob.check import check_int
-
-from dataprob.model_wrapper.model_wrapper import ModelWrapper
-from dataprob.model_wrapper.wrap_function import wrap_function
 
 def _pretty_zeropad_str(N):
 
@@ -427,6 +426,11 @@ class Fitter:
             out["weighted_residuals"] = self._weighted_residuals(estimate)
 
         return pd.DataFrame(out)
+
+    @data_df.setter
+    def data_df(self,data_df):
+
+        df = read_spreadsheet(data_df)
 
     def _initialize_fit_df(self):
 

@@ -11,7 +11,7 @@ from dataprob.model_wrapper._function_processing import param_sanity_check
 from dataprob.model_wrapper._dataframe_processing import validate_dataframe
 
 
-from dataprob.check import check_float
+from dataprob.util.check import check_float
 
 import numpy as np
 import pandas as pd

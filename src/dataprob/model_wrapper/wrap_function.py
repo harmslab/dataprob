@@ -4,9 +4,9 @@ specified input function.
 """
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
-from dataprob.model_wrapper._dataframe_processing import read_spreadsheet
+from dataprob.util.read_spreadsheet import read_spreadsheet
 
-from dataprob.check import check_bool
+from dataprob.util.check import check_bool
 
 import pandas as pd
 

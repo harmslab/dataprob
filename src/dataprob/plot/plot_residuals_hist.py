@@ -2,7 +2,7 @@
 Function to plot a histogram of residuals. 
 """
 
-from dataprob.check import check_bool
+from dataprob.util.check import check_bool
 from dataprob.plot._plot_utils import get_plot_dimensions
 from dataprob.plot._plot_utils import get_plot_features
 from dataprob.plot._plot_utils import get_style

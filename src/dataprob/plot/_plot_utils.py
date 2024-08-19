@@ -1,4 +1,4 @@
-from dataprob.check import check_int
+from dataprob.util.check import check_int
 from dataprob.plot import appearance
 
 import numpy as np
