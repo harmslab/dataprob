@@ -1,3 +1,8 @@
+"""
+Utility functions used internally by the plotting functions to calculate things
+like the plot size, check variable types, etc. 
+"""
+
 from dataprob.util.check import check_int
 from dataprob.plot import appearance
 

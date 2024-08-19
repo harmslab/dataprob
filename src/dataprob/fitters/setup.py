@@ -12,6 +12,8 @@ def setup(some_function,
           non_fit_kwargs=None,
           vector_first_arg=False):
     """
+    Set up a dataprob analysis. 
+
     Parameters
     ----------
     some_function : callable
@@ -32,12 +34,42 @@ def setup(some_function,
         If True, the first argument of the function is taken as a vector of 
         parameters to fit. All other arguments to some_function are treated as 
         non-fittable parameters. Fit_parameters must then specify the names of
-        each vector element.
+        each vector element. 
 
     Returns
     -------
     f : Fitter
         fitter instance to use for the analysis
+
+    Notes
+    -----
+    
+    Basic pattern: 
+
+    ..code-block :: python
+
+        # assume we have a dataframe named 'df' with the columns 'x', 'y_obs'
+        # and 'y_std'. x is our independent variable, y_obs is what we observed
+        # and y_std is the uncertainty on each observation.
+
+        import dataprob
+
+        # Define model
+        def linear_model(m,b,x): return m*x + b
+
+        # Set up the fit, passing in "x", which we need to run the model but is not
+        # a fittable parameter. 
+        f = dataprob.setup(linear_model,
+                        non_fit_kwargs={"x":df["x"]})
+
+        # do fit
+        f.fit(y_obs=df["y_obs"],
+              y_std=df["y_std"])
+
+        # Plot and print fit result dataframe
+        fig = dataprob.plot.plot_summary(f)
+        print(f.fit_df)
+        
     """
     
     

@@ -1,3 +1,6 @@
+"""
+Styling information for dataprob plots.
+"""
 
 default_styles = {
 

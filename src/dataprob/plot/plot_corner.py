@@ -1,3 +1,7 @@
+"""
+Code to create a "corner plot" that shows distributions and correlations of 
+values for all fit parameters. 
+"""
 
 import corner
 import numpy as np

@@ -1,4 +1,3 @@
-
 """
 Class for wrapping functions that use an array as their first argument for use
 in likelihood calculations. 

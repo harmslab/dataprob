@@ -18,6 +18,9 @@ import os
 import copy
 
 def _pretty_zeropad_str(N):
+    """
+    Make a string zero-pad based on the number of digits in a number.
+    """
 
     num_digits = len(f"{N}") + 1
     fmt_string = "s{:0" + f"{num_digits}" + "d}"

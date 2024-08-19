@@ -1,3 +1,6 @@
+"""
+Functions for plotting fit results.
+"""
 
 from dataprob.plot.plot_summary import plot_summary
 from dataprob.plot.plot_corner import plot_corner

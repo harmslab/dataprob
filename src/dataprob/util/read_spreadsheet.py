@@ -1,3 +1,6 @@
+"""
+Code for dealing with spreadsheets in a user-friendly way. 
+"""
 
 import pandas as pd
 

@@ -6,8 +6,6 @@ functions.
 import numpy as np
 import pandas as pd
 
-import re
-
 def check_bool(value,variable_name=None):
     """
     Process a `bool` argument and do error checking.
