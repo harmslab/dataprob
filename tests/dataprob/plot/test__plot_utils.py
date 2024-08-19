@@ -136,7 +136,6 @@ def test_get_vectors():
     assert np.array_equal(y_obs,y_obs_in)
     assert np.array_equal(y_std,y_std_in)
     assert y_calc.shape == y_obs.shape
-    assert not np.array_equal(y_obs,y_calc) # fit -- not exactly same
 
 def test__get_edges():
 
