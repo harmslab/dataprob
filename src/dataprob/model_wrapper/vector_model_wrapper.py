@@ -161,7 +161,6 @@ class VectorModelWrapper(ModelWrapper):
         # Finalize -- read to run the model
         self.finalize_params()
 
-
     def finalize_params(self):
         """
         Validate current state of param_df and build map between parameters
@@ -185,12 +184,25 @@ class VectorModelWrapper(ModelWrapper):
         # Make sure the user has not altered non_fit_kwargs keys
         self._validate_non_fit_kwargs()
 
-    def _mw_observable(self,params=None):
+
+    def model(self,params=None):
         """
-        Actual function called by the fitter.
+        Model observable. This function takes a numpy array the number of 
+        unfixed parameters long. 
+
+        Parameters
+        ----------
+        params : numpy.ndarray, optional
+            float numpy array the length of the number of unfixed parameters.
+            If this is not specified, the model is run using the parameter 
+            guess values. 
         """
 
-        compiled_params = np.array(self._param_df["guess"])
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value or made a change that has not propagated properly
+        self.finalize_params()
+
+        compiled_params = self._all_param_vector
 
         if params is None:
             params = compiled_params
@@ -211,20 +223,6 @@ class VectorModelWrapper(ModelWrapper):
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
             raise RuntimeError(err) from e
-
-    @property
-    def model(self):
-        """
-        The observable.
-        """
-
-        # Update mapping between parameters and model arguments in case
-        # user has fixed value or made a change that has not propagated properly
-        self.finalize_params()
-
-        # This model, once returned, does not have to re-run update_parameter_map
-        # and should thus be faster when run again and again in regression
-        return self._mw_observable
     
     def fast_model(self,params):
         """

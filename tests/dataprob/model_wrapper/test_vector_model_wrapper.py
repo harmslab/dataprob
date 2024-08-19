@@ -19,7 +19,7 @@ def test_VectorModelWrapper__init__():
     assert mw.param_df.loc["z","guess"] == 3
     assert mw.non_fit_kwargs["a"] is None
     assert mw.non_fit_kwargs["b"] == "test"
-    assert mw._mw_observable() == 6
+    assert mw.model() == 6
 
 def test_VectorModelWrapper__load_model():
 
@@ -213,7 +213,7 @@ def test_VectorModelWrapper__finalize_params():
     with pytest.raises(ValueError):
         mw.finalize_params()
     
-def test_VectorModelWrapper__mw_observable():
+def test_VectorModelWrapper_model():
 
     # fittable_param dict, good value
     def test_fcn(x,z="test"): return x[0] + x[1] + x[2]
@@ -229,120 +229,75 @@ def test_VectorModelWrapper__mw_observable():
 
     # not enough
     with pytest.raises(ValueError):
-        mw._mw_observable(params=[1])
+        mw.model(params=[1])
 
     # too many parameters
     with pytest.raises(ValueError):
-        mw._mw_observable(params=[1,2,3,4,5,6,7])
+        mw.model(params=[1,2,3,4,5,6,7])
 
+     # something that is not even an array of numbers
+    with pytest.raises(ValueError):
+        result = mw.model(params="stupid")
 
     # basic check. Does it run with parameters sent in?
-    result = mw._mw_observable([1,2,3])
+    result = mw.model([1,2,3])
     assert result == 6
 
     # basic check. no parameters sent in -- pulled from the parameter guessess
-    result = mw._mw_observable(params=None)
+    result = mw.model(params=None)
     assert result == 20 + 30 + 50
 
     # fix a parameter. should still work
     mw.param_df.loc["a","fixed"] = True
-    mw.finalize_params()
-    result = mw._mw_observable(params=None)
+    result = mw.model(params=None)
     assert result == 20 + 30 + 50
 
     mw.param_df.loc["a","fixed"] = True
     mw.param_df.loc["b","fixed"] = True
-    mw.finalize_params()
-    result = mw._mw_observable(params=[1,2,3])
+    result = mw.model(params=[1,2,3])
     assert result == 6
 
     # Should give fixed values for a and b plus what we sent in for c
-    result = mw._mw_observable(params=[1000])
+    result = mw.model(params=[1000])
     assert result == 20 + 30 + 1000
 
-    # wrong number of parameters
-    with pytest.raises(ValueError):
-        result = mw._mw_observable(params=[1,2])
+    # change "a"
+    mw.param_df.loc["a","guess"] = 10
 
-    # wrong number of parameters
-    with pytest.raises(ValueError):
-        result = mw._mw_observable(params=[1,2,3,4])
-
-    # wrong number of parameters
-    with pytest.raises(ValueError):
-        result = mw._mw_observable(params=[])
+    # make sure it recognizes fix and guess
+    assert mw.model([1000]) == 10 + 30 + 1000
 
     # Test error catching from model
     def test_fcn(x,z="test"): raise TypeError
     mw = VectorModelWrapper(model_to_fit=test_fcn,
                             fittable_params={"a":20,"b":30,"c":50}) 
     with pytest.raises(RuntimeError):
-        mw._mw_observable()
+        mw.model()
 
-
-def test_VectorModelWrapper_model():
-
-    # light wrapper for _mw_observable (tested elsewhere). Make sure finalize
-    # runs and that it works as advertised but do not test deeply
-
-    # fittable_param dict, good value
-    def test_fcn(x,z="test"): return x[0] * x[1] * x[2]
-    mw = VectorModelWrapper(model_to_fit=test_fcn,
-                            fittable_params={"a":20,"b":30,"c":50}) 
     
-    m = mw.model
-
-    # Make sure it is callable and takes arguments
-    assert hasattr(m,"__call__")
-    assert m() == 20*30*50
-    assert m([10,20,30]) == 10*20*30
-
-    # Make sure it calls finalize. 
-    # Run model and _mw_observable
-    assert mw.model([1,2,3]) == 1*2*3
-    assert mw._mw_observable([1,2,3]) == 1*2*3
-
-    # fix and change "a"
-    mw.param_df.loc["a","fixed"] = True
-    mw.param_df.loc["a","guess"] = 10
-
-    # mw_observable is not aware of this 
-    assert mw._mw_observable([1,2,3]) == 1*2*3
-    with pytest.raises(ValueError):
-        mw._mw_observable([2,3])
-
-    # but model is because it calls finalize
-    assert mw.model([2,3]) == 10*2*3
-
-    # and now mw_observable should be too
-    assert mw._mw_observable([2,3]) == 10*2*3
-
 def test_VectorModelWrapper_fast_model():
 
-    # light wrapper for fast_model 
-
     # fittable_param dict, good value
-    def test_fcn(x,z="test"): return x[0] * x[1] * x[2]
+    def test_fcn(x,z="test"): return x[0] + x[1] + x[2]
     mw = VectorModelWrapper(model_to_fit=test_fcn,
                             fittable_params={"a":20,"b":30,"c":50}) 
     
     # Make sure it is callable and takes arguments
-    assert mw.fast_model([10,20,30]) == 10*20*30
+    assert mw.fast_model([10,20,30]) == 10 + 20 + 30
 
     # Make sure it calls finalize. 
     # Run model and _mw_observable
-    assert mw.model([1,2,3]) == 1*2*3
-    assert mw._mw_observable([1,2,3]) == 1*2*3
-    assert mw.fast_model(np.array([1,2,3])) == 1*2*3
+    assert mw.model([1,2,3]) == 1 + 2 + 3
+    assert mw.fast_model(np.array([1,2,3])) == 1 + 2 + 3
 
     # fix and change "a"
     mw.param_df.loc["a","fixed"] = True
     mw.param_df.loc["a","guess"] = 10
 
     # fast_model is not aware of this 
-    assert mw.fast_model(np.array([1,2,3])) == 1*2*3
+    assert mw.fast_model(np.array([1,2,3])) == 1 + 2 + 3
     
     mw.finalize_params()
 
     # and now fast_model should be too if finalized
-    assert mw.fast_model(np.array([2,3])) == 10*2*3
+    assert mw.fast_model(np.array([2,3])) == 10 + 2 + 3

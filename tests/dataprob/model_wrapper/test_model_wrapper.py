@@ -398,39 +398,6 @@ def test_ModelWrapper_finalize_params():
     mw.finalize_params()
     
 
-def test_ModelWrapper__mw_observable():
-
-    # Simple model
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
-    mw = ModelWrapper(model_to_test_wrap)
-    
-    # internal parameters
-    assert mw._mw_observable() == 1*2*3
-    
-    # bad parameters -- wrong length
-    with pytest.raises(ValueError):
-        mw._mw_observable([1,2])
-    
-    with pytest.raises(ValueError):
-        mw._mw_observable([1,2,3,4])
-
-    # check valid pass of parameter
-    assert mw._mw_observable([3,4,5]) == 3*4*5
-
-    # fix parameter
-    mw.param_df.loc["b","fixed"] = True
-    mw.finalize_params()
-    assert mw._mw_observable([3,4]) == 3*2*4 #(a*fixed(b)*c)
-
-    # now fail because too many params
-    with pytest.raises(ValueError):
-        mw._mw_observable([3,4,5])
-
-    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): raise ValueError
-    mw = ModelWrapper(model_to_test_wrap)
-    with pytest.raises(RuntimeError):
-        mw._mw_observable()
-
 def test_ModelWrapper_update_params(spreadsheets):
 
     # method calls three other functions that are tested extensively elsewhere.
@@ -503,42 +470,38 @@ def test_ModelWrapper_update_params(spreadsheets):
     
 def test_ModelWrapper_model():
 
-    # light wrapper for _mw_observable (tested elsewhere). Make sure finalize
-    # runs and that it works as advertised but do not test deeply
-
+    # Simple model
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
-    m = mw.model
     
-    # Make sure it is callable and takes arguments
-    assert hasattr(m,"__call__")
-    assert m() == 1*2*3
-    assert m([10,20,30]) == 10*20*30
-
-    # Make sure it calls finalize. 
-    # Run model and _mw_observable
-    assert mw.model([1,2,3]) == 1*2*3
-    assert mw._mw_observable([1,2,3]) == 1*2*3
-
-    # fix and change "a"
-    mw.param_df.loc["a","fixed"] = True
-    mw.param_df.loc["a","guess"] = 10
-
-    # mw_observable is not aware of this 
-    assert mw._mw_observable([1,2,3]) == 1*2*3
-
-    # but model is because it calls finalize
+    # internal parameters
+    assert mw.model() == 1*2*3
+    
+    # bad parameters -- wrong length
     with pytest.raises(ValueError):
-        assert mw.model([1,2,3])
-    assert mw.model([2,3]) == 10*2*3
+        mw.model([1,2])
+    
+    with pytest.raises(ValueError):
+        mw.model([1,2,3,4])
 
-    # and now mw_observable should be too
-    assert mw._mw_observable([2,3]) == 10*2*3
+    # check valid pass of parameter
+    assert mw.model([3,4,5]) == 3*4*5
+
+    # fix parameter
+    mw.param_df.loc["b","fixed"] = True
+    mw.finalize_params()
+    assert mw.model([3,4]) == 3*2*4 #(a*fixed(b)*c)
+
+    # now fail because too many params
+    with pytest.raises(ValueError):
+        mw.model([3,4,5])
+
+    def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): raise ValueError
+    mw = ModelWrapper(model_to_test_wrap)
+    with pytest.raises(RuntimeError):
+        mw.model()
     
 def test_ModelWrapper_fast_model():
-
-    # light wrapper for _mw_observable (tested elsewhere). Make sure finalize
-    # runs and that it works as advertised but do not test deeply
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): return a*b*c
     mw = ModelWrapper(model_to_test_wrap)
@@ -549,7 +512,7 @@ def test_ModelWrapper_fast_model():
     # Make sure it calls finalize. 
     # Run model and fast_model
     assert mw.fast_model([1,2,3]) == 1*2*3
-    assert mw._mw_observable([1,2,3]) == 1*2*3
+    assert mw.model([1,2,3]) == 1*2*3
 
     # fix and change "a"
     mw.param_df.loc["a","fixed"] = True

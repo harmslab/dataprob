@@ -240,34 +240,7 @@ class ModelWrapper:
             
         self._mw_kwargs.update(self._non_fit_kwargs)
 
-    def _mw_observable(self,params=None):
-        """
-        Actual function called by the fitter. 
-        """
-
-        # If parameters are not passed, get current parameter values
-        if params is None:
-            params = np.array(self._param_df.loc[self._unfixed_mask,
-                                                 "guess"],dtype=float)
-        else:
-            params = np.array(params,dtype=float)
-
-        # Sanity check
-        if len(params) != np.sum(self._unfixed_mask):
-            err = f"Number of fit parameters ({len(params)}) does not match\n"
-            err += f"number of unfixed parameters ({np.sum(self._unfixed_mask)})\n"
-            raise ValueError(err)
-
-        # Update kwargs
-        for i in range(len(params)):
-            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
-
-        try:
-            return self._model_to_fit(**self._mw_kwargs)
-        except Exception as e:
-            err = "\n\nThe wrapped model threw an error (see trace).\n\n"
-            raise RuntimeError(err) from e
-        
+ 
     def update_params(self,param_input):
         """
         Update the parameter features. 
@@ -309,8 +282,7 @@ class ModelWrapper:
                                             param_in_order=self._fit_params_in_order,
                                             default_guess=self._default_guess)
 
-    @property
-    def model(self):
+    def model(self,params=None):
         """
         Model observable. This function takes a numpy array the number of 
         unfixed parameters long. 
@@ -325,9 +297,29 @@ class ModelWrapper:
 
         self.finalize_params()
 
-        # This model, once returned, does not have to re-run finalize and should
-        # thus be faster when run again and again in regression
-        return self._mw_observable
+        # If parameters are not passed, get current parameter values
+        if params is None:
+            params = np.array(self._param_df.loc[self._unfixed_mask,
+                                                 "guess"],dtype=float)
+        else:
+            params = np.array(params,dtype=float)
+
+        # Sanity check
+        if len(params) != np.sum(self._unfixed_mask):
+            err = f"Number of fit parameters ({len(params)}) does not match\n"
+            err += f"number of unfixed parameters ({np.sum(self._unfixed_mask)})\n"
+            raise ValueError(err)
+
+        # Update kwargs
+        for i in range(len(params)):
+            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
+
+        try:
+            return self._model_to_fit(**self._mw_kwargs)
+        except Exception as e:
+            err = "\n\nThe wrapped model threw an error (see trace).\n\n"
+            raise RuntimeError(err) from e
+
 
     def fast_model(self,params):
         """
