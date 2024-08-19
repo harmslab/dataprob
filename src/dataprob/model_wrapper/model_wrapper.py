@@ -284,30 +284,42 @@ class ModelWrapper:
 
     def model(self,params=None):
         """
-        Model observable. This function takes a numpy array the number of 
-        unfixed parameters long. 
+        Model observable. This function takes a numpy array either the number of 
+        unfixed parameters long OR the total number of parameters long. If 
+        parameters are fixed, their values in a params array with all fit 
+        parameters are *ignored* and the fixed parameter guesses are used 
+        instead. 
 
         Parameters
         ----------
         params : numpy.ndarray, optional
-            float numpy array the length of the number of unfixed parameters.
-            If this is not specified, the model is run using the parameter 
-            guess values. 
+            float numpy array with parameter values. If this is not specified,
+            the model is run using the parameter guess values. 
         """
 
+        # Update mapping between parameters and model arguments in case
+        # user has fixed value or made a change that has not propagated properly
         self.finalize_params()
 
-        # If parameters are not passed, get current parameter values
-        if params is None:
-            params = np.array(self._param_df.loc[self._unfixed_mask,
-                                                 "guess"],dtype=float)
-        else:
-            params = np.array(params,dtype=float)
+        # Create all param vector
+        all_params = np.array(self._param_df["guess"],dtype=float)
 
-        # Sanity check
+        # no parameters specified, get all guesses
+        if params is None:
+            params = all_params
+
+        # make sure the params array is a float array
+        params = np.array(params,dtype=float)
+
+        # If this is as long as all_fit parameters, pull out only the fit 
+        # parameters we care about. 
+        if len(params) == len(all_params):
+            params = params[self._unfixed_mask]
+        
         if len(params) != np.sum(self._unfixed_mask):
-            err = f"Number of fit parameters ({len(params)}) does not match\n"
-            err += f"number of unfixed parameters ({np.sum(self._unfixed_mask)})\n"
+            err = f"params length ({len(params)}) must either correspond to\n"
+            err += f"the total number of parameters ({len(self._param_df)})\n"
+            err += f"or the number of unfixed parameters ({np.sum(self._unfixed_mask)}).\n"
             raise ValueError(err)
 
         # Update kwargs
@@ -323,7 +335,8 @@ class ModelWrapper:
 
     def fast_model(self,params):
         """
-        Calculate model result with minimal error checking. 
+        Calculate model result with minimal error checking. params *must* be
+        an array the same length as the number of unfixed parameters. 
 
         Parameters
         ----------

@@ -174,7 +174,7 @@ class VectorModelWrapper(ModelWrapper):
                                             default_guess=self._default_guess)
         
         # Get currently un-fixed parameters
-        self._unfixed_mask = np.logical_not(self._param_df["fixed"])
+        self._unfixed_mask = np.array(np.logical_not(self._param_df["fixed"]),dtype=bool)
         self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
         
         # Create all param vector
@@ -186,28 +186,36 @@ class VectorModelWrapper(ModelWrapper):
 
     def model(self,params=None):
         """
-        Model observable. This function takes a numpy array the number of 
-        unfixed parameters long. 
+        Model observable. This function takes a numpy array either the number of 
+        unfixed parameters long OR the total number of parameters long. If 
+        parameters are fixed, their values in a params array with all fit 
+        parameters are *ignored* and the fixed parameter guesses are used 
+        instead. 
 
         Parameters
         ----------
         params : numpy.ndarray, optional
-            float numpy array the length of the number of unfixed parameters.
-            If this is not specified, the model is run using the parameter 
-            guess values. 
+            float numpy array with parameter values. If this is not specified,
+            the model is run using the parameter guess values. 
         """
-
+        
         # Update mapping between parameters and model arguments in case
         # user has fixed value or made a change that has not propagated properly
         self.finalize_params()
 
-        compiled_params = self._all_param_vector
+        compiled_params = np.array(self._param_df["guess"],dtype=float)
 
         if params is None:
             params = compiled_params
 
+        # make sure the params are a float array
+        params = np.array(params,dtype=float)
+
+        # Copy in only unfixed params from full vector sent in
         if len(params) == len(compiled_params):
-            compiled_params = params
+            compiled_params[self._unfixed_mask] = params[self._unfixed_mask]
+
+        # Copy in all params into unfixed positions
         elif len(params) == np.sum(self._unfixed_mask):
             compiled_params[self._unfixed_mask] = params
         else:
@@ -215,7 +223,7 @@ class VectorModelWrapper(ModelWrapper):
             err += f"the total number of parameters ({len(self._param_df)})\n"
             err += f"or the number of unfixed parameters ({np.sum(self._unfixed_mask)}).\n"
             raise ValueError(err)
-
+        
         try:
             return self._model_to_fit(compiled_params,
                                       **self._non_fit_kwargs)

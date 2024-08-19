@@ -492,9 +492,10 @@ def test_ModelWrapper_model():
     mw.finalize_params()
     assert mw.model([3,4]) == 3*2*4 #(a*fixed(b)*c)
 
-    # now fail because too many params
-    with pytest.raises(ValueError):
-        mw.model([3,4,5])
+    # This should work, ignoring the fixed 'b' parameter
+    mw.model([3,4,5]) == 3*2*5
+    mw.model([3,17,5]) == 3*2*5
+    mw.model([3,17,8]) == 3*2*8
 
     def model_to_test_wrap(a=1,b=2,c=3,d="test",e=3): raise ValueError
     mw = ModelWrapper(model_to_test_wrap)

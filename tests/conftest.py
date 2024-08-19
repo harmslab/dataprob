@@ -1,10 +1,6 @@
 import pytest
 
-from dataprob.fitters.ml import MLFitter
-from dataprob.model_wrapper.model_wrapper import ModelWrapper
-
 import pandas as pd
-import numpy as np
 
 import os
 import json
@@ -142,7 +138,6 @@ def fit_tolerance_fixture():
     Fit tolerance for checking (relative tolerance)
     """
     return 0.1
-
 
 ## Code for skipping slow tests.
 def pytest_addoption(parser):

@@ -99,8 +99,11 @@ class BayesianSampler(Fitter):
 
         # Grab lower and upper bounds. We pull them out of the dataframe so we
         # can use in prior calculations without any dictionary lookups. 
-        self._lower_bounds = np.array(self.param_df["lower_bound"])
-        self._upper_bounds = np.array(self.param_df["upper_bound"])
+        unfixed = self._model.unfixed_mask
+        self._lower_bounds = np.array(self.param_df.loc[unfixed,"lower_bound"],
+                                      dtype=float)
+        self._upper_bounds = np.array(self.param_df.loc[unfixed,"upper_bound"],
+                                      dtype=float)
 
     def _ln_prior(self,param):
         """

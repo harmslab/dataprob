@@ -502,10 +502,9 @@ def test_Fitter_data_df():
 
     out_df = f.data_df
     assert len(out_df) == 0
-    
+
     y_obs = np.arange(10,dtype=float)
     y_std = np.ones(10,dtype=float)
-    y_calc = np.arange(10)*0.9
 
     f = Fitter(some_function=test_fcn)
     f._y_obs = y_obs
@@ -523,15 +522,18 @@ def test_Fitter_data_df():
     assert np.array_equal(out_df["y_obs"],y_obs)
     assert np.array_equal(out_df["y_std"],y_std)
     
-    def hack_fcn(a,b): return np.arange(10)*0.9
-    f = Fitter(some_function=hack_fcn)
+    # Create real function and fitter
+    def linear_fcn(m=1,b=2,x=None): return m*x + b
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":np.arange(10)})
+    y_obs = 1*np.arange(10) + 2
+    y_std = np.ones(10,dtype=float)*0.1
+    y_calc = 1*np.arange(10) + 3
     f._y_obs = y_obs
     f._y_std = y_std
-
-    # hack it so it thinks its done
     f._success = True
-    f._fit_df = {"estimate":[1,2]}
-    f.model([2,3])
+    f._fit_df = pd.DataFrame({"estimate":[1,3]})
+    f._model._unfixed_mask = np.ones(2,dtype=bool)
 
     # check final data_df
     out_df = f.data_df
