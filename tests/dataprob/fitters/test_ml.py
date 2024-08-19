@@ -42,7 +42,6 @@ def test_MLFitter_fit():
               num_samples="not_an_integer")
 
 
-
 def test_MLFitter__fit():
 
     # Basic functionality and logic tests. Numerical tests on more interesting
@@ -251,7 +250,37 @@ def test_MLFitter_samples():
     assert new_samples is None
     assert not hasattr(f,"_samples")
 
-    
+    # --------------------------------------------------------------------------
+    # test trimming due to parameters being outside of bounds
+
+    # Generate a fit with strong constraints on m and b
+    def linear_fcn(m=2,b=-1,x=None): return m*x + b
+    f = MLFitter(some_function=linear_fcn,
+                fit_parameters=["m","b"],
+                non_fit_kwargs={"x":x})
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.2*np.ones(10)})
+    f.data_df = data_df
+
+    f.param_df.loc["m","lower_bound"] = 1.9
+    f.param_df.loc["m","upper_bound"] = 2.1
+
+    f.param_df.loc["b","lower_bound"] = -1.1
+    f.param_df.loc["b","upper_bound"] = -0.9
+
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # no samples generated
+    assert not hasattr(f,"_samples") 
+
+    # Generate samples
+    samples = f.samples
+
+    # There should be a ton of samples lost due to the lower and upper bounds 
+    assert samples.shape[0] < f._num_samples
+
+
 def test_MLFitter___repr__():
 
     # Stupidly simple fitting problem. find slope

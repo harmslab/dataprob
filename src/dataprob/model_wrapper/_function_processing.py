@@ -80,7 +80,7 @@ def analyze_fcn_sig(fcn):
     return all_args, can_be_fit, cannot_be_fit, has_kwargs
 
 
-def reconcile_fittable(fittable_params,
+def reconcile_fittable(fit_parameters,
                        non_fit_kwargs,
                        all_args,
                        can_be_fit,
@@ -91,7 +91,7 @@ def reconcile_fittable(fittable_params,
 
     Parameters
     ----------
-    fittable_params : list-like, optional
+    fit_parameters : list-like, optional
         list of fittable parameter names. if None, infer
     non_fit_kwargs : dict, optional
         non-fit keyword arguments to pass to the function. if None, infer. 
@@ -109,42 +109,42 @@ def reconcile_fittable(fittable_params,
 
     Returns
     -------
-    fittable_params : list
-        list of fittable parameters built from fittable_params input and
+    fit_parameters : list
+        list of fittable parameters built from fit_parameters input and
         can_be_fit
-    not_fittable_params : list
+    not_fit_parameters : list
         list of unfittable params built from non_fit_kwargs, all_args, and
         cannot_be_fit
     """
     
-    # Construct not_fittable_params from non_fit_kwargs keys
+    # Construct not_fit_parameters from non_fit_kwargs keys
     if non_fit_kwargs is not None:
-        not_fittable_params = list(non_fit_kwargs.keys())
+        not_fit_parameters = list(non_fit_kwargs.keys())
     else:
-        not_fittable_params = []
+        not_fit_parameters = []
 
     # Make sure the user didn't send in the same parameter as both a fittable
     # and non-fittable parameter
-    if fittable_params is not None:
-        fittable_set = set(fittable_params)
-        not_fittable_set = set(not_fittable_params)
+    if fit_parameters is not None:
+        fittable_set = set(fit_parameters)
+        not_fittable_set = set(not_fit_parameters)
         intersect = fittable_set.intersection(not_fittable_set)
         if len(intersect) != 0:
-            err = "a parameter cannot be in fittable_params and not fittable_params.\n"
+            err = "a parameter cannot be in fit_parameters and not fit_parameters.\n"
             err += f"Bad parameters: {str(intersect)}\n"
             raise ValueError(err)
             
-    # If fittable_params are not specified, construct
-    if fittable_params is None:
-        fittable_params = []
+    # If fit_parameters are not specified, construct
+    if fit_parameters is None:
+        fit_parameters = []
         for a in all_args:
             if a in can_be_fit:
-                fittable_params.append(a)
+                fit_parameters.append(a)
             else:
                 break
 
     # Go through all fittable parameters
-    for p in fittable_params:
+    for p in fit_parameters:
         
         # Not fittable based on sig -- die
         if p in cannot_be_fit:
@@ -158,7 +158,7 @@ def reconcile_fittable(fittable_params,
             raise ValueError(err)
 
     # Go through all nonfittable params
-    for p in not_fittable_params:
+    for p in not_fit_parameters:
 
         # Parameter not in function signature and the signature does not have 
         # **kwargs. Fail. 
@@ -168,58 +168,31 @@ def reconcile_fittable(fittable_params,
             err = f"not_fittable parameter '{p}' is not in the function definition\n"
             raise ValueError(err)
 
-    # Filter kwargs to remove any user-specified nonfittable_params
-    fittable_params = [p for p in fittable_params
-                       if p not in not_fittable_params]
+    # Filter kwargs to remove any user-specified nonfit_parameters
+    fit_parameters = [p for p in fit_parameters
+                       if p not in not_fit_parameters]
 
     # If we get here and do not have a fittable parameter, bad news. 
-    if len(fittable_params) == 0:
+    if len(fit_parameters) == 0:
         err = "no parameters to fit!\n"
         raise ValueError(err)
     
-    # Make a final list of not_fittable_params -- everything that is not 
+    # Make a final list of not_fit_parameters -- everything that is not 
     # fittable. 
     final_not_fittable = []
     for p in all_args:
-        if p not in fittable_params:
+        if p not in fit_parameters:
             final_not_fittable.append(p)
 
     # Grab anything sent in by the user that is not already in the definition. 
     # (Do this way so args are in order from signature, then in order sent in by
     # user for any **kwargs. 
-    for p in not_fittable_params:
+    for p in not_fit_parameters:
         if p not in final_not_fittable:
             final_not_fittable.append(p)
 
-    return fittable_params, final_not_fittable
+    return fit_parameters, final_not_fittable
 
-
-def param_sanity_check(param_to_check,
-                       reserved_params=None):
-    """
-    Check parameters against list of reserved parameters.
-
-    Parameters
-    ----------
-    param_to_check : list
-        list of parameters to check
-    reserved_params : list
-        list of reserved names we cannot use for parameters
-    """
-
-    if param_to_check is None:
-        return param_to_check
-
-    if reserved_params is None:
-        reserved_params = []
-
-    for p in param_to_check:
-        if p in reserved_params:
-            err = f"parameter '{p}' is reserved by dataprob. Please use a\n"
-            err += "different parameter name\n"
-            raise ValueError(err)
-
-    return param_to_check
 
 def analyze_vector_input_fcn(fcn):
     """

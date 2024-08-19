@@ -180,6 +180,25 @@ class MLFitter(Fitter):
                                                 chol_cov)
     
         self._samples = self._samples + estimate
+        
+        num_param = self._samples.shape[1]
+
+        # above_mask is True for a given sample if all of the parameter values
+        # are >= the lower bound for that sample
+        lower_bound = np.array(self.fit_df.loc[unfixed,"lower_bound"],dtype=float)
+        above_mask = np.sum(self._samples >= lower_bound,axis=1) == num_param
+
+        # below_mak is True for a given sample if all of the parameter values
+        # are <= the upper bound for that sample
+        upper_bound = np.array(self.fit_df.loc[unfixed,"upper_bound"],dtype=float)
+        below_mask = np.sum(self._samples <= upper_bound,axis=1) == num_param
+
+        # Keep mask is True only if above_mask and below_mask are true for a 
+        # given sample
+        keep_mask = np.logical_and(above_mask,below_mask)
+
+        # Get only samples that fit the condition 
+        self._samples = self._samples[keep_mask,:]
 
         return self._samples
 

@@ -1,5 +1,5 @@
 """
-Fit a five parameter polynomial model to data. 
+Fit a two-parameter linear model to plausible data. 
 """
 
 import pytest
@@ -14,28 +14,29 @@ def _core_test(method,**method_kwargs):
     # ------------------------------------------------------------------------
     # Define model and generate data
 
-    def fourth_order_polynomial(a=1,b=1,c=1,d=1,e=1,x=None): 
-          return a + b*x + c*(x**2) + d*(x**3) + e*(x**4)
+    def linear_model(m,b,x): 
+        return m*x + b
+
+    gen_params = {"m":-3,
+                  "b":20}
+
+    err = 0.25
+    num_points = 20
+
+    x = np.linspace(-5,5,num_points)
+    y_obs = linear_model(x=x,**gen_params) + np.random.normal(0,err,num_points)
+    y_std = 2*err
     
-    gen_params = {"a":5,
-                "b":0.01,
-                "c":0.2,
-                "d":0.03,
-                "e":0.001}
-    
-    err = 1
-    num_points = 50
-    x = np.linspace(-10,10,num_points)
-    y_obs = fourth_order_polynomial(x=x,**gen_params) + np.random.normal(loc=0,scale=err,size=num_points)
-    y_std = err*2.5
+    test_fcn = linear_model
+    non_fit_kwargs = {"x":x}
 
     # ------------------------------------------------------------------------
-    # Define model and generate data
+    # Run analysis
 
-    f = dataprob.setup(fourth_order_polynomial,
+    f = dataprob.setup(some_function=test_fcn,
                        method=method,
-                       non_fit_kwargs={"x":x})
-    
+                       non_fit_kwargs=non_fit_kwargs)
+
     f.fit(y_obs=y_obs,
           y_std=y_std,
           **method_kwargs)
@@ -66,5 +67,3 @@ def test_bayesian():
 def test_bootstrap():
 
     _core_test(method="bootstrap")
-
-

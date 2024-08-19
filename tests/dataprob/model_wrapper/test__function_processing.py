@@ -3,7 +3,6 @@ import pytest
 
 from dataprob.model_wrapper._function_processing import analyze_fcn_sig
 from dataprob.model_wrapper._function_processing import reconcile_fittable
-from dataprob.model_wrapper._function_processing import param_sanity_check
 from dataprob.model_wrapper._function_processing import analyze_vector_input_fcn
 
 import numpy as np
@@ -120,7 +119,7 @@ def test_analyze_fcn_sig():
 
 def test_reconcile_fittable():
 
-    base_kwargs = {"fittable_params":None,
+    base_kwargs = {"fit_parameters":None,
                    "non_fit_kwargs":None,
                    "all_args":[],
                    "can_be_fit":{},
@@ -142,7 +141,7 @@ def test_reconcile_fittable():
 
     # No fittable parameter, but we tell function to use "a" anyway
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a"]
+    kwargs["fit_parameters"] = ["a"]
     kwargs["all_args"] = ["a"]
     kwargs["cannot_be_fit"] = {"a":"test"}
     with pytest.raises(ValueError):
@@ -150,7 +149,7 @@ def test_reconcile_fittable():
     
     # No fittable parameter. tell it to use "b" (not in function, no kwarg)
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["b"]
+    kwargs["fit_parameters"] = ["b"]
     kwargs["all_args"] = ["a"]
     kwargs["cannot_be_fit"] = {"a":"test"}
     with pytest.raises(ValueError):
@@ -158,7 +157,7 @@ def test_reconcile_fittable():
 
     # No fittable parameter, but kwarg. tell it to use "b"
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["b"]
+    kwargs["fit_parameters"] = ["b"]
     kwargs["all_args"] = ["a"]
     kwargs["cannot_be_fit"] = {"a":"test"}
     kwargs["has_kwargs"] = True
@@ -168,7 +167,7 @@ def test_reconcile_fittable():
 
     # Make sure it trims off after first fittable arg
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
+    kwargs["fit_parameters"] = None
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"c":2}
     kwargs["cannot_be_fit"] = {"b":"test"}
@@ -179,7 +178,7 @@ def test_reconcile_fittable():
 
     # Make sure we can force it to take after non-fittable breaks arg list
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","c"]
+    kwargs["fit_parameters"] = ["a","c"]
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"c":2}
     kwargs["cannot_be_fit"] = {"b":"test"}
@@ -190,7 +189,7 @@ def test_reconcile_fittable():
 
     # Fail. non-fittable in the mix
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
+    kwargs["fit_parameters"] = ["a","b"]
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"c":2}
     kwargs["cannot_be_fit"] = {"b":"test"}
@@ -200,7 +199,7 @@ def test_reconcile_fittable():
 
     # Fail. non-fittable in the mix
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","d"]
+    kwargs["fit_parameters"] = ["a","d"]
     kwargs["all_args"] = ["a","b","c","d"]
     kwargs["can_be_fit"] = {"a":1,"c":2}
     kwargs["cannot_be_fit"] = {"b":"test"}
@@ -212,7 +211,7 @@ def test_reconcile_fittable():
 
     # Send in non_fit_kwargs where this is in "cannot be fit"
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
+    kwargs["fit_parameters"] = ["a","b"]
     kwargs["non_fit_kwargs"] = {"c":33}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2}
@@ -225,7 +224,7 @@ def test_reconcile_fittable():
     
     # Send in non_fit_kwargs where this is in "can be fit"
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
+    kwargs["fit_parameters"] = ["a","b"]
     kwargs["non_fit_kwargs"] = {"c":33}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -235,9 +234,9 @@ def test_reconcile_fittable():
     assert np.array_equal(fittable,["a","b"])
     assert np.array_equal(not_fittable,["c"])
 
-    # Send in non_fit_kwargs but not fittable_params
+    # Send in non_fit_kwargs but not fit_parameters
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
+    kwargs["fit_parameters"] = None
     kwargs["non_fit_kwargs"] = {"c":33}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -247,9 +246,9 @@ def test_reconcile_fittable():
     assert np.array_equal(fittable,["a","b"])
     assert np.array_equal(not_fittable,["c"])
 
-    # Send in same value in non_fit_kwargs and fittable_params
+    # Send in same value in non_fit_kwargs and fit_parameters
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
+    kwargs["fit_parameters"] = ["a","b"]
     kwargs["non_fit_kwargs"] = {"b":None,"c":None}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -260,7 +259,7 @@ def test_reconcile_fittable():
 
     # Send in all args as non_fit_kwargs, not fittable!
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
+    kwargs["fit_parameters"] = None
     kwargs["non_fit_kwargs"] = {"a":1,"b":3,"c":3}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -271,7 +270,7 @@ def test_reconcile_fittable():
     
     # Send in non_fit_kwargs  that are not in the function signature
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
+    kwargs["fit_parameters"] = None
     kwargs["non_fit_kwargs"] = {"d":None}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -283,7 +282,7 @@ def test_reconcile_fittable():
     # Send in non_fit_kwargs that are not in the function signature, but
     # has_kwargs, so okay
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = None
+    kwargs["fit_parameters"] = None
     kwargs["non_fit_kwargs"] = {"d":None}
     kwargs["all_args"] = ["a","b","c"]
     kwargs["can_be_fit"] = {"a":1,"b":2,"c":3}
@@ -295,9 +294,9 @@ def test_reconcile_fittable():
     assert np.array_equal(not_fittable,["d"])
 
 
-    # Send in fittable_params and non_fit_kwargs with only **kwargs
+    # Send in fit_parameters and non_fit_kwargs with only **kwargs
     kwargs = copy.deepcopy(base_kwargs)
-    kwargs["fittable_params"] = ["a","b"]
+    kwargs["fit_parameters"] = ["a","b"]
     kwargs["non_fit_kwargs"] = {"c":None,"d":None}
     kwargs["all_args"] = []
     kwargs["can_be_fit"] = {}
@@ -308,28 +307,6 @@ def test_reconcile_fittable():
     assert np.array_equal(fittable,["a","b"])
     assert np.array_equal(not_fittable,["c","d"])
 
-    
-def test_param_sanity_check():
-
-    result = param_sanity_check(param_to_check=None,
-                                reserved_params=["a","b"])
-    assert result is None
-
-    result = param_sanity_check(param_to_check=["a","b"],
-                                 reserved_params=None)
-    assert np.array_equal(result,["a","b"])
-
-    with pytest.raises(ValueError):
-        result = param_sanity_check(param_to_check=["a","b"],
-                                     reserved_params=["a"])
-    
-    result = param_sanity_check(param_to_check=[],
-                                 reserved_params=None)
-    assert np.array_equal(result,[])
-
-    result = param_sanity_check(param_to_check=[],
-                                 reserved_params=["a","b"])
-    assert np.array_equal(result,[])
 
 def test_analyze_vector_input_fcn():
 

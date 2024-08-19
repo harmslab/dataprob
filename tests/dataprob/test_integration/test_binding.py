@@ -30,7 +30,7 @@ def _core_test(method,**method_kwargs):
     non_fit_kwargs = {"x":x}
 
     # ------------------------------------------------------------------------
-    # Define model and generate data
+    # Run analysis
 
     f = dataprob.setup(some_function=test_fcn,
                        method=method,

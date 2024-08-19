@@ -6,7 +6,6 @@ in likelihood calculations.
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 
 from dataprob.model_wrapper._function_processing import analyze_vector_input_fcn
-from dataprob.model_wrapper._function_processing import param_sanity_check
 from dataprob.model_wrapper._dataframe_processing import validate_dataframe
 
 
@@ -23,7 +22,7 @@ class VectorModelWrapper(ModelWrapper):
 
     def _load_model(self,
                     model_to_fit,
-                    fittable_params,
+                    fit_parameters,
                     non_fit_kwargs):
         """
         Load a model into the wrapper, putting all fittable parameters into the
@@ -33,7 +32,7 @@ class VectorModelWrapper(ModelWrapper):
         ----------
         model_to_fit : callable
             a function or method to fit.
-        fittable_params : list or dict
+        fit_parameters : list or dict
             dictionary of fit parameters with guesses
         non_fit_kwargs : dict
             non_fit_kwargs are keyword arguments for model_to_fit that should
@@ -52,56 +51,51 @@ class VectorModelWrapper(ModelWrapper):
         
         # Make sure fittable params has at least one param
         try:
-            num_param = len(fittable_params)
+            num_param = len(fit_parameters)
             if num_param < 1:
                 raise ValueError
         except Exception as e:
-            err = f"fittable_params must be a list or dictionary with at least one\n"
+            err = f"fit_parameters must be a list or dictionary with at least one\n"
             err += "fittable parameter\n"
             raise ValueError(err) from e
 
         # Make sure fittable param names do not conflict with argument param
         # names
-        fit_set = set(fittable_params)
+        fit_set = set(fit_parameters)
         args_set = set(other_args)
         if len(fit_set.intersection(args_set)) > 0:
-            err = "fittable_params must not include other arguments to the function\n"
+            err = "fit_parameters must not include other arguments to the function\n"
             raise ValueError(err)
         
-        if param_arg in fittable_params:
-            err = f"the first vector arg '{param_arg}' cannot be in fittable_params.\n"
-            err += "fittable_params should specify the names of every element\n"
+        if param_arg in fit_parameters:
+            err = f"the first vector arg '{param_arg}' cannot be in fit_parameters.\n"
+            err += "fit_parameters should specify the names of every element\n"
             err += "*within* this vector\n"
             raise ValueError(err)
-
-        # Make sure these do not conflict with attributes already in the class
-        reserved_params = dir(self.__class__)
-        fittable_params = param_sanity_check(param_to_check=fittable_params,
-                                             reserved_params=reserved_params)
 
         # --------------------------------------------------------------------
         # Go through fittable params 
 
-        fit_params = []
+        fit_param_names = []
         guesses = []
-        for p in fittable_params:
+        for p in fit_parameters:
 
             # If a dictionary, grab the guess checking for float
-            if issubclass(type(fittable_params),dict):
-                guess = check_float(value=fittable_params[p],
-                                    variable_name=f"fittable_params['{p}']")
+            if issubclass(type(fit_parameters),dict):
+                guess = check_float(value=fit_parameters[p],
+                                    variable_name=f"fit_parameters['{p}']")
             
             # If a list, set to default_guess
             else:
                 guess = self._default_guess
         
             # Record fit parameter
-            fit_params.append(p)
+            fit_param_names.append(p)
             guesses.append(guess)
         
         # Construct fit parameter dataframe
-        self._fit_params_in_order = fit_params[:]
-        param_df = pd.DataFrame({"name":fit_params,
+        self._fit_params_in_order = fit_param_names[:]
+        param_df = pd.DataFrame({"name":fit_param_names,
                                  "guess":guesses})
         self._param_df = validate_dataframe(param_df,
                                             param_in_order=self._fit_params_in_order,
@@ -110,20 +104,20 @@ class VectorModelWrapper(ModelWrapper):
         # --------------------------------------------------------------------
         # Deal with non_fit_kwargs
 
-        # Construct not_fittable_params from non_fit_kwargs keys
+        # Construct not_fit_parameters from non_fit_kwargs keys
         if non_fit_kwargs is not None:
-            not_fittable_params = list(non_fit_kwargs.keys())
+            not_fit_parameters = list(non_fit_kwargs.keys())
         else:
-            not_fittable_params = []
+            not_fit_parameters = []
 
-        # Make sure param_arg is not in not_fittable_params
-        if param_arg in not_fittable_params:
+        # Make sure param_arg is not in not_fit_parameters
+        if param_arg in not_fit_parameters:
             err = f"the first argument {param_arg} cannot be in non_fit_kwargs\n"
             raise ValueError(err)
 
         # Go through non-fittable parameters. If they are not in other_args 
         # and the function does not have **kwargs, throw an error. 
-        for p in not_fittable_params:
+        for p in not_fit_parameters:
             if p not in other_args and not has_kwargs:
                 err = f"not_fittable parameter '{p}' is not in the function definition\n"
                 raise ValueError(err)
@@ -132,18 +126,13 @@ class VectorModelWrapper(ModelWrapper):
             # signature) with what hte user passed in. 
             other_args[p] = non_fit_kwargs[p]
                 
-
-        # Validate non_fittable params 
-        other_args = param_sanity_check(param_to_check=other_args,
-                                        reserved_params=reserved_params)
-        
         # Make sure that we don't have a situation where we have the same 
         # parameter name in both fittable and not_fittable
-        fittable_set = set(fittable_params)
+        fittable_set = set(fit_parameters)
         not_fittable_set = set(other_args)
         intersect = fittable_set.intersection(not_fittable_set)
         if len(intersect) != 0:
-            err = "a parameter cannot be in both fittable_params and non_fit_kwargs.\n"
+            err = "a parameter cannot be in both fit_parameters and non_fit_kwargs.\n"
             err += f"Bad parameters: {str(intersect)}\n"
             raise ValueError(err)
         

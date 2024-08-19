@@ -33,7 +33,7 @@ def wrap_function(some_function,
     vector_first_arg : bool, default=False
         If True, the first argument of the function is taken as a vector of 
         parameters to fit. All other arguments to some_function are treated as 
-        non-fittable parameters. Fit_parameters must then specify the names of
+        non-fittable parameters. fit_parameters must then specify the names of
         each vector element. 
 
     Returns
@@ -195,7 +195,7 @@ def wrap_function(some_function,
     
     # Create class with appropriate parameters
     mw = mw_class(model_to_fit=some_function,
-                  fittable_params=fit_param_list,
+                  fit_parameters=fit_param_list,
                   non_fit_kwargs=non_fit_kwargs)
     
     # Update fit parameters with values

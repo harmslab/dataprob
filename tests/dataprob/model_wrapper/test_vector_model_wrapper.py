@@ -11,7 +11,7 @@ def test_VectorModelWrapper__init__():
     def test_fcn(some_array,a,b="test"): return some_array[0] + some_array[1] + some_array[2]
 
     mw = VectorModelWrapper(model_to_fit=test_fcn,
-                            fittable_params={"x":1,"y":2,"z":3})
+                            fit_parameters={"x":1,"y":2,"z":3})
     
     assert len(mw.param_df) == 3
     assert mw.param_df.loc["x","guess"] == 1
@@ -38,28 +38,28 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"x":1,"y":2,"z":3},
+                       fit_parameters={"x":1,"y":2,"z":3},
                        non_fit_kwargs=None)
         
-    # no fittable_params
+    # no fit_parameters
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={},
+                       fit_parameters={},
                        non_fit_kwargs=None) 
         
-    # bad fittable_params
+    # bad fit_parameters
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params=None,
+                       fit_parameters=None,
                        non_fit_kwargs=None) 
     
-    # bad fittable_params --> has same name as first arg
+    # bad fit_parameters --> has same name as first arg
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params=["x"],
+                       fit_parameters=["x"],
                        non_fit_kwargs=None) 
     
 
@@ -67,7 +67,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"a":"test"},
+                       fit_parameters={"a":"test"},
                        non_fit_kwargs=None) 
         
     # fittable_param dict, bad value because it matches secondary 
@@ -75,21 +75,15 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x,a): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"a":1.0},
+                       fit_parameters={"a":1.0},
                        non_fit_kwargs=None) 
     
-    # extra argument conflicts with attribute of the class
-    def test_fcn(x,model): pass
-    with pytest.raises(ValueError):
-        mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"a":1.0},
-                       non_fit_kwargs=None) 
     
     # fittable_param dict, good value
     mw = TestVectorModelWrapper()
     def test_fcn(x): pass
     mw._load_model(model_to_fit=test_fcn,
-                   fittable_params={"a":20},
+                   fit_parameters={"a":20},
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
@@ -98,7 +92,7 @@ def test_VectorModelWrapper__load_model():
     mw = TestVectorModelWrapper()
     def test_fcn(x): pass
     mw._load_model(model_to_fit=test_fcn,
-                   fittable_params=["a","b"],
+                   fit_parameters=["a","b"],
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 0
@@ -109,7 +103,7 @@ def test_VectorModelWrapper__load_model():
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6): pass
     mw._load_model(model_to_fit=test_fcn,
-                   fittable_params={"a":20},
+                   fit_parameters={"a":20},
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
@@ -122,7 +116,7 @@ def test_VectorModelWrapper__load_model():
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     mw._load_model(model_to_fit=test_fcn,
-                   fittable_params={"a":20},
+                   fit_parameters={"a":20},
                    non_fit_kwargs=None) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
@@ -135,7 +129,7 @@ def test_VectorModelWrapper__load_model():
     mw = TestVectorModelWrapper()
     def test_fcn(x,b,c=6,**kwargs): pass
     mw._load_model(model_to_fit=test_fcn,
-                   fittable_params={"a":20},
+                   fit_parameters={"a":20},
                    non_fit_kwargs={"c":16,"d":17}) 
     assert mw._model_to_fit is test_fcn
     assert mw.param_df.loc["a","guess"] == 20
@@ -149,7 +143,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x,b,c=6,**kwargs): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                    fittable_params={"a":20},
+                    fit_parameters={"a":20},
                     non_fit_kwargs={"x":1})
 
     # Should not work if fittable and non_fit_kwargs have same args
@@ -157,7 +151,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x,b,c=6,**kwargs): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params=["a"],
+                       fit_parameters=["a"],
                        non_fit_kwargs={"a":20})
     
 
@@ -166,7 +160,7 @@ def test_VectorModelWrapper__load_model():
     def test_fcn(x,b,c=6): pass
     with pytest.raises(ValueError):
         mw._load_model(model_to_fit=test_fcn,
-                       fittable_params={"a":20},
+                       fit_parameters={"a":20},
                        non_fit_kwargs={"d":"missing"}), 
 
 
@@ -175,7 +169,7 @@ def test_VectorModelWrapper__finalize_params():
 
     def model_to_test_wrap(a,b,c=3): return a[0]*a[1]*b*c
     mw = VectorModelWrapper(model_to_test_wrap,
-                            fittable_params={"x":1,"y":2})
+                            fit_parameters={"x":1,"y":2})
     
     # Check initial configuration after __init__
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
@@ -218,7 +212,7 @@ def test_VectorModelWrapper_model():
     # fittable_param dict, good value
     def test_fcn(x,z="test"): return x[0] + x[1] + x[2]
     mw = VectorModelWrapper(model_to_fit=test_fcn,
-                            fittable_params={"a":20,"b":30,"c":50}) 
+                            fit_parameters={"a":20,"b":30,"c":50}) 
     
     # Check initial sets
     assert mw._model_to_fit is test_fcn
@@ -272,7 +266,7 @@ def test_VectorModelWrapper_model():
     # Test error catching from model
     def test_fcn(x,z="test"): raise TypeError
     mw = VectorModelWrapper(model_to_fit=test_fcn,
-                            fittable_params={"a":20,"b":30,"c":50}) 
+                            fit_parameters={"a":20,"b":30,"c":50}) 
     with pytest.raises(RuntimeError):
         mw.model()
 
@@ -282,7 +276,7 @@ def test_VectorModelWrapper_fast_model():
     # fittable_param dict, good value
     def test_fcn(x,z="test"): return x[0] + x[1] + x[2]
     mw = VectorModelWrapper(model_to_fit=test_fcn,
-                            fittable_params={"a":20,"b":30,"c":50}) 
+                            fit_parameters={"a":20,"b":30,"c":50}) 
     
     # Make sure it is callable and takes arguments
     assert mw.fast_model([10,20,30]) == 10 + 20 + 30
