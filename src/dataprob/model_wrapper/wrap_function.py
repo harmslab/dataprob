@@ -38,8 +38,7 @@ def wrap_function(some_function,
     Returns
     -------
     mw : ModelWrapper
-        ModelWrapper instance can be fed directly into a Fitter.fit method. The
-        user can also manipulate fit parameters prior to the analysis. 
+        ModelWrapper instance that can be used in a Fitter instance. 
 
     Note
     ----
