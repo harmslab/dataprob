@@ -213,20 +213,22 @@ def test_Fitter__process_obs_args():
 
 
 
-def test_Fitter_fit(linear_fit):
+def test_Fitter_fit():
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
 
-    base_kwargs = {"y_obs":df.y_obs,
-                   "y_std":df.y_std,
+    base_kwargs = {"y_obs":data_df.y_obs,
+                   "y_std":data_df.y_std,
                    "fit_kwarg":5}
 
     def new_fitter():
 
         # Create a fitter with a model, then hacked _fit, _fit_result, 
         # and _update_fit_df
-        f = Fitter(some_function=fcn)
+        f = Fitter(some_function=linear_fcn)
         f._fit = lambda **kwargs: None
         f._fit_result = {}
         f._update_fit_df = lambda *args: None
@@ -255,7 +257,7 @@ def test_Fitter_fit(linear_fit):
         f.fit(**kwargs)
     
     f = new_fitter() # have to reset fitter b/c model set above
-    kwargs["y_obs"] = df["y_obs"]
+    kwargs["y_obs"] = data_df["y_obs"]
     f.fit(**kwargs)
     
 def test_Fitter__fit():
@@ -274,155 +276,151 @@ def test_Fitter__fit():
     with pytest.raises(NotImplementedError):
         f._fit()
 
-def test_Fitter__unweighted_residuals(binding_curve_test_data):
+def test_Fitter__unweighted_residuals():
     """
-    Test unweighted residuals call against "manual" code used to generate
-    test data. Just make sure answer is right; no error checking on this 
-    function. 
+    Test unweighted residuals call with linear function.
     """
 
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
+    test_params =  np.array([10,20])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
     
-    # Calculate residual given the input params
-    f._y_obs = df.Y
-    r = f._unweighted_residuals(input_params)
+    f.data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                              "y_std":0.1*np.ones(15)})
 
-    assert np.allclose(r,df.residual)
+    assert np.allclose(linear_fcn(10,20,x) - linear_fcn(m=2,b=-1,x=x),
+                       f._unweighted_residuals(test_params))
 
-def test_Fitter_unweighted_residuals(binding_curve_test_data):
+
+def test_Fitter_unweighted_residuals():
     """
-    Test unweighted residuals call against "manual" code used to generate
-    test data.
+    Test unweighted residuals like _unweighted_residuals, but test error 
+    checking. 
     """
 
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
-    
+    test_params =  np.array([10,20])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
+
     # Should fail, haven't loaded y_obs or y_std yet
     with pytest.raises(RuntimeError):
-        f.unweighted_residuals(input_params)
+        f.unweighted_residuals(test_params)
+
+    # Load in y_obs and y_std
+    f.data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                              "y_std":0.1*np.ones(15)})
 
     # Should work now
-    f._y_obs = df.Y
-    r = f.unweighted_residuals(input_params)
-    assert np.allclose(r,df.residual)
+    assert np.allclose(linear_fcn(10,20,x) - linear_fcn(m=2,b=-1,x=x),
+                       f.unweighted_residuals(test_params))
 
-    # Make sure error check is running
+    # Make sure error check is running by sending in too many parameters
     with pytest.raises(ValueError):
-        f.unweighted_residuals([1,2])
+        f.unweighted_residuals([1,2,3,4])
 
-def test_Fitter__weighted_residuals(binding_curve_test_data):
+def test_Fitter__weighted_residuals():
     """
-    Test weighted residuals call against "manual" code used to generate
-    test data. Just make sure answer is right; no error checking on this 
-    function. 
+    Test weighted residuals call with linear function.
     """
 
-    # Build model
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
+    test_params =  np.array([10,20])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
+    
+    f.data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                              "y_std":0.1*np.ones(15)})
 
-    f._y_obs = df.Y
-    f._y_std = df.Y_stdev
-
-    # Calculate residual given the input params
-    input_params = binding_curve_test_data["input_params"]
-    r = f._weighted_residuals(input_params)
-
-    assert np.allclose(r,df.weighted_residual)
+    assert np.allclose((linear_fcn(10,20,x) - linear_fcn(m=2,b=-1,x=x))/0.1,
+                       f._weighted_residuals(test_params))
 
 
-def test_Fitter_weighted_residuals(binding_curve_test_data):
+def test_Fitter_weighted_residuals():
     """
-    Test weighted residuals call against "manual" code used to generate
-    test data.
+    Test weighted residuals like _weighted_residuals, but test error 
+    checking. 
     """
 
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
+    test_params =  np.array([10,20])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
 
     # Should fail, haven't loaded y_obs or y_std yet
     with pytest.raises(RuntimeError):
-        f.weighted_residuals(input_params)
+        f.weighted_residuals(test_params)
 
-    f._y_obs = df.Y
+    # Load in y_obs and y_std
+    f.data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                              "y_std":0.1*np.ones(15)})
 
-    # Should fail, haven't loaded y_std yet
-    with pytest.raises(RuntimeError):
-        f.weighted_residuals(input_params)
+    # Should work now
+    assert np.allclose((linear_fcn(10,20,x) - linear_fcn(m=2,b=-1,x=x))/0.1,
+                       f.weighted_residuals(test_params))
 
-    f._y_std = df.Y_stdev
-
-    r = f.weighted_residuals(input_params)
-    assert np.allclose(r,df.weighted_residual)
-
-    # Make sure error check is running
+    # Make sure error check is running by sending in too many parameters
     with pytest.raises(ValueError):
-        f.weighted_residuals([1,2])
+        f.weighted_residuals([1,2,3,4])
 
-def test_Fitter__ln_like(binding_curve_test_data):
+def test_Fitter__ln_like():
     """
     Test internal function -- no error checking. 
     """
 
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    y_obs = linear_fcn(m=2,b=-1,x=x)
+    y_std = 0.1*np.ones(15)
+    y_calc = linear_fcn(m=10,b=20,x=x)
+    test_params = np.array([10,20])
 
-    f._y_obs = df.Y
-    f._y_std = df.Y_stdev
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
+    f.data_df = pd.DataFrame({"y_obs":y_obs,
+                              "y_std":y_std})
 
-    input_params = binding_curve_test_data["input_params"]
+    sigma2 = y_std**2
+    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(sigma2)))
 
-    L = f.ln_like(input_params)
-    assert np.allclose(L,binding_curve_test_data["ln_like"])
+    assert np.isclose(f._ln_like(test_params),ln_like)
 
-def test_Fitter_ln_like(binding_curve_test_data):
+def test_Fitter_ln_like():
     """
-    Test log likelihood call against "manual" code used to generate
-    test data.
+    Test ln_like like _ln_like, but test error checking. 
     """
 
-    df = binding_curve_test_data["df"]
-    input_params = binding_curve_test_data["input_params"]
-    f_base = Fitter(some_function=binding_curve_test_data["wrappable_model"],
-                    non_fit_kwargs={"df":df})
-    f = copy.deepcopy(f_base)
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,15)
+    y_obs = linear_fcn(m=2,b=-1,x=x)
+    y_std = 0.1*np.ones(15)
+    y_calc = linear_fcn(m=10,b=20,x=x)
+    test_params = np.array([10,20])
 
+    f = Fitter(some_function=linear_fcn,
+               non_fit_kwargs={"x":x})
+    
     # Should fail, haven't loaded y_obs or y_std yet
     with pytest.raises(RuntimeError):
-        f.ln_like(input_params)
+        f.ln_like(test_params)
 
-    f._y_obs = df.Y
+    f.data_df = pd.DataFrame({"y_obs":y_obs,
+                              "y_std":y_std})
 
-    # Should fail, haven't loaded y_std yet
-    with pytest.raises(RuntimeError):
-        f.ln_like(input_params)
+    # should work now
+    sigma2 = y_std**2
+    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(sigma2)))
 
-    f._y_std = df.Y_stdev
+    assert np.isclose(f._ln_like(test_params),ln_like)
     
-    L = f.ln_like(input_params)
-    
-    assert np.allclose(L,binding_curve_test_data["ln_like"])
-
     # make sure input params sanity check is running
     with pytest.raises(ValueError):
-        f.ln_like([1,2])
+        f.ln_like([1,2,3,4])
 
 
 # ---------------------------------------------------------------------------- #
@@ -911,7 +909,7 @@ def test_Fitter_append_samples(tmpdir):
 
     os.chdir(cwd)
 
-def test_Fitter_num_params(binding_curve_test_data):
+def test_Fitter_num_params():
 
     def test_fcn(a=2,b=3): return a*b
     f = Fitter(some_function=test_fcn)

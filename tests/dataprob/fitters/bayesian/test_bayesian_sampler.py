@@ -232,20 +232,18 @@ def test_BayesianSampler__ln_prior():
     value = f._ln_prior(np.array([-1,2]))
     assert np.isclose(-np.inf,value)
 
-def test_BayesianSampler_ln_prior(linear_fit):
+def test_BayesianSampler_ln_prior():
     
     # test error checking. __ln_prior test checks numerical results 
     
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    param = np.array([coeff["m"],coeff["b"]])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    expected_result = np.array([2,-1])
 
-    f = BayesianSampler(some_function=fcn,
-                        non_fit_kwargs={"x":df.x})
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
     
-
-    v = f.ln_prior(param)
+    v = f.ln_prior(expected_result)
     assert v < 0
 
     with pytest.raises(ValueError):
@@ -258,22 +256,22 @@ def test_BayesianSampler_ln_prior(linear_fit):
         f.ln_prior([1,2,3])
 
 
-def test_BayesianSampler__ln_prob(linear_fit):
+def test_BayesianSampler__ln_prob():
 
     # Not really a numeric test, but makes sure the code is in fact summing 
     # ln_prior and ln_like and recognizing nan/inf correctly
-    
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    param = np.array([coeff["m"],coeff["b"]])
 
-    f = BayesianSampler(some_function=fcn,
-                        non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = np.ones(len(df.y_obs))*0.1
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    expected_result = np.array([2,-1])
 
-    f.param_df["guess"] = param
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
+
+    f.param_df["guess"] = expected_result
     f.param_df["prior_mean"] = [2,1]
     f.param_df["prior_std"] = [2,2]
     f.param_df["lower_bound"] = [-np.inf,-np.inf]
@@ -281,40 +279,33 @@ def test_BayesianSampler__ln_prob(linear_fit):
     f._model.finalize_params()
     f._setup_priors()
 
-    ln_like = f.ln_like(param)
-    ln_prob = f.ln_prior(param)
+    ln_like = f.ln_like(expected_result)
+    ln_prob = f.ln_prior(expected_result)
 
-    assert f._ln_prob(param) == ln_like + ln_prob
+    assert f._ln_prob(expected_result) == ln_like + ln_prob
     assert np.isinf(f._ln_prob(np.array([np.nan,1])))
     
-def test_BayesianSampler_ln_prob(linear_fit):
+def test_BayesianSampler_ln_prob():
     
     # test error checking. __ln_prob test checks numerical results 
     
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    param = np.array([coeff["m"],coeff["b"]])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    expected_result = np.array([2,-1])
 
-    f = BayesianSampler(some_function=fcn,
-                        non_fit_kwargs={"x":df.x})
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
     
-    # should not work -- no model, y_obs, y_std loaded
-    with pytest.raises(RuntimeError):
-        f.ln_prob(param)
-
     # should not work -- no y_obs, y_std loaded
     with pytest.raises(RuntimeError):
-        f.ln_prob(param)
+        f.ln_prob(expected_result)
     
-    # should not work -- no y_std loaded
-    f._y_obs = df.y_obs
-    with pytest.raises(RuntimeError):
-        f.ln_prob(param)
+    f.data_df = data_df
 
     # should work -- all needed features defined
-    f._y_std = df.y_std
-    v = f.ln_prob(param)
+    v = f.ln_prob(expected_result)
     assert v < 0
     
     with pytest.raises(ValueError):
@@ -396,21 +387,19 @@ def test_BayesianSampler_fit():
               not_an_emcee_kwarg="five")
 
 
-def test_BayesianSampler__fit(linear_fit):
+def test_BayesianSampler__fit():
     
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
 
     # -------------------------------------------------------------------------
     # basic run; checking use_ml_guess = True effect
 
-    # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -439,12 +428,9 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; checking use_ml_guess = False effect
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # set guess to 1, 1. works, but differs from ML guess of 2, 1 and can thus
     # be distinguished below
@@ -475,12 +461,9 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; checking effects of altered num_steps and num_walkers
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -509,12 +492,9 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; altered burn in
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -543,18 +523,14 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; fixed parameter; no ml
 
     # Very small analysis, starting from no ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
     
     f.param_df.loc["b","fixed"] = True
     f.param_df.loc["m","prior_mean"] = 2
     f.param_df.loc["m","prior_std"] = 5
     
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
-
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
     assert not hasattr(f,"_initial_state")
@@ -584,14 +560,11 @@ def test_BayesianSampler__fit(linear_fit):
     # basic run; fixed parameter; ml
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     f.param_df.loc["b","fixed"] = True
-
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
@@ -622,12 +595,9 @@ def test_BayesianSampler__fit(linear_fit):
     # run twice in a row to check for sample appending
 
     # Very small analysis, starting from ML
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -667,7 +637,7 @@ def test_BayesianSampler__fit(linear_fit):
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
 
-def test_BayesianSampler__update_fit_df(linear_fit):
+def test_BayesianSampler__update_fit_df():
     
     # Create a BayesianSampler with a model loaded (and _fit_df implicitly 
     # created)
@@ -696,16 +666,14 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     # make sure the updater properly copies in parameter values the user may 
     # have altered after defining the model but before finalizing the fit. 
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    
-    # super small sampler
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
 
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -750,16 +718,9 @@ def test_BayesianSampler__update_fit_df(linear_fit):
     # --------------------------------------------------------------------------
     # make sure the function handles a tiny number of samples
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    
-    # super small sampler
-    f = BayesianSampler(some_function=fcn,
-                        fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f = BayesianSampler(some_function=linear_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert f.samples is None
 

@@ -122,22 +122,6 @@ def binding_curve_test_data():
     json_data["df"] = pd.read_csv(f,index_col=0)
 
     # ------------------------------------------------------------
-    # Generic method that can be fit (observable takes a single
-    # numpy array of arguments and returns an array of y_calc)
-    # ------------------------------------------------------------
-    class BindingCurve:
-        """
-        Pre-wrapped binding model.
-        """
-        def __init__(self,X):
-            self.X = X
-        def observable(self,K):
-            return K[0]*self.X/(1 + K[0]*self.X)
-
-    lm = BindingCurve(X=json_data["df"].X)
-    json_data["generic_model"] = lm.observable
-
-    # ------------------------------------------------------------
     # Save a model that should be readily wrapped by ModelWrapper
     # ------------------------------------------------------------
 
@@ -145,19 +129,10 @@ def binding_curve_test_data():
         """
         A form of the model that should be wrappable by ModelWrapper.
         """
-        return K*df.X/(1 + K*df.X)
+        return K*df.x/(1 + K*df.x)
 
     json_data["wrappable_model"] = wrappable_model
 
-    def model_to_test_wrap(K1,K2=20,extra_stuff="test",K3=42):
-
-        K1 = float(K1)
-        K2 = float(K2)
-        K3 = float(K3)
-
-        return K1*K2*K3
-
-    json_data["model_to_test_wrap"] = model_to_test_wrap
 
     return json_data
 
@@ -167,78 +142,6 @@ def fit_tolerance_fixture():
     Fit tolerance for checking (relative tolerance)
     """
     return 0.1
-
-@pytest.fixture(scope="module")
-def fitter_object(binding_curve_test_data):
-    """
-    Do a successful fit that can be passed into other functions
-    """
-
-    out_dict = {}
-
-    # Do a generic fit where the input function (generic_model) is run without
-    # an intervening ModelWrapper
-
-    generic_fit = MLFitter()
-
-    model = binding_curve_test_data["generic_model"]
-    guesses = binding_curve_test_data["guesses"]
-    df = binding_curve_test_data["df"]
-
-    generic_fit.fit(model=model,
-                    guesses=guesses,
-                    y_obs=df.Y,
-                    y_std=df.Y_stdev)
-
-    if not generic_fit.success:
-        raise RuntimeError("generic test fit did not converge!")
-
-    out_dict["generic_fit"] = generic_fit
-
-    # Do a fit where the input function is wrapped by ModelWrapper
-
-    wrapped_fit = MLFitter()
-    
-    model = binding_curve_test_data["wrappable_model"]
-    model = ModelWrapper(model)
-    df = binding_curve_test_data["df"]
-    model.df = df
-
-    guesses = binding_curve_test_data["guesses"]
-    
-    wrapped_fit.fit(model=model,
-                    guesses=guesses,
-                    y_obs=df.Y,
-                    y_std=df.Y_stdev)
-    
-    if not wrapped_fit.success:
-        raise RuntimeError("wrapped test fit did not converge!")
-
-    out_dict["wrapped_fit"] = wrapped_fit
-
-    return out_dict
-
-@pytest.fixture(scope="module")
-def linear_fit():
-    
-    out = {}
-
-    out["coeff"] = {"m":2,"b":1}
-
-    x = np.arange(10)
-    y_obs = out["coeff"]["m"]*x + out["coeff"]["b"]
-    y_std = 0.1*np.ones(10)
-
-    out["df"] = pd.DataFrame({"x":x,
-                              "y_obs":y_obs,
-                              "y_std":y_std})
-
-    def simple_linear(m,b,x):
-        return m*x + b
-    
-    out["fcn"] = simple_linear
-
-    return out
 
 
 ## Code for skipping slow tests.

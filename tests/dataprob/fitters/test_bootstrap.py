@@ -63,20 +63,21 @@ def test_BootstrapFitter_fit():
 
 
 
-def test_BootstrapFitter__fit(linear_fit):
+def test_BootstrapFitter__fit():
     
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
 
     # -------------------------------------------------------------------------
     # basic run with small number of bootstraps
 
-    f = BootstrapFitter(some_function=fcn,
+    f = BootstrapFitter(some_function=linear_fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -115,8 +116,7 @@ def test_BootstrapFitter__fit(linear_fit):
 
     def bad_model(a,b): return np.ones(10)*np.nan
     f = BootstrapFitter(some_function=bad_model)
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+    f.data_df = data_df
     
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -137,11 +137,10 @@ def test_BootstrapFitter__fit(linear_fit):
     # basic run by set number of steps so small it never converges. should have
     # fit.success == False on each least squares
 
-    f = BootstrapFitter(some_function=fcn,
+    f = BootstrapFitter(some_function=linear_fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -173,7 +172,7 @@ def test_BootstrapFitter__fit(linear_fit):
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
-def test_BootstrapFitter__update_fit_df(linear_fit):
+def test_BootstrapFitter__update_fit_df():
     
     # Create a BootstrapFitter with a model loaded (and _fit_df implicitly 
     # created)
@@ -238,15 +237,16 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     # make sure the updater properly copies in parameter values the user may 
     # have altered after defining the model but before finalizing the fit. 
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
     
     # super small sampler
-    f = BootstrapFitter(some_function=fcn,
+    f = BootstrapFitter(some_function=linear_fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -289,15 +289,16 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     # --------------------------------------------------------------------------
     # make sure the function handles a tiny number of samples
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    
     # super small sampler
-    f = BootstrapFitter(some_function=fcn,
+    f = BootstrapFitter(some_function=linear_fcn,
                         fit_parameters=["m","b"],
-                        non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     assert f.samples is None
 

@@ -43,7 +43,7 @@ def test_MLFitter_fit():
 
 
 
-def test_MLFitter__fit(linear_fit):
+def test_MLFitter__fit():
 
     # Basic functionality and logic tests. Numerical tests on more interesting
     # fitting problems are below. Tests run through .fit() because that
@@ -52,19 +52,19 @@ def test_MLFitter__fit(linear_fit):
     # --------------------------------------------------------------------------
     # Simple model to test
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    expected_result = np.array([coeff["m"],coeff["b"]])
-
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    expected_result = np.array([2,-1])
+    
     # --------------------------------------------------------------------------
     # Run fit
 
-    f = MLFitter(some_function=fcn,
+    f = MLFitter(some_function=linear_fcn,
                  fit_parameters=["m","b"],
-                 non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
     
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
 
@@ -103,11 +103,10 @@ def test_MLFitter__fit(linear_fit):
     # --------------------------------------------------------------------------
     # Make sure that parameter fixing is propagating properly
 
-    f = MLFitter(some_function=fcn,
+    f = MLFitter(some_function=linear_fcn,
                  fit_parameters=["m","b"],
-                 non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     f.param_df.loc["b","guess"] = 0
     f.param_df.loc["b","fixed"] = True
@@ -115,18 +114,18 @@ def test_MLFitter__fit(linear_fit):
     f.fit()
 
 
-def test_MLFitter__update_fit_df(linear_fit):
+def test_MLFitter__update_fit_df():
     
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    expected_result = np.array([coeff["m"],coeff["b"]])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    expected_result = np.array([2,-1])
 
-    f = MLFitter(some_function=fcn,
+    f = MLFitter(some_function=linear_fcn,
                  fit_parameters=["m","b"],
-                 non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
@@ -160,11 +159,10 @@ def test_MLFitter__update_fit_df(linear_fit):
     # make sure the updater properly copies in parameter values the user may 
     # have altered after defining the model but before finalizing the fit. 
 
-    f = MLFitter(some_function=fcn,
+    f = MLFitter(some_function=linear_fcn,
                  fit_parameters=["m","b"],
-                 non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -203,18 +201,18 @@ def test_MLFitter__update_fit_df(linear_fit):
     assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
     assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
 
-def test_MLFitter_samples(linear_fit):
+def test_MLFitter_samples():
 
-    df = linear_fit["df"]
-    fcn = linear_fit["fcn"]  # def simple_linear(m,b,x): return m*x + b
-    coeff = linear_fit["coeff"]
-    expected_result = np.array([coeff["m"],coeff["b"]])
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+    expected_result = np.array([2,-1])
 
-    f = MLFitter(some_function=fcn,
+    f = MLFitter(some_function=linear_fcn,
                  fit_parameters=["m","b"],
-                 non_fit_kwargs={"x":df.x})
-    f._y_obs = df.y_obs
-    f._y_std = df.y_std
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
 
     # no samples generated
     assert f.samples is None

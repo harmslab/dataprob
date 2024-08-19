@@ -176,12 +176,12 @@ class VectorModelWrapper(ModelWrapper):
                                             default_guess=self._default_guess)
         
         # Get currently un-fixed parameters
-        self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
+        self._unfixed_mask = np.logical_not(self._param_df["fixed"])
         self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
         
         # Create all param vector
         self._all_param_vector = np.array(self._param_df["guess"],dtype=float)
-
+    
         # Make sure the user has not altered non_fit_kwargs keys
         self._validate_non_fit_kwargs()
 

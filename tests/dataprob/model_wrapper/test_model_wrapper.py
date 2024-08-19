@@ -398,10 +398,6 @@ def test_ModelWrapper_finalize_params():
     mw.finalize_params()
     
 
-
-    
-
-
 def test_ModelWrapper__mw_observable():
 
     # Simple model
