@@ -15,7 +15,6 @@ import pandas as pd
 
 import pickle
 import os
-import warnings
 import copy
 
 def _pretty_zeropad_str(N):
@@ -102,32 +101,35 @@ class Fitter:
         and y_std). Make sure they are consistent with each other.
         """
 
-        # Record y_obs if specified. The setter does sanity checking. 
+        # record y_obs if specified
+        to_df = {}
         if y_obs is not None:
-            self.y_obs = y_obs
+            to_df["y_obs"] = y_obs
         
-        # Make sure y_obs was specified
-        if self.y_obs is None:
-            err = "y_obs must be specified prior to doing a fit\n"
-            raise ValueError(err)
-        
-        # Record y_std if specified. The setter does sanity checking. 
+        # record y_std if specified
         if y_std is not None:
-            self.y_std = y_std
+            to_df["y_std"] = y_std
 
-        # Make fake y_std if not specified, warning. 
-        if self.y_std is None:
-
-            scalar = np.mean(np.abs(self._y_obs))*0.1
-            self.y_std = scalar*np.ones(len(self.y_obs),dtype=float)
-
-            w = "\ny_std must be sent in for proper residual/likelihood\n"
-            w += f"calculation. We have arbitrarily set it to {scalar:.2e}\n"
-            w += "(10% of mean y_obs magnitude). We highly recommend you\n"
-            w += "explicitly set your estimate for the uncertainty on each\n"
-            w += "observation.\n"
-            warnings.warn(w) 
+        # If both specified, turn into dataframe and store as data_df. Setter 
+        # validates. 
+        if len(to_df) == 2:
+            self.data_df = pd.DataFrame(to_df)
         
+        # If one specified, store in the existing data_df. data_df setter takes
+        # care of validation
+        elif len(to_df) == 1:
+
+            data_df = self.data_df
+            for column in to_df:
+                data_df[column] = to_df[column]
+            self.data_df = data_df
+
+        # else here for completeness -- do not do anything if y_obs and y_std
+        # are both zero. 
+        else:
+            pass
+
+                
     def fit(self,
             y_obs=None,
             y_std=None,
@@ -322,8 +324,7 @@ class Fitter:
     @property
     def y_obs(self):
         """
-        Observed y values for fit. This should be a 1D numpy array of floats 
-        the same length as the number of observations. 
+        Observed y values for fit. 
         """
 
         try:
@@ -331,63 +332,17 @@ class Fitter:
         except AttributeError:
             return None
 
-    @y_obs.setter
-    def y_obs(self,y_obs):
-        
-        y_obs = check_array(value=y_obs,
-                            variable_name="y_obs",
-                            expected_shape=(None,),
-                            expected_shape_names="(num_obs,)",
-                            nan_allowed=False)
-        self._y_obs = y_obs
-        self._fit_has_been_run = False
 
     @property
     def y_std(self):
         """
-        Estimated standard deviation on observed y values. This should be a 1D
-        numpy array of floats the same length as the number of observations. 
+        Estimated standard deviation on observed y values. 
         """
 
         try:
             return self._y_std
         except AttributeError:
             return None
-
-    @y_std.setter
-    def y_std(self,y_std):
-
-        # Make sure the number of observations is known (determined by 
-        # self._y_obs, ultimately)
-        if self.num_obs is None:
-            err = "y_std cannot be specified before y_obs\n"
-            raise ValueError(err)
-            
-        # If the user sends in a single value, try to expand to an array 
-        if not hasattr(y_std,"__iter__"):
-
-            # Make sure it's a float
-            y_std = check_float(value=y_std,
-                                variable_name="y_std")
-
-            # Expanded y_std
-            y_std = y_std*np.ones(self.num_obs,dtype=float)
-            
-        # Make sure array has correct dimensions
-        y_std = check_array(value=y_std,
-                            variable_name="y_std",
-                            expected_shape=(self.num_obs,),
-                            expected_shape_names=f"({self.num_obs},)",
-                            nan_allowed=False)
-        
-        # no values < 0 allowed
-        if np.sum(y_std < 0) > 0:
-            err = "all entries in y_std must be greater than zero\n"
-            raise ValueError(err)
-        
-        self._y_std = y_std
-        self._fit_has_been_run = False
-
 
     @property
     def param_df(self):
@@ -397,15 +352,10 @@ class Fitter:
 
         return self._model.param_df
     
-    @property
-    def non_fit_kwargs(self):
-        """
-        Return a dictionary with the keyword arguments to pass to the function
-        that are not fit parameters.
-        """
-        
-        return self._model.non_fit_kwargs
-        
+    @param_df.setter
+    def param_df(self,param_df):
+        self._model.param_df = param_df
+    
     @property
     def data_df(self):
 
@@ -430,7 +380,56 @@ class Fitter:
     @data_df.setter
     def data_df(self,data_df):
 
-        df = read_spreadsheet(data_df)
+        # Read dataframe
+        data_df = read_spreadsheet(data_df)
+
+        # make sure it has y_obs and y_std
+        has_columns = np.sum(data_df.columns.isin(["y_obs","y_std"]))
+        if has_columns != 2:
+            err = "data_df must have both y_obs and y_std columns\n"
+            raise ValueError(err)
+        
+        # Go through each column
+        for c in ["y_obs","y_std"]:
+
+            # start with the pandas caster to numeric as this is smart and
+            # robust
+            try:
+                data_df[c] = pd.to_numeric(data_df[c])
+            except Exception as e:
+                err = f"Could not coerce all entries in the '{c}' column to float\n"
+                raise ValueError(err) from e
+            
+            # then do a direct cast to float
+            data_df[c] = data_df[c].astype(float)
+
+            if np.sum(np.isnan(data_df[c])) > 0:
+                err = "y_obs and y_std must not contain nan\n"
+                raise ValueError(err)
+            
+            if np.sum(np.isinf(data_df[c])) > 0:
+                err = "y_obs and y_std must be finite\n"
+                raise ValueError(err)
+
+        if np.sum(data_df["y_std"] <= 0) > 0:
+            err = "all y_std values must be >= 0\n"
+            raise ValueError(err)
+
+        # Store y_obs and y_std
+        self._y_obs = data_df["y_obs"]
+        self._y_std = data_df["y_std"]
+
+        # new y_obs, fit has not been run yet
+        self._fit_has_been_run = False
+
+    @property
+    def non_fit_kwargs(self):
+        """
+        Return a dictionary with the keyword arguments to pass to the function
+        that are not fit parameters.
+        """
+        
+        return self._model.non_fit_kwargs
 
     def _initialize_fit_df(self):
 
@@ -465,7 +464,6 @@ class Fitter:
 
         return self._fit_df
         
-
     @property
     def samples(self):
         """

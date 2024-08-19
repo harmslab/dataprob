@@ -281,8 +281,7 @@ class BayesianSampler(Fitter):
         if self._use_ml_guess:
 
             ml_fit = MLFitter(some_function=self._model)
-            ml_fit.y_obs = self.y_obs
-            ml_fit.y_std = self.y_std
+            ml_fit.data_df = self.data_df
             ml_fit.fit()
             self._initial_state = ml_fit.samples[:self._num_walkers,:]
 

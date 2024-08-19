@@ -63,8 +63,8 @@ def test_MLFitter__fit(linear_fit):
     f = MLFitter(some_function=fcn,
                  fit_parameters=["m","b"],
                  non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
     
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
 
@@ -106,8 +106,8 @@ def test_MLFitter__fit(linear_fit):
     f = MLFitter(some_function=fcn,
                  fit_parameters=["m","b"],
                  non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     f.param_df.loc["b","guess"] = 0
     f.param_df.loc["b","fixed"] = True
@@ -125,8 +125,8 @@ def test_MLFitter__update_fit_df(linear_fit):
     f = MLFitter(some_function=fcn,
                  fit_parameters=["m","b"],
                  non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
@@ -163,8 +163,8 @@ def test_MLFitter__update_fit_df(linear_fit):
     f = MLFitter(some_function=fcn,
                  fit_parameters=["m","b"],
                  non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -203,9 +203,6 @@ def test_MLFitter__update_fit_df(linear_fit):
     assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
     assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
 
-
-
-
 def test_MLFitter_samples(linear_fit):
 
     df = linear_fit["df"]
@@ -216,8 +213,8 @@ def test_MLFitter_samples(linear_fit):
     f = MLFitter(some_function=fcn,
                  fit_parameters=["m","b"],
                  non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # no samples generated
     assert f.samples is None

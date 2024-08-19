@@ -150,8 +150,8 @@ def test_Fitter__process_obs_args():
     assert f.y_obs is None
     assert f.y_std is None
 
-    # now set y_obs with setter
-    f.y_obs = [1,2,3]
+    # now set _y_obs with setter
+    f._y_obs = [1,2,3]
     f._process_obs_args(y_obs=None,
                         y_std=[1,1,1])
     assert np.array_equal(f.y_obs,[1,2,3])
@@ -164,20 +164,16 @@ def test_Fitter__process_obs_args():
     assert f.y_std is None
 
     # Fail and make sure nothing changed
-    with pytest.warns():
+    with pytest.raises(ValueError):
         f._process_obs_args(y_obs=[1,2,3],
                             y_std=None)
-    assert np.array_equal(f.y_obs,[1,2,3])
-    expected_y_std = np.mean([1,2,3])*0.1*np.ones(3)
-    assert np.array_equal(f.y_std,expected_y_std)
-
+    
     # ----------------------------------------------------------------------
     # y_std via setter, warn
     f = copy.deepcopy(f_base)
     assert f.y_obs is None
     assert f.y_std is None
-    f.y_obs = [4,5,6] # have to define y_obs before y_std
-    f.y_std = [1,1,1]
+    f._y_std = [1,1,1]
 
     # Should work fine, no warning because y_std defined previously
     f._process_obs_args(y_obs=[1,2,3],y_std=None)
@@ -292,7 +288,7 @@ def test_Fitter__unweighted_residuals(binding_curve_test_data):
     f = copy.deepcopy(f_base)
     
     # Calculate residual given the input params
-    f.y_obs = df.Y
+    f._y_obs = df.Y
     r = f._unweighted_residuals(input_params)
 
     assert np.allclose(r,df.residual)
@@ -314,7 +310,7 @@ def test_Fitter_unweighted_residuals(binding_curve_test_data):
         f.unweighted_residuals(input_params)
 
     # Should work now
-    f.y_obs = df.Y
+    f._y_obs = df.Y
     r = f.unweighted_residuals(input_params)
     assert np.allclose(r,df.residual)
 
@@ -336,8 +332,8 @@ def test_Fitter__weighted_residuals(binding_curve_test_data):
                     non_fit_kwargs={"df":df})
     f = copy.deepcopy(f_base)
 
-    f.y_obs = df.Y
-    f.y_std = df.Y_stdev
+    f._y_obs = df.Y
+    f._y_std = df.Y_stdev
 
     # Calculate residual given the input params
     input_params = binding_curve_test_data["input_params"]
@@ -362,13 +358,13 @@ def test_Fitter_weighted_residuals(binding_curve_test_data):
     with pytest.raises(RuntimeError):
         f.weighted_residuals(input_params)
 
-    f.y_obs = df.Y
+    f._y_obs = df.Y
 
     # Should fail, haven't loaded y_std yet
     with pytest.raises(RuntimeError):
         f.weighted_residuals(input_params)
 
-    f.y_std = df.Y_stdev
+    f._y_std = df.Y_stdev
 
     r = f.weighted_residuals(input_params)
     assert np.allclose(r,df.weighted_residual)
@@ -388,8 +384,8 @@ def test_Fitter__ln_like(binding_curve_test_data):
                     non_fit_kwargs={"df":df})
     f = copy.deepcopy(f_base)
 
-    f.y_obs = df.Y
-    f.y_std = df.Y_stdev
+    f._y_obs = df.Y
+    f._y_std = df.Y_stdev
 
     input_params = binding_curve_test_data["input_params"]
 
@@ -412,13 +408,13 @@ def test_Fitter_ln_like(binding_curve_test_data):
     with pytest.raises(RuntimeError):
         f.ln_like(input_params)
 
-    f.y_obs = df.Y
+    f._y_obs = df.Y
 
     # Should fail, haven't loaded y_std yet
     with pytest.raises(RuntimeError):
         f.ln_like(input_params)
 
-    f.y_std = df.Y_stdev
+    f._y_std = df.Y_stdev
     
     L = f.ln_like(input_params)
     
@@ -433,98 +429,29 @@ def test_Fitter_ln_like(binding_curve_test_data):
 # Test setters, getters, and internal sanity checks
 # ---------------------------------------------------------------------------- #
 
-def test_Fitter_y_obs_setter_getter(binding_curve_test_data):
+def test_Fitter_y_obs():
     """
     Test the y_obs setter.
     """
 
     def test_fcn(x=1,y=2): return x*y
-
     f = Fitter(some_function=test_fcn)
- 
-    y_obs_input = np.array(binding_curve_test_data["df"].Y)
-
-    f.y_obs = y_obs_input
-    assert f.y_obs is not None
-    assert np.array_equal(f.y_obs,y_obs_input)
-    assert f._fit_has_been_run is False
-
-    f = Fitter(some_function=test_fcn)
-    with pytest.raises(ValueError):
-        f.y_obs = "a"
-    with pytest.raises(ValueError):
-        f.y_obs = ["a","b"]
-
-    # nan
-    tmp_input = y_obs_input.copy()
-    tmp_input[0] = np.nan
-    with pytest.raises(ValueError):
-        f.y_std = tmp_input
-
-    f = Fitter(some_function=test_fcn)
-    f.y_obs = y_obs_input
-    assert np.array_equal(f.y_obs,y_obs_input)
-    assert f.num_obs == y_obs_input.shape[0]
+    assert f.y_obs is None
+    f._y_obs = "something"
+    assert f.y_obs == "something"
+    
 
   
-def test_Fitter_y_std_setter_getter(binding_curve_test_data):
+def test_Fitter_y_std():
     """
     Test the y_std setter.
     """
 
     def test_fcn(x=1,y=2): return x*y
-    y_obs_input = np.array(binding_curve_test_data["df"].Y)
-    y_std_input = np.array(binding_curve_test_data["df"].Y_stdev)
-
     f = Fitter(some_function=test_fcn)
     assert f.y_std is None
-    assert f.num_obs is None
-
-    # Cannot add y_std before y_obs
-    with pytest.raises(ValueError):
-        f.y_std = y_std_input
-
-    f.y_obs = y_obs_input
-
-    f.y_std = y_std_input
-    assert np.array_equal(y_std_input,f.y_std)
-    assert f.num_obs == len(y_std_input)
-    assert f._fit_has_been_run is False
-
-    f = Fitter(some_function=test_fcn)
-    assert f.y_std is None
-    f.y_obs = y_obs_input
-
-    # Bad values
-    with pytest.raises(ValueError):
-        f.y_std = "a"
-    with pytest.raises(ValueError):
-        f.y_std = ["a","b"]
-    with pytest.raises(ValueError):
-        f.y_std = y_std_input[:-1]
-    
-    # nan
-    tmp_input = y_std_input.copy()
-    tmp_input[0] = np.nan
-    with pytest.raises(ValueError):
-        f.y_std = tmp_input
-    
-    # negative
-    tmp_input = y_std_input.copy()
-    tmp_input[0] = -1
-    with pytest.raises(ValueError):
-        f.y_std = tmp_input
-    
-    f.y_std = y_std_input
-    assert np.array_equal(y_std_input,f.y_std)
-    assert f._fit_has_been_run is False
-
-    # Set single value
-    f = Fitter(some_function=test_fcn)
-    assert f.y_std is None
-    f.y_obs = y_obs_input
-    f.y_std = 1.0
-    assert np.array_equal(f.y_std,np.ones(f.y_obs.shape))
+    f._y_std = "something"
+    assert f.y_std == "something"
 
 
 def test_Fitter_param_df():
@@ -535,7 +462,17 @@ def test_Fitter_param_df():
     assert len(f.param_df) == 2
     assert np.array_equal(f.param_df["name"],["a","b"])
 
+    not_good = pd.DataFrame({'name':["x","y"]})
+    with pytest.raises(ValueError):
+        f.param_df = not_good
+    
+    assert np.array_equal(f.param_df["guess"],[1,2])
+    good_df = pd.DataFrame({"name":["a","b"],"guess":[3,4]})
+    f.param_df = good_df
+    assert np.array_equal(f.param_df["guess"],[3,4])
+    
 
+        
 def test_Fitter_non_fit_kwargs():
 
     def test_fcn(a=1,b=2,c="test"): return a*b
@@ -560,6 +497,8 @@ def test_Fitter_non_fit_kwargs():
 
 def test_Fitter_data_df():
     
+    # test getter
+    
     def test_fcn(a=1,b=2): return a*b
     f = Fitter(some_function=test_fcn)
 
@@ -571,15 +510,15 @@ def test_Fitter_data_df():
     y_calc = np.arange(10)*0.9
 
     f = Fitter(some_function=test_fcn)
-    f.y_obs = y_obs
+    f._y_obs = y_obs
     out_df = f.data_df
     assert len(out_df) == 10
     assert len(out_df.columns) == 1
     assert np.array_equal(out_df["y_obs"],y_obs)
 
     f = Fitter(some_function=test_fcn)
-    f.y_obs = y_obs
-    f.y_std = y_std
+    f._y_obs = y_obs
+    f._y_std = y_std
     out_df = f.data_df
     assert len(out_df) == 10
     assert len(out_df.columns) == 2
@@ -588,8 +527,8 @@ def test_Fitter_data_df():
     
     def hack_fcn(a,b): return np.arange(10)*0.9
     f = Fitter(some_function=hack_fcn)
-    f.y_obs = y_obs
-    f.y_std = y_std
+    f._y_obs = y_obs
+    f._y_std = y_std
 
     # hack it so it thinks its done
     f._success = True
@@ -608,7 +547,68 @@ def test_Fitter_data_df():
     assert np.array_equal(out_df["weighted_residuals"],
                           (y_calc - y_obs)/y_std)
 
+    # set setter
+    def test_fcn(a=1,b=2): return a*b
+    f = Fitter(some_function=test_fcn)
+    f._fit_has_been_run = True # hack to True to check that it gets set to F
 
+    tmp_df = pd.DataFrame({"y_obs":[1,2],
+                           "y_std":[3,4]})
+    f.data_df = tmp_df
+    assert np.array_equal(f._y_obs,[1,2])
+    assert np.array_equal(f._y_std,[3,4])
+    assert np.array_equal(f.data_df["y_obs"],[1,2])
+    assert np.array_equal(f.data_df["y_std"],[3,4])
+    assert not f._fit_has_been_run
+
+    # missing column
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs":[1,2]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+    
+    # missing column
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_std":[1,2]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+
+    # bad column name
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs_y":[1,2],
+                           "y_std":[3,4]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+
+    # non-numeric column
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs":["not",2],
+                           "y_std":[3,4]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+
+    # nan column
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs":[np.nan,2],
+                           "y_std":[3,4]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+    
+    # inf column
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs":[np.inf,2],
+                           "y_std":[3,4]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+
+    # bad std
+    f = Fitter(some_function=test_fcn)
+    tmp_df = pd.DataFrame({"y_obs":[1,2],
+                           "y_std":[0,4]})
+    with pytest.raises(ValueError):
+        f.data_df = tmp_df
+
+    
 def test_Fitter__initialize_fit_df():
     
     # test on fake class
@@ -662,9 +662,6 @@ def test_Fitter_fit_df():
                            "guess","fixed","lower_bound","upper_bound",
                            "prior_mean","prior_std"])
 
-    f.y_obs = y_obs
-    f.y_std = 0.1
-
 
 def test_Fitter_samples():
     
@@ -697,7 +694,7 @@ def test_Fitter_get_sample_df():
     assert len(sample_df) == 0
 
     # add y_obs, should be in dataframe by itself
-    f.y_obs = y_obs
+    f._y_obs = y_obs
     sample_df = f.get_sample_df()
     assert issubclass(type(sample_df),pd.DataFrame)
     assert len(sample_df) == 10
@@ -705,7 +702,7 @@ def test_Fitter_get_sample_df():
     assert np.array_equal(sample_df.columns,["y_obs"])
 
     # add y_std, should now be in dataframe
-    f.y_std = y_std
+    f._y_std = y_std
     sample_df = f.get_sample_df()
     assert issubclass(type(sample_df),pd.DataFrame)
     assert len(sample_df) == 10
@@ -715,8 +712,8 @@ def test_Fitter_get_sample_df():
 
     # Create a fitter that has apparently been run, but has no samples
     f = Fitter(some_function=test_fcn)
-    f.y_obs = y_obs
-    f.y_std = y_std
+    f._y_obs = y_obs
+    f._y_std = y_std
     f._fit_df = pd.DataFrame({"estimate":[10,20]})
     f._success = True
 
@@ -953,11 +950,11 @@ def test_Fitter_num_obs():
     f = Fitter(some_function=test_fcn)
     assert f.num_obs is None
 
-    f.y_obs = np.arange(10)
+    f._y_obs = np.arange(10)
     assert f.num_obs == 10
 
     f = Fitter(some_function=test_fcn)
-    f.y_obs = np.array([])
+    f._y_obs = np.array([])
     assert f.num_obs == 0
 
 def test_Fitter_success():

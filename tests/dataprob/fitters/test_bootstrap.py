@@ -75,8 +75,8 @@ def test_BootstrapFitter__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
 
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -115,8 +115,8 @@ def test_BootstrapFitter__fit(linear_fit):
 
     def bad_model(a,b): return np.ones(10)*np.nan
     f = BootstrapFitter(some_function=bad_model)
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
     
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -140,8 +140,8 @@ def test_BootstrapFitter__fit(linear_fit):
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.sum(np.isnan(f._fit_df["estimate"])) == 2
@@ -173,9 +173,6 @@ def test_BootstrapFitter__fit(linear_fit):
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
-
-
-    
 def test_BootstrapFitter__update_fit_df(linear_fit):
     
     # Create a BootstrapFitter with a model loaded (and _fit_df implicitly 
@@ -248,8 +245,8 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -299,8 +296,8 @@ def test_BootstrapFitter__update_fit_df(linear_fit):
     f = BootstrapFitter(some_function=fcn,
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert f.samples is None
 

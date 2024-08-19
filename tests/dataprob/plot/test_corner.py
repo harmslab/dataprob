@@ -22,8 +22,8 @@ def test_plot_corner():
 
     # Create a fitter that has apparently been run and has some samples
     f = MLFitter(some_function=test_fcn)
-    f.y_obs = y_obs
-    f.y_std = y_std
+    f._y_obs = y_obs
+    f._y_std = y_std
     f._fit_df = pd.DataFrame({"name":["a","b"],"estimate":[10,20]})
     f._success = False
     f._samples = fake_samples

@@ -270,8 +270,8 @@ def test_BayesianSampler__ln_prob(linear_fit):
 
     f = BayesianSampler(some_function=fcn,
                         non_fit_kwargs={"x":df.x})
-    f.y_obs = df.y_obs
-    f.y_std = 0.1
+    f._y_obs = df.y_obs
+    f._y_std = np.ones(len(df.y_obs))*0.1
 
     f.param_df["guess"] = param
     f.param_df["prior_mean"] = [2,1]
@@ -308,12 +308,12 @@ def test_BayesianSampler_ln_prob(linear_fit):
         f.ln_prob(param)
     
     # should not work -- no y_std loaded
-    f.y_obs = df.y_obs
+    f._y_obs = df.y_obs
     with pytest.raises(RuntimeError):
         f.ln_prob(param)
 
     # should work -- all needed features defined
-    f.y_std = df.y_std
+    f._y_std = df.y_std
     v = f.ln_prob(param)
     assert v < 0
     
@@ -409,8 +409,8 @@ def test_BayesianSampler__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -443,8 +443,8 @@ def test_BayesianSampler__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # set guess to 1, 1. works, but differs from ML guess of 2, 1 and can thus
     # be distinguished below
@@ -479,8 +479,8 @@ def test_BayesianSampler__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -513,8 +513,8 @@ def test_BayesianSampler__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -552,8 +552,8 @@ def test_BayesianSampler__fit(linear_fit):
     f.param_df.loc["m","prior_mean"] = 2
     f.param_df.loc["m","prior_std"] = 5
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
@@ -590,8 +590,8 @@ def test_BayesianSampler__fit(linear_fit):
 
     f.param_df.loc["b","fixed"] = True
 
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert np.array_equal(f.param_df["fixed"],[False,True]) # make sure fixed
@@ -626,8 +626,8 @@ def test_BayesianSampler__fit(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
 
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert np.array_equal(f.param_df["guess"],[0,0])
     assert not hasattr(f,"_initial_state")
@@ -704,8 +704,8 @@ def test_BayesianSampler__update_fit_df(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
 
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     # fit_df should have been populated with default values from param_df
     assert np.array_equal(f.fit_df["fixed"],[False,False])
@@ -758,8 +758,8 @@ def test_BayesianSampler__update_fit_df(linear_fit):
                         fit_parameters=["m","b"],
                         non_fit_kwargs={"x":df.x})
     
-    f.y_obs = df.y_obs
-    f.y_std = df.y_std
+    f._y_obs = df.y_obs
+    f._y_std = df.y_std
 
     assert f.samples is None
 
