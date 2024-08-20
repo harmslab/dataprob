@@ -455,18 +455,48 @@
 ./build/lib/dataprob/fitters/setup.py:35:79: W291 trailing whitespace
 ./build/lib/dataprob/fitters/setup.py:37:29: W291 trailing whitespace
 ./build/lib/dataprob/fitters/setup.py:46:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:47:19: W291 trailing whitespace
 ./build/lib/dataprob/fitters/setup.py:61:32: W291 trailing whitespace
-./build/lib/dataprob/fitters/setup.py:72:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:74:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:75:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:76:5: E303 too many blank lines (2)
-./build/lib/dataprob/fitters/setup.py:76:23: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/setup.py:77:30: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/setup.py:78:25: E231 missing whitespace after ':'
-./build/lib/dataprob/fitters/setup.py:79:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:85:1: W293 blank line contains whitespace
-./build/lib/dataprob/fitters/setup.py:89:65: W292 no newline at end of file
+./build/lib/dataprob/fitters/setup.py:78:83: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:81:67: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:82:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:93:18: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:94:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:95:73: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:99:83: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:101:26: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:103:74: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:107:74: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:108:36: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:109:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:115:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:116:86: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:117:74: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:119:24: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:123:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:124:75: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:125:20: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:126:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:127:79: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:131:76: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:133:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:136:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:143:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:145:13: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:147:80: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:148:62: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:149:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:150:78: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:171:77: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:175:75: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:176:70: W291 trailing whitespace
+./build/lib/dataprob/fitters/setup.py:179:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:180:5: E303 too many blank lines (2)
+./build/lib/dataprob/fitters/setup.py:180:23: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/setup.py:181:30: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/setup.py:182:25: E231 missing whitespace after ':'
+./build/lib/dataprob/fitters/setup.py:183:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:189:1: W293 blank line contains whitespace
+./build/lib/dataprob/fitters/setup.py:193:65: W292 no newline at end of file
 ./build/lib/dataprob/model_wrapper/__init__.py:2:63: W291 trailing whitespace
 ./build/lib/dataprob/model_wrapper/__init__.py:3:4: W292 no newline at end of file
 ./build/lib/dataprob/model_wrapper/_dataframe_processing.py:8:1: E302 expected 2 blank lines, found 1
@@ -731,56 +761,23 @@
 ./build/lib/dataprob/model_wrapper/wrap_function.py:35:79: W291 trailing whitespace
 ./build/lib/dataprob/model_wrapper/wrap_function.py:37:29: W291 trailing whitespace
 ./build/lib/dataprob/model_wrapper/wrap_function.py:42:69: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:49:83: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:52:67: W291 trailing whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:44:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:47:1: W293 blank line contains whitespace
 ./build/lib/dataprob/model_wrapper/wrap_function.py:53:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:64:18: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:65:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:66:73: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:70:83: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:72:26: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:74:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:78:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:79:36: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:80:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:86:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:87:86: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:88:74: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:90:24: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:94:77: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:95:75: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:96:20: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:97:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:98:79: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:102:76: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:104:77: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:107:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:114:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:116:13: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:118:80: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:119:62: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:120:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:121:78: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:142:77: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:146:75: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:147:70: W291 trailing whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:150:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:153:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:159:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:165:33: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/wrap_function.py:168:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:169:35: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/wrap_function.py:172:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:173:35: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/wrap_function.py:173:78: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/wrap_function.py:180:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:184:32: E231 missing whitespace after ','
-./build/lib/dataprob/model_wrapper/wrap_function.py:195:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:196:5: E303 too many blank lines (2)
-./build/lib/dataprob/model_wrapper/wrap_function.py:200:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:206:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:207:1: W293 blank line contains whitespace
-./build/lib/dataprob/model_wrapper/wrap_function.py:207:9: W292 no newline at end of file
+./build/lib/dataprob/model_wrapper/wrap_function.py:59:33: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/wrap_function.py:62:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:63:35: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/wrap_function.py:66:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:67:35: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/wrap_function.py:67:78: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/wrap_function.py:74:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:78:32: E231 missing whitespace after ','
+./build/lib/dataprob/model_wrapper/wrap_function.py:89:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:90:5: E303 too many blank lines (2)
+./build/lib/dataprob/model_wrapper/wrap_function.py:94:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:100:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:101:1: W293 blank line contains whitespace
+./build/lib/dataprob/model_wrapper/wrap_function.py:101:9: W292 no newline at end of file
 ./build/lib/dataprob/plot/_plot_utils.py:3:47: W291 trailing whitespace
 ./build/lib/dataprob/plot/_plot_utils.py:13:1: E302 expected 2 blank lines, found 1
 ./build/lib/dataprob/plot/_plot_utils.py:38:36: W291 trailing whitespace
@@ -1577,18 +1574,48 @@
 ./src/dataprob/fitters/setup.py:35:79: W291 trailing whitespace
 ./src/dataprob/fitters/setup.py:37:29: W291 trailing whitespace
 ./src/dataprob/fitters/setup.py:46:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:47:19: W291 trailing whitespace
 ./src/dataprob/fitters/setup.py:61:32: W291 trailing whitespace
-./src/dataprob/fitters/setup.py:72:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:74:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:75:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:76:5: E303 too many blank lines (2)
-./src/dataprob/fitters/setup.py:76:23: E231 missing whitespace after ':'
-./src/dataprob/fitters/setup.py:77:30: E231 missing whitespace after ':'
-./src/dataprob/fitters/setup.py:78:25: E231 missing whitespace after ':'
-./src/dataprob/fitters/setup.py:79:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:85:1: W293 blank line contains whitespace
-./src/dataprob/fitters/setup.py:89:65: W292 no newline at end of file
+./src/dataprob/fitters/setup.py:78:83: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:81:67: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:82:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:93:18: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:94:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:95:73: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:99:83: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:101:26: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:103:74: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:107:74: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:108:36: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:109:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:115:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:116:86: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:117:74: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:119:24: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:123:77: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:124:75: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:125:20: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:126:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:127:79: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:131:76: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:133:77: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:136:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:143:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:145:13: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:147:80: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:148:62: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:149:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:150:78: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:171:77: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:175:75: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:176:70: W291 trailing whitespace
+./src/dataprob/fitters/setup.py:179:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:180:5: E303 too many blank lines (2)
+./src/dataprob/fitters/setup.py:180:23: E231 missing whitespace after ':'
+./src/dataprob/fitters/setup.py:181:30: E231 missing whitespace after ':'
+./src/dataprob/fitters/setup.py:182:25: E231 missing whitespace after ':'
+./src/dataprob/fitters/setup.py:183:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:189:1: W293 blank line contains whitespace
+./src/dataprob/fitters/setup.py:193:65: W292 no newline at end of file
 ./src/dataprob/model_wrapper/__init__.py:2:63: W291 trailing whitespace
 ./src/dataprob/model_wrapper/__init__.py:3:4: W292 no newline at end of file
 ./src/dataprob/model_wrapper/_dataframe_processing.py:8:1: E302 expected 2 blank lines, found 1
@@ -1853,56 +1880,23 @@
 ./src/dataprob/model_wrapper/wrap_function.py:35:79: W291 trailing whitespace
 ./src/dataprob/model_wrapper/wrap_function.py:37:29: W291 trailing whitespace
 ./src/dataprob/model_wrapper/wrap_function.py:42:69: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:49:83: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:52:67: W291 trailing whitespace
+./src/dataprob/model_wrapper/wrap_function.py:44:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:47:1: W293 blank line contains whitespace
 ./src/dataprob/model_wrapper/wrap_function.py:53:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:64:18: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:65:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:66:73: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:70:83: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:72:26: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:74:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:78:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:79:36: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:80:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:86:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:87:86: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:88:74: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:90:24: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:94:77: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:95:75: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:96:20: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:97:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:98:79: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:102:76: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:104:77: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:107:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:114:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:116:13: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:118:80: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:119:62: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:120:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:121:78: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:142:77: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:146:75: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:147:70: W291 trailing whitespace
-./src/dataprob/model_wrapper/wrap_function.py:150:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:153:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:159:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:165:33: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/wrap_function.py:168:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:169:35: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/wrap_function.py:172:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:173:35: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/wrap_function.py:173:78: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/wrap_function.py:180:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:184:32: E231 missing whitespace after ','
-./src/dataprob/model_wrapper/wrap_function.py:195:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:196:5: E303 too many blank lines (2)
-./src/dataprob/model_wrapper/wrap_function.py:200:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:206:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:207:1: W293 blank line contains whitespace
-./src/dataprob/model_wrapper/wrap_function.py:207:9: W292 no newline at end of file
+./src/dataprob/model_wrapper/wrap_function.py:59:33: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/wrap_function.py:62:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:63:35: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/wrap_function.py:66:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:67:35: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/wrap_function.py:67:78: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/wrap_function.py:74:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:78:32: E231 missing whitespace after ','
+./src/dataprob/model_wrapper/wrap_function.py:89:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:90:5: E303 too many blank lines (2)
+./src/dataprob/model_wrapper/wrap_function.py:94:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:100:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:101:1: W293 blank line contains whitespace
+./src/dataprob/model_wrapper/wrap_function.py:101:9: W292 no newline at end of file
 ./src/dataprob/plot/_plot_utils.py:3:47: W291 trailing whitespace
 ./src/dataprob/plot/_plot_utils.py:13:1: E302 expected 2 blank lines, found 1
 ./src/dataprob/plot/_plot_utils.py:38:36: W291 trailing whitespace
@@ -6103,8 +6097,8 @@
 17    F401 '.fitters.setup.setup' imported but unused
 17    F541 f-string is missing placeholders
 3     F841 local variable 'patterns' is assigned to but never used
-838   W291 trailing whitespace
+836   W291 trailing whitespace
 43    W292 no newline at end of file
-880   W293 blank line contains whitespace
+876   W293 blank line contains whitespace
 12    W391 blank line at end of file
-6080
+6074
