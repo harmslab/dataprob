@@ -101,9 +101,9 @@ class BayesianSampler(Fitter):
         # can use in prior calculations without any dictionary lookups. 
         unfixed = self._model.unfixed_mask
         self._lower_bounds = np.array(self.param_df.loc[unfixed,"lower_bound"],
-                                      dtype=float)
+                                      dtype=float).copy()
         self._upper_bounds = np.array(self.param_df.loc[unfixed,"upper_bound"],
-                                      dtype=float)
+                                      dtype=float).copy()
 
     def _ln_prior(self,param):
         """
@@ -357,7 +357,7 @@ class BayesianSampler(Fitter):
                     "prior_std"]:
             self._fit_df[col] = self.param_df[col]
 
-        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        fixed = np.array(self._fit_df["fixed"],dtype=bool).copy()
         unfixed = np.logical_not(fixed)
 
         self._fit_df.loc[unfixed,"estimate"] = estimate

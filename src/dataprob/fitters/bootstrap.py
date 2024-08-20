@@ -64,9 +64,9 @@ class BootstrapFitter(Fitter):
 
         # Grab un-fixed guesses and bounds
         to_fit = self._model.unfixed_mask
-        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
+        guesses = np.array(self._model.param_df.loc[to_fit,"guess"]).copy()
         bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
-                           self._model.param_df.loc[to_fit,"upper_bound"]])
+                           self._model.param_df.loc[to_fit,"upper_bound"]]).copy()
 
         # Create array to store bootstrap replicates
         samples = np.zeros((self._num_bootstrap,len(guesses)),dtype=float)
@@ -182,7 +182,7 @@ class BootstrapFitter(Fitter):
                     "prior_std"]:
             self._fit_df[col] = self.param_df[col]
 
-        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        fixed = np.array(self._fit_df["fixed"],dtype=bool).copy()
         unfixed = np.logical_not(fixed)
 
         self._fit_df.loc[unfixed,"estimate"] = estimate

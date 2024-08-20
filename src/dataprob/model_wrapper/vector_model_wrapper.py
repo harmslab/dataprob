@@ -164,10 +164,10 @@ class VectorModelWrapper(ModelWrapper):
         
         # Get currently un-fixed parameters
         self._unfixed_mask = np.array(np.logical_not(self._param_df["fixed"]),dtype=bool)
-        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
+        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"]).copy()
         
         # Create all param vector
-        self._all_param_vector = np.array(self._param_df["guess"],dtype=float)
+        self._all_param_vector = np.array(self._param_df["guess"],dtype=float).copy()
     
         # Make sure the user has not altered non_fit_kwargs keys
         self._validate_non_fit_kwargs()
@@ -192,7 +192,7 @@ class VectorModelWrapper(ModelWrapper):
         # user has fixed value or made a change that has not propagated properly
         self.finalize_params()
 
-        compiled_params = np.array(self._param_df["guess"],dtype=float)
+        compiled_params = np.array(self._param_df["guess"],dtype=float).copy()
 
         if params is None:
             params = compiled_params
@@ -212,7 +212,7 @@ class VectorModelWrapper(ModelWrapper):
             err += f"the total number of parameters ({len(self._param_df)})\n"
             err += f"or the number of unfixed parameters ({np.sum(self._unfixed_mask)}).\n"
             raise ValueError(err)
-        
+
         try:
             return self._model_to_fit(compiled_params,
                                       **self._non_fit_kwargs)

@@ -66,9 +66,9 @@ class MLFitter(Fitter):
         """
 
         to_fit = self._model.unfixed_mask
-        guesses = np.array(self._model.param_df.loc[to_fit,"guess"])
+        guesses = np.array(self._model.param_df.loc[to_fit,"guess"]).copy()
         bounds = np.array([self._model.param_df.loc[to_fit,"lower_bound"],
-                           self._model.param_df.loc[to_fit,"upper_bound"]])
+                           self._model.param_df.loc[to_fit,"upper_bound"]]).copy()
         # Do the actual fit
         def fn(*args): return -self._weighted_residuals(*args)
         self._fit_result = optimize.least_squares(fn,
@@ -127,7 +127,7 @@ class MLFitter(Fitter):
                     "prior_std"]:
             self._fit_df[col] = self.param_df[col]
 
-        fixed = np.array(self._fit_df["fixed"],dtype=bool)
+        fixed = np.array(self._fit_df["fixed"],dtype=bool).copy()
         unfixed = np.logical_not(fixed)
 
         self._fit_df.loc[unfixed,"estimate"] = estimate
@@ -174,7 +174,7 @@ class MLFitter(Fitter):
             return None
 
         unfixed = np.logical_not(np.array(self.fit_df["fixed"],dtype=bool))
-        estimate = np.array(self.fit_df.loc[unfixed,"estimate"])
+        estimate = np.array(self.fit_df.loc[unfixed,"estimate"]).copy()
         self._samples = np.dot(np.random.normal(size=(self._num_samples,
                                                       chol_cov.shape[0])),
                                                 chol_cov)

@@ -375,7 +375,7 @@ class Fitter:
         if self.success:
             
             estimate = np.array(self.fit_df.loc[self._model.unfixed_mask,
-                                                "estimate"],dtype=float)
+                                                "estimate"],dtype=float).copy()
             out["y_calc"] = self.model(estimate)
             out["unweighted_residuals"] = self._unweighted_residuals(estimate)
             out["weighted_residuals"] = self._weighted_residuals(estimate)
@@ -604,7 +604,7 @@ class Fitter:
 
         # get y_calc if fit was successful
         if self.success:
-            estimate = np.array(self.fit_df["estimate"],dtype=float)
+            estimate = np.array(self.fit_df["estimate"],dtype=float).copy()
             out["y_calc"] = self.model(estimate)
 
         samples = self.samples

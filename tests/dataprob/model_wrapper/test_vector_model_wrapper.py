@@ -233,9 +233,13 @@ def test_VectorModelWrapper_model():
     with pytest.raises(ValueError):
         result = mw.model(params="stupid")
 
+    print("XNAY",mw.param_df)
+
     # basic check. Does it run with parameters sent in?
     result = mw.model([1,2,3])
     assert result == 6
+
+    print("HERE",mw.param_df)
 
     # basic check. no parameters sent in -- pulled from the parameter guessess
     result = mw.model(params=None)

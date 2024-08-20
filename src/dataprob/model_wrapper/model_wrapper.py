@@ -219,7 +219,7 @@ class ModelWrapper:
         
         # Get currently un-fixed parameters
         self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
-        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"])
+        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"]).copy()
 
         # Build a dictionary of keyword arguments to pass to the model when
         # called. 
@@ -293,7 +293,7 @@ class ModelWrapper:
         self.finalize_params()
 
         # Create all param vector
-        all_params = np.array(self._param_df["guess"],dtype=float)
+        all_params = np.array(self._param_df["guess"],dtype=float).copy()
 
         # no parameters specified, get all guesses
         if params is None:

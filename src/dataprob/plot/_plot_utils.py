@@ -125,9 +125,9 @@ def get_vectors(f,x_axis=None):
     """
 
     # Grab y_obs, y_std, y_calc
-    y_obs = np.array(f.data_df["y_obs"],dtype=float)
-    y_std = np.array(f.data_df["y_std"],dtype=float)
-    y_calc = np.array(f.data_df["y_calc"],dtype=float)
+    y_obs = np.array(f.data_df["y_obs"],dtype=float).copy()
+    y_std = np.array(f.data_df["y_std"],dtype=float).copy()
+    y_calc = np.array(f.data_df["y_calc"],dtype=float).copy()
     
     # If no x-axis sent in, build one
     if x_axis is None:
