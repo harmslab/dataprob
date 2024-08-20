@@ -5438,6 +5438,77 @@
 ./tests/dataprob/test_integration/test_exponential-saturation.py:68:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_exponential-saturation.py:73:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_exponential-saturation.py:78:1: W391 blank line at end of file
+./tests/dataprob/test_integration/test_lagged-exponential.py:2:73: W291 trailing whitespace
+./tests/dataprob/test_integration/test_lagged-exponential.py:3:20: W291 trailing whitespace
+./tests/dataprob/test_integration/test_lagged-exponential.py:13:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_lagged-exponential.py:13:22: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:14:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_lagged-exponential.py:18:33: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:18:39: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:21:22: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_lagged-exponential.py:22:24: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_lagged-exponential.py:27:22: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:27:26: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:28:35: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:28:70: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:28:74: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:32:26: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_lagged-exponential.py:51:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:55:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_lagged-exponential.py:58:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_lagged-exponential.py:59:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_lagged-exponential.py:62:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_lagged-exponential.py:67:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:2:69: W291 trailing whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:3:43: W291 trailing whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:13:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:13:22: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:14:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:18:41: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:19:29: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:19:39: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:20:29: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:20:38: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:21:29: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:21:42: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:21:51: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:23:46: W291 trailing whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:51:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:55:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:61:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:63:30: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:64:17: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:64:27: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:65:17: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:65:27: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:66:17: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:66:27: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:67:17: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:67:26: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:68:17: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:68:26: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:75:29: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:75:31: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:78:37: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:78:40: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:79:37: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:80:45: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:80:49: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:84:33: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:85:21: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:85:24: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:86:21: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:86:24: E231 missing whitespace after ':'
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:96:5: E303 too many blank lines (2)
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:97:9: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:98:9: E128 continuation line under-indented for visual indent
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:104:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:106:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:110:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:113:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:114:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:117:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:122:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_linear.py:2:52: W291 trailing whitespace
 ./tests/dataprob/test_integration/test_linear.py:12:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_linear.py:12:22: E231 missing whitespace after ','
@@ -6013,16 +6084,16 @@
 2     E117 over-indented
 2     E122 continuation line missing indentation or outdented
 55    E127 continuation line over-indented for visual indent
-41    E128 continuation line under-indented for visual indent
+55    E128 continuation line under-indented for visual indent
 27    E222 multiple spaces after operator
 1     E225 missing whitespace around operator
-3757  E231 missing whitespace after ','
+3792  E231 missing whitespace after ','
 15    E261 at least two spaces before inline comment
 3     E262 inline comment should start with '# '
 4     E265 block comment should start with '# '
 1     E266 too many leading '#' for block comment
-164   E302 expected 2 blank lines, found 1
-95    E303 too many blank lines (2)
+172   E302 expected 2 blank lines, found 1
+96    E303 too many blank lines (2)
 7     E306 expected 1 blank line before a nested definition, found 0
 4     E701 multiple statements on one line (colon)
 1     E702 multiple statements on one line (semicolon)
@@ -6032,8 +6103,8 @@
 17    F401 '.fitters.setup.setup' imported but unused
 17    F541 f-string is missing placeholders
 3     F841 local variable 'patterns' is assigned to but never used
-833   W291 trailing whitespace
+838   W291 trailing whitespace
 43    W292 no newline at end of file
-874   W293 blank line contains whitespace
+882   W293 blank line contains whitespace
 12    W391 blank line at end of file
-6009
+6080

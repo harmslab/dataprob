@@ -6,8 +6,8 @@ dataprob
 
 Library for using likelihoods (the probability of observed data given a model)
 to extract parameter estimates for models describing experimental data. Can do
-maximum likelihood, Bayesian MCMC sampling, and Bootstrap sampling using a
-consistent API.  
+maximum likelihood, Bayesian Markov-Chain Monte Carlo sampling, and bootstrap
+sampling using a simple, consistent API.  
 
 The docs are in progress. See the "examples" directory for jupyter notebooks 
 demonstrating the library. 
