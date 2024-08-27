@@ -54,16 +54,29 @@ def _core_test(method,**method_kwargs):
     assert issubclass(type(fig),matplotlib.figure.Figure)
     matplotlib.pyplot.close(fig)
 
+# Try tests twice. We do a lot of tests around 95% confidence intervals. Odds
+# are relatively high we hit one across the whole suite. So try once; if fails,
+# try again. If it fails again, fail completely
+
 def test_ml():
     
-    _core_test(method="ml")
+    try:
+        _core_test(method="ml")
+    except AssertionError:
+        _core_test(method="ml")
 
 @pytest.mark.slow
 def test_bayesian():
 
-    _core_test(method="mcmc")
+    try:
+        _core_test(method="mcmc")
+    except AssertionError:
+        _core_test(method="mcmc")
 
 @pytest.mark.slow
 def test_bootstrap():
 
-    _core_test(method="bootstrap")
+    try:
+        _core_test(method="bootstrap")
+    except AssertionError:
+        _core_test(method="bootstrap")

@@ -155,11 +155,17 @@ def plot_residuals(f,
         for c in sample_df.columns:
 
             if c[0] == "y": continue # skip y_obs, etc. 
+
+            s = sample_df[c]
+
+            # Skip nan values
+            if np.sum(np.isnan(s)) > 0:
+                continue
             
             if sample_is_x:
-                ax.plot(sample_df[c],main_y,**sample_point_style)
+                ax.plot(s,main_y,**sample_point_style)
             else:
-                ax.plot(main_x,sample_df[c],**sample_point_style) 
+                ax.plot(main_x,s,**sample_point_style) 
 
     
     ax.set_xlabel(x_label)

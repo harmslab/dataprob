@@ -80,8 +80,10 @@ def plot_corner(f,filter_params=None,**kwargs):
 
         names.append(name)
         keep_indexes.append(i)
-        corner_range.append(tuple([np.min(f.samples[:,i])-0.5,
-                                   np.max(f.samples[:,i])+0.5]))
+
+        # use nanmin in case there is a failed sample in there somewhere
+        corner_range.append(tuple([np.nanmin(f.samples[:,i])-0.5,
+                                   np.nanmax(f.samples[:,i])+0.5]))
         est_values.append(estimate)
 
     # make sure we kept at least one parameter
