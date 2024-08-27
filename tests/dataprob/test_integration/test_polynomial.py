@@ -23,11 +23,11 @@ def _core_test(method,**method_kwargs):
                 "d":0.03,
                 "e":0.001}
     
-    err = 1
+    err = 2
     num_points = 50
     x = np.linspace(-10,10,num_points)
     y_obs = fourth_order_polynomial(x=x,**gen_params) + np.random.normal(loc=0,scale=err,size=num_points)
-    y_std = err*2.5
+    y_std = err*2
 
     # ------------------------------------------------------------------------
     # Define model and generate data

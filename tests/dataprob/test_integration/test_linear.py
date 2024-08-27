@@ -20,7 +20,7 @@ def _core_test(method,**method_kwargs):
     gen_params = {"m":-3,
                   "b":20}
 
-    err = 0.25
+    err = 0.50
     num_points = 20
 
     x = np.linspace(-5,5,num_points)

@@ -57,7 +57,7 @@ def _core_test(method,**method_kwargs):
     gen_params = {"params":np.array([5,0.3,10,6,1.5,10]),
                 "num_gaussians":2}
 
-    err = 0.25
+    err = 0.2
     num_points = 50
 
     x = np.linspace(0,10,num_points)

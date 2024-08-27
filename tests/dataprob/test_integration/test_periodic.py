@@ -26,7 +26,7 @@ def _core_test(method,**method_kwargs):
                   "phase":np.pi/2,
                   "freq":2}
 
-    err = 0.2
+    err = 0.4
     num_points = 50
 
     theta = np.linspace(0,4*np.pi,num_points)

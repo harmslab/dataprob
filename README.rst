@@ -2,10 +2,9 @@
 dataprob
 ========
 
-.. image:: tests-badge
-    :target: docs/badges/tests-badge.svg
-.. image:: coverage-badge
-    :target: docs/badges/coverage-badge.svg
+.. image:: docs/badges/tests-badge.svg
+
+.. image:: docs/badges/coverage-badge.svg
 
 
 dataprob was designed to allow experimentalists to fit parameters from arbitrary
@@ -108,15 +107,14 @@ self-contained demonstrations in which dataprob is used to analyze various
 classes of experimental data. The links below launch each notebook in Google
 colab:
 
-+ `linear.ipynb <linear-example_>`_: fit a linear model to noisy data (2 parameter, linear)
-+ `binding.ipynb <binding-example_>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
-+ `hill-model.ipynb <hill-model-example_>`_: cooperative ligand binding (3 parameter, sigmoidal curve)
-+ `michaelis-menten.ipynb <michaelis-menten-example>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
-+ `lagged-exponential.ipynb <lagged-exponential-example>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
-+ `multi-gaussian.ipynb <multi-gaussian-example>`_: two overlapping normal distributions (6 parameter, Gaussian)
-+ `periodic.ipynb <periodic-example>`_: periodic data (3 parameter, sine) 
-+ `polynomial.ipynb <polynomial-example>`_: nonlinear data with no obvious form (5 parameter, polynomial)
-+ `linear-extrapolation-folding.ipynb <linear-extrapolation-folding-example>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
++ `linear.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/linear.ipynb>`_: fit a linear model to noisy data (2 parameter, linear)
++ `binding.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/binding.ipynb>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
++ `michaelis-menten.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/michaelis-menten.ipynb>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
++ `lagged-exponential.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/lagged-exponential.ipynb>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
++ `multi-gaussian.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/multi-gaussian.ipynb>`_: two overlapping normal distributions (6 parameter, Gaussian)
++ `periodic.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/periodic.ipynb>`_: periodic data (3 parameter, sine) 
++ `polynomial.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/polynomial.ipynb>`_: nonlinear data with no obvious form (5 parameter, polynomial)
++ `linear-extrapolation-folding.ipynb <https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/linear-extrapolation-folding.ipynb>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
 
 Documentation
 =============

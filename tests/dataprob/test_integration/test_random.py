@@ -16,7 +16,7 @@ def _core_test(method,**method_kwargs):
     
     # Create some random data
     gen_params = {"K":1e-3}
-    err = 0.05
+    err = 0.1
     num_points = 20
     values = np.random.normal(loc=0,scale=1,size=num_points)
     y_obs = random_function(values=values,**gen_params) 

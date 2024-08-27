@@ -114,13 +114,12 @@ colab:
 
 + `linear.ipynb <linear-example_>`_: fit a linear model to noisy data (2 parameter, linear)
 + `binding.ipynb <binding-example_>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
-+ `hill-model.ipynb <hill-model-example_>`_: cooperative ligand binding (3 parameter, sigmoidal curve)
-+ `michaelis-menten.ipynb <michaelis-menten-example>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
-+ `lagged-exponential.ipynb <lagged-exponential-example>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
-+ `multi-gaussian.ipynb <multi-gaussian-example>`_: two overlapping normal distributions (6 parameter, Gaussian)
-+ `periodic.ipynb <periodic-example>`_: periodic data (3 parameter, sine) 
-+ `polynomial.ipynb <polynomial-example>`_: nonlinear data with no obvious form (5 parameter, polynomial)
-+ `linear-extrapolation-folding.ipynb <linear-extrapolation-folding-example>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
++ `michaelis-menten.ipynb <michaelis-menten-example_>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
++ `lagged-exponential.ipynb <lagged-exponential-example_>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
++ `multi-gaussian.ipynb <multi-gaussian-example_>`_: two overlapping normal distributions (6 parameter, Gaussian)
++ `periodic.ipynb <periodic-example_>`_: periodic data (3 parameter, sine) 
++ `polynomial.ipynb <polynomial-example_>`_: nonlinear data with no obvious form (5 parameter, polynomial)
++ `linear-extrapolation-folding.ipynb <linear-extrapolation-folding-example_>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
 
 
 Set up an analysis

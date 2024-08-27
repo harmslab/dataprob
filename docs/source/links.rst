@@ -8,7 +8,6 @@
     # example links
 .. _linear-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/linear.ipynb
 .. _binding-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/binding.ipynb
-.. _hill-model-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/hill-model.ipynb
 .. _michaelis-menten-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/michaelis-menten.ipynb
 .. _lagged-exponential-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/lagged-exponential.ipynb
 .. _multi-gaussian-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/multi-gaussian.ipynb

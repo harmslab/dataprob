@@ -19,7 +19,7 @@ def _core_test(method,**method_kwargs):
 
     gen_params = {"K":1e-3}
 
-    err = 0.05
+    err = 0.1
     num_points = 20
 
     x = 10**(np.linspace(-8,0,num_points))

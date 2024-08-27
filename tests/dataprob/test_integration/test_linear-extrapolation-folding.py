@@ -70,7 +70,7 @@ def _core_test(method,**method_kwargs):
     # Generate data
     T = 298
     R = 0.001987
-    err = 0.10
+    err = 0.1
     num_points = 50
     osmolyte = np.linspace(0,8,num_points)
 
@@ -92,11 +92,18 @@ def _core_test(method,**method_kwargs):
                        method=method,
                        non_fit_kwargs=non_fit_kwargs)
 
+    # Put some bounds in place to avoid numerical overflow
+    f.param_df.loc["dG_unfold","lower_bound"] = 0
+    f.param_df.loc["dG_unfold","upper_bound"] = 20
+
+    f.param_df.loc["m_unfold","lower_bound"] = -10
+    f.param_df.loc["m_unfold","upper_bound"] = 0
+
 
     f.fit(y_obs=y_obs,
-        y_std=y_std,
-        **method_kwargs)
-
+          y_std=y_std,
+          **method_kwargs)
+  
     # make estimate lands between confidence intervals
     expected = np.array([gen_params[p] for p in f.fit_df.index])
     assert np.sum(expected < np.array(f.fit_df["low_95"])) == 0

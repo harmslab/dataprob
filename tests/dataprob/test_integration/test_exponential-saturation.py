@@ -22,7 +22,7 @@ def _core_test(method,**method_kwargs):
                   "b":-2,
                   "k":0.5}
 
-    err = 0.3
+    err = 0.6
     num_points = 20
 
     x = np.linspace(0,10,num_points)

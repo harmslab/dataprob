@@ -21,7 +21,7 @@ def _core_test(method,**method_kwargs):
     gen_params = {"k":1/20,
                   "lag":5}
 
-    err = 10
+    err = 20
     num_points = 150
 
     t = np.linspace(0,120,num_points)

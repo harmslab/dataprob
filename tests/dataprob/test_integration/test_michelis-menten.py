@@ -20,7 +20,7 @@ def _core_test(method,**method_kwargs):
     gen_params = {"vmax":300,
                   "km":10}
 
-    err = 5
+    err = 10
     num_points = 20
 
     s0 = np.linspace(0,100,num_points)
