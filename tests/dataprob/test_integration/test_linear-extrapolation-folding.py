@@ -61,22 +61,22 @@ def _core_test(method,**method_kwargs):
             
     # Parameter for staphylococcal nuclease d+phs protein, pH 7.0
     gen_params = {"dG_unfold":11.9,
-                "m_unfold":-4.2,
-                "b_native":1.5,
-                "m_native":-0.15,
-                "b_denat":0.1,
-                "m_denat":-0.03}
+                  "m_unfold":-4.2,
+                  "b_native":1.5,
+                  "m_native":-0.15,
+                  "b_denat":0.1,
+                  "m_denat":-0.03}
 
     # Generate data
     T = 298
     R = 0.001987
-    err = 0.05
+    err = 0.10
     num_points = 50
     osmolyte = np.linspace(0,8,num_points)
 
     y_obs_clean = linear_extrapolation(osmolyte=osmolyte,
-                                    R=R,T=T,
-                                    **gen_params)
+                                       R=R,T=T,
+                                       **gen_params)
     y_obs = y_obs_clean + np.random.normal(0,err,num_points)
     y_std = err*2
 

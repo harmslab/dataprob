@@ -288,7 +288,7 @@ class Fitter:
 
         y_calc = self._model.fast_model(param)
         sigma2 = self._y_std**2
-        return -0.5*(np.sum((y_calc - self._y_obs)**2/sigma2 + np.log(sigma2)))
+        return -0.5*(np.sum((y_calc - self._y_obs)**2/sigma2 + np.log(2*np.pi*sigma2)))
 
     def ln_like(self,param):
         """

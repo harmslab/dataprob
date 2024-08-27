@@ -116,6 +116,15 @@ def test_analyze_fcn_sig():
     assert np.array_equal(cannot_be_fit["a"],[1,2,3])
     assert has_kwargs is False
 
+    # test for bool default not being fittable
+    def test_fcn(a=1,b=False): pass
+    all_args, can_be_fit, cannot_be_fit, has_kwargs = analyze_fcn_sig(test_fcn)
+    assert len(all_args) == 2
+    assert len(can_be_fit) == 1
+    assert len(cannot_be_fit) == 1
+    assert has_kwargs is False
+    assert can_be_fit["a"] == 1.0
+    assert cannot_be_fit["b"] is False
 
 def test_reconcile_fittable():
 

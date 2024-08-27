@@ -386,7 +386,7 @@ def test_Fitter__ln_like():
                               "y_std":y_std})
 
     sigma2 = y_std**2
-    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(sigma2)))
+    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(2*np.pi*sigma2)))
 
     assert np.isclose(f._ln_like(test_params),ln_like)
 
@@ -414,7 +414,7 @@ def test_Fitter_ln_like():
 
     # should work now
     sigma2 = y_std**2
-    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(sigma2)))
+    ln_like = -0.5*(np.sum((y_calc - y_obs)**2/sigma2 + np.log(2*np.pi*sigma2)))
 
     assert np.isclose(f._ln_like(test_params),ln_like)
     

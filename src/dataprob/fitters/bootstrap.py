@@ -75,7 +75,7 @@ class BootstrapFitter(Fitter):
         original_y_obs = np.copy(self._y_obs)
 
         # Define function to regress against
-        def fn(*args): return -self._weighted_residuals(*args)
+        def fn(*args): return -self._unweighted_residuals(*args)
         
         # Go through bootstrap reps
         problems = []

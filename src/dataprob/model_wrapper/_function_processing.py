@@ -71,8 +71,10 @@ def analyze_fcn_sig(fcn):
             can_be_fit[p] = None    
             continue
 
-        # Fittable if it can be coerced as a float
+        # Fittable if it can be coerced as a float. Explicitly exclude bool
         try:
+            if issubclass(type(default),bool):
+                raise ValueError
             can_be_fit[p] = float(default)
         except (TypeError,ValueError):
             cannot_be_fit[p] = default

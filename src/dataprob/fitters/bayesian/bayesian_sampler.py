@@ -228,6 +228,9 @@ class BayesianSampler(Fitter):
         num_threads : int
             number of threads to use.  if `0`, use the total number of cpus. 
             [NOT YET IMPLEMENTED]
+        **emcee_kwargs : 
+            all remaining keyword arguments are passed to the initialization 
+            function of emcee.EnsembleSampler
         """
         
         # Set keywords, validating as we go
