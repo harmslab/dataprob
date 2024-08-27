@@ -1,0 +1,4 @@
+name	guess	lower_bound	upper_bound	prior_mean	prior_std	fixed
+K1	1.00E+07			1.00E+06	10	TRUE
+K2	1.00E-06					FALSE
+K3	1.00E+00	-1	2	1.00E-06	1000	FALSE

@@ -1,12 +1,10 @@
 __description__ = \
 """
-Fitters for doing fits with likelihood functions.
+Key public functions and methods for dataprob library.
 """
-__author__ = "Michael J. Harms"
-__date__ = "2017-05-09"
 
-from .fitters import MLFitter
-from .fitters import BootstrapFitter
-from .fitters import BayesianFitter
-from .model_wrapper import ModelWrapper
-from .fit_param import FitParameter
+from .fitters.setup import setup
+from .plot.plot_corner import plot_corner
+from .plot.plot_summary import plot_summary
+
+from .__version__ import __version__

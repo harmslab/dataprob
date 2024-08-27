@@ -2,42 +2,79 @@
 Fitter base class allowing different classes of fits.
 """
 
+from dataprob.util.check import check_array
+from dataprob.util.check import check_float
+from dataprob.util.check import check_int
+
+from dataprob.model_wrapper.model_wrapper import ModelWrapper
+from dataprob.model_wrapper.wrap_function import wrap_function
+from dataprob.util.read_spreadsheet import read_spreadsheet
+
 import numpy as np
 import pandas as pd
-import corner
 
-
-import re
-import inspect
 import pickle
 import os
+import copy
 
-import dataprob
-from dataprob.check import check_array
+def _pretty_zeropad_str(N):
+    """
+    Make a string zero-pad based on the number of digits in a number.
+    """
+
+    num_digits = len(f"{N}") + 1
+    fmt_string = "s{:0" + f"{num_digits}" + "d}"
+    return fmt_string
 
 class Fitter:
     """
     Base class for fits/analyses using a dataprob function.
     """
 
-    def __init__(self):
+    def __init__(self,
+                 some_function,
+                 fit_parameters=None,
+                 non_fit_kwargs=None,
+                 vector_first_arg=False):
         """
-        Init function for the class.
+        Initialize the fitter.
+
+        Parameters
+        ----------
+        some_function : callable
+            A function that takes at least one argument and returns a float numpy
+            array. Compare the outputs of this function against y_obs when doing
+            the analysis. 
+        fit_parameters : list, dict, str, pandas.DataFrame; optional
+            fit_parameters lets the user specify information about the parameters 
+            in the fit. 
+        non_fit_kwargs : dict
+            non_fit_kwargs are keyword arguments for some_function that should not
+            be fit but need to be specified to non-default values. 
+        vector_first_arg : bool, default=False
+            If True, the first argument of the function is taken as a vector of 
+            parameters to fit. All other arguments to some_function are treated as 
+            non-fittable parameters. fit_parameters must then specify the names of
+            each vector element. 
         """
 
-        self._num_obs = None
-        self._num_params = None
-
-        # Keep track of whether or not the model is a ModelWrapper instance
-        # (which can be used for more powerful fit/parameter options)
-        self._model_is_model_wrapper = False
+        # Load the model. Copy in ModelWrapper if passed in; otherwise, create
+        # from arguments. 
+        if issubclass(type(some_function),ModelWrapper):
+            self._model = copy.deepcopy(some_function)
+        else:        
+            self._model = wrap_function(some_function=some_function,
+                                        fit_parameters=fit_parameters,
+                                        non_fit_kwargs=non_fit_kwargs,
+                                        vector_first_arg=vector_first_arg)
+        
+        # Initialize the fit df now that we have a model
+        self._initialize_fit_df()
 
         # This is set to True after a fit is run but is reset to False by
         # the setter functions like guesses, etc. that would influence the
         # fit results.
         self._fit_has_been_run = False
-
-        self._fit_type = ""
 
     def _sanity_check(self,call_string,attributes_to_check):
         """
@@ -58,134 +95,96 @@ class Fitter:
             except KeyError:
                 err = f"'{a}' must be set before {call_string}\n"
                 raise RuntimeError(err)
+        
+    def _process_obs_args(self,
+                          y_obs,
+                          y_std):
+        """
+        Process the arguments the user sends in defining the observable (y_obs
+        and y_std). Make sure they are consistent with each other.
+        """
 
+        # record y_obs if specified
+        to_df = {}
+        if y_obs is not None:
+            to_df["y_obs"] = y_obs
+        
+        # record y_std if specified
+        if y_std is not None:
+            to_df["y_std"] = y_std
+
+        # If both specified, turn into dataframe and store as data_df. Setter 
+        # validates. 
+        if len(to_df) == 2:
+            self.data_df = pd.DataFrame(to_df)
+        
+        # If one specified, store in the existing data_df. data_df setter takes
+        # care of validation
+        elif len(to_df) == 1:
+
+            data_df = self.data_df
+            for column in to_df:
+                data_df[column] = to_df[column]
+            self.data_df = data_df
+
+        # else here for completeness -- do not do anything if y_obs and y_std
+        # are both zero. 
+        else:
+            pass
+
+                
     def fit(self,
-            model=None,
-            guesses=None,
             y_obs=None,
-            bounds=None,
-            priors=None,
-            names=None,
-            y_stdev=None,
+            y_std=None,
             **kwargs):
         """
         Fit the parameters.
 
         Parameters
         ----------
-
-        model : callable
-            model to fit.  Model should take "guesses" as its only argument.
-            If model is a ModelWrapper instance, arguments related to the
-            parameters (guess, bounds, names) will automatically be
-            filled in.
-        guesses : array of floats
-            guesses for parameters to be optimized.
-        y_obs : array of floats
-            observations in an concatenated array
-        bounds : list, optional
-            list of two lists containing lower and upper bounds.  If None,
-            bounds are set to -np.inf and np.inf
-        priors : list, optional
-            list of two lists containing the mean and standard deviation of 
-            gaussian priors. None entries use uniform priors. If whole argument
-            is None, use uniform priors for all parameters. 
-        names : array of str
-            names of parameters.  If None, parameters assigned names p0,p1,..pN
-        y_stdev : array of floats or None
-            standard deviation of each observation.  if None, each observation
-            is assigned an error of 1.
+        y_obs : numpy.ndarray
+            observations in a numpy array of floats that matches the shape
+            of the output of some_function set when initializing the fitter. 
+            nan values are not allowed. y_obs must either be specified here 
+            or in the data_df dataframe. 
+        y_std : numpy.ndarray
+            standard deviation of each observation. nan values are not allowed.
+            If not specified, all points are assigned an uncertainty of
+            0.1*mean(y_obs). 
         **kwargs : any remaining keyword arguments are passed as **kwargs to
-            core engine (optimize.least_squares or emcee.EnsembleSampler)
+            the core engine (optimize.least_squares or emcee.EnsembleSampler)
         """
 
-        # Record model, check for preloaded model, or fail.
-        if model is not None:
-            self.model = model
-        else:
-            if self.model is None:
-                err = "model must be specified before fit\n"
-                raise RuntimeError(err)
+        # Load y_obs and y_std into attributes
+        self._process_obs_args(y_obs=y_obs,
+                               y_std=y_std)
 
-        # Record guesses, grab from ModelWrapper model, or fail.
-        if guesses is not None:
-            self.guesses = guesses
-        else:
-            if self.guesses is None:
-                err = "parameter guesses must be specified before fit\n"
-                raise RuntimeError(err)
-
-        # Record bounds, grab from ModelWrapper model, or make infinite
-        if bounds is not None:
-            self.bounds = bounds
-        else:
-            if self.bounds is None:
-                tmp = np.ones(len(self.guesses))
-                self.bounds = [-np.inf*tmp,np.inf*tmp]
-
-        # Record priors, grab from ModelWrapper model, or make infinite
-        if priors is not None:
-            self.priors = priors
-        else:
-            if self.priors is None:
-                self.priors = np.nan*np.ones((2,len(self.guesses)),
-                                                dtype=float)
-
-        # Record names, grab from ModelWrapper model, or use default
-        if names is not None:
-            self.names = names
-        else:
-            if self.names is None:
-                self.names = ["p{}".format(i) for i in range(len(self.guesses))]
-
-        # Record y_obs, check for preloaded, or fail
-        if y_obs is not None:
-            self.y_obs = y_obs
-        else:
-            if self.y_obs is None:
-                err = "y_obs must be specified before fit\n"
-                raise RuntimeError(err)
-
-        # Record y_stdev, check for preloaded, or use default
-        if y_stdev is not None:
-            self.y_stdev = y_stdev
-        else:
-            if self.y_stdev is None:
-                self.y_stdev = np.ones(len(self.y_obs),dtype=float)
-
+        # Final check that everything is loaded 
+        self._sanity_check("fit can be done",["model","y_obs","y_std"])
+        
         # No fit has been run
         self._success = None
 
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
+        # Finalize model
+        self._model.finalize_params()
 
-        # Make sure that there is at least one adjustable parameter
-        if len(self.guesses) < 1:
-            err = "Cannot do fit with no adjustable parameters\n"
-            raise RuntimeError(err)
-
+        # Run the fit
         self._fit(**kwargs)
-
-        # Load the fit results into the model_wrapper
-        if self._model_is_model_wrapper:
-            self._model.load_fit_result(self)
 
         self._fit_has_been_run = True
 
     def _fit(self,**kwargs):
         """
-        Should be redefined in subclass.
+        Should be redefined in subclass. This function should: 
+
+        1. Update self._fit_result in whatever way makes sense for the fit. 
+        2. Update self._success with True or False, depending on success. 
+        3. Call self._update_fit_df
         """
 
         raise NotImplementedError("should be implemented in subclass\n")
 
-    def _update_estimates(self):
-        """
-        Should be redefined in subclass.
-        """
 
-        raise NotImplementedError("should be implemented in subclass\n")
-    
-    
     def _unweighted_residuals(self,param):
         """
         Private function calculating residuals with no error checking. 
@@ -201,8 +200,8 @@ class Fitter:
             difference between observed and calculated values
         """
 
-        y_calc = self.model(param)
-        return self._y_obs - y_calc
+        y_calc = self._model.fast_model(param)
+        return y_calc - self._y_obs
 
     def unweighted_residuals(self,param):
         """
@@ -226,10 +225,6 @@ class Fitter:
                             expected_shape=(self.num_params,),
                             expected_shape_names="(num_param,)")
         
-        # This call should finalize the number of parameters if not already set
-        if self.num_params is None:
-            self._num_params = len(param)
-
         return self._unweighted_residuals(param)
 
     def _weighted_residuals(self,param):
@@ -248,12 +243,12 @@ class Fitter:
             standard deviation
         """
 
-        y_calc = self.model(param)
-        return (self.y_obs - y_calc)/self.y_stdev
+        y_calc = self._model.fast_model(param)
+        return (y_calc - self._y_obs)/self._y_std
 
     def weighted_residuals(self,param):
         """
-        Calculate weighted residuals: (y_obs - y_calc)/y_stdev
+        Calculate weighted residuals: (y_obs - y_calc)/y_std
 
         Parameters
         ----------
@@ -267,17 +262,13 @@ class Fitter:
             standard deviation
         """
 
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev"])
+        self._sanity_check("fit can be done",["model","y_obs","y_std"])
 
         param = check_array(value=param,
                             variable_name="param",
                             expected_shape=(self.num_params,),
                             expected_shape_names="(num_param,)")
         
-        # This call should finalize the number of parameters if not already set
-        if self.num_params is None:
-            self._num_params = len(param)
-
         return self._weighted_residuals(param)
 
     def _ln_like(self,param):
@@ -295,9 +286,9 @@ class Fitter:
             log likelihood 
         """
 
-        y_calc = self.model(param)
-        sigma2 = self._y_stdev**2
-        return -0.5*(np.sum((self._y_obs - y_calc)**2/sigma2 + np.log(sigma2)))
+        y_calc = self._model.fast_model(param)
+        sigma2 = self._y_std**2
+        return -0.5*(np.sum((y_calc - self._y_obs)**2/sigma2 + np.log(2*np.pi*sigma2)))
 
     def ln_like(self,param):
         """
@@ -314,283 +305,29 @@ class Fitter:
             log likelihood
         """
 
-        self._sanity_check("fit can be done",["model","y_obs","y_stdev",])
+        self._sanity_check("fit can be done",["model","y_obs","y_std",])
 
         param = check_array(value=param,
                             variable_name="param",
                             expected_shape=(self.num_params,),
                             expected_shape_names="(num_param,)")
         
-        # This call should finalize the number of parameters if not already set
-        if self.num_params is None:
-            self._num_params = len(param)
-
         return self._ln_like(param)
 
+        
     @property
     def model(self):
         """
-        Model to use for calculating y_calc. The model should either be an 
-        instance of dataprob.ModelWrapper OR a function that takes param (a 1D
-        numpy array) as its only argument and returns y_calc (a 1D numpy array)
-        as its only returned value. 
+        Model to use for calculating y_calc given parameters. 
         """
 
-        try:
-            if self._model_is_model_wrapper:
-                return self._model.model
-            else:
-                return self._model
-        except AttributeError:
-            return None
+        return self._model.model
 
-    @model.setter
-    def model(self,model):
-
-        # If this is a ModelWrapper instance, grab the model method rather than
-        # the model instance for the check below.
-        if isinstance(model,dataprob.model_wrapper.ModelWrapper):
-            model = model.model
-
-        has_err = False
-        try:
-            if not inspect.isfunction(model) and not inspect.ismethod(model):
-                has_err = True
-            if len(inspect.signature(model).parameters) < 1:
-                has_err = True
-
-        except TypeError:
-            has_err = True
-
-        if has_err:
-            err = "model must be a function that takes at least one argument\n"
-            raise ValueError(err)
-
-        # If the model is a method of a ModelWrapper instance, record this so
-        # the Fitter object knows it can get guesses, bounds, and names from
-        # the ModelWrapper if necessary.
-        self._model_is_model_wrapper = False
-        try:
-            if model.__qualname__.startswith("ModelWrapper"):
-
-                # If this is a model wrapper, we can check for consistency
-                # between the number of model parameters in the model vs.
-                # what has been pre-set in the model.
-                if self.num_params is not None:
-                    if len(model.__self__.guesses) != self.num_params:
-                        err = f"number of model parameters ({len(model.__self__.guesses)}) does\n"
-                        err += f"not match the number of parameters in the Fitter ({self.num_params})\n"
-                        raise ValueError(err)
-
-                self._model_is_model_wrapper = True
-
-                # We're going to store the ModelWrapper instance, not the
-                # method.
-                model = model.__self__
-
-        except AttributeError:
-            pass
-
-        # Record the model
-        self._model = model
-        self._fit_has_been_run = False
-
-    @property
-    def guesses(self):
-        """
-        Guesses for fit parameters.
-        """
-
-        # Grab the guesses from the model wrapper in case they changed
-        if self._model_is_model_wrapper:
-            self._guesses = self._model.guesses
-
-        try:
-            return self._guesses
-        except AttributeError:
-            return None
-
-    @guesses.setter
-    def guesses(self,guesses):
-
-        guesses = check_array(value=guesses,
-                              variable_name="guesses",
-                              expected_shape=(None,),
-                              expected_shape_names="(num_param,)")
-        
-        if self.num_params is None:
-            self._num_params = guesses.shape[0]
-
-        if guesses.shape[0] != self.num_params:
-            err = "guesses should be a numpy array the same length as the\n"
-            err += "number of guesses\n"
-            raise ValueError(err)
-        
-        self._guesses = guesses
-
-        # Update the underlying guesses in each FitParameter instance
-        if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].guess = guesses[i]
-
-        self._fit_has_been_run = False
-
-    @property
-    def bounds(self):
-        """
-        Bounds for fit parameters.
-
-        bounds must be a (2 x num_parameters) numpy array of floats with the
-        form:
-
-        [[lower_0, lower_1, ..., lower_n],
-         [upper_0, upper_1, ..., upper_n]]
-
-        np.inf values are allowed, indicating no bounds on that parameter.
-        np.nan are not allowed. 
-        """
-
-        # Grab the bounds from the model wrapper in case they changed
-        if self._model_is_model_wrapper:
-            self._bounds = self._model.bounds
-
-        try:
-            return self._bounds
-        except AttributeError:
-            return None
-
-    @bounds.setter
-    def bounds(self,bounds):
-
-        bounds = check_array(value=bounds,
-                              variable_name="bounds",
-                              expected_shape=(2,None),
-                              expected_shape_names="(2,num_param)")
-        
-        if self.num_params is None:
-            self._num_params = bounds.shape[1]
-
-        if bounds.shape[1] != self.num_params:
-            doc = inspect.getdoc(Fitter.bounds)
-            err = f"incorrectly specified bounds. \n\n{doc}\n\n"
-            raise ValueError(err)
-
-        self._bounds = bounds
-
-        # Update the underlying guesses in each FitParameter instance
-        if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].bounds = bounds[:,i]
-
-        self._fit_has_been_run = False
-
-    @property
-    def priors(self):
-        """
-        Gaussian priors to use for each parameter.
-
-        priors must be a (2 x num_parameters) numpy array of floats with the
-        form:
-
-        [[mean_0,   mean_1, ...,  mean_n],
-         [stdev_0, stdev_1, ..., stdev_n]]
-
-        np.inf values are not allowed. np.nan entries indicate that uniform
-        priors should be used for that parameter.        
-        """
-
-        # Grab the priors from the model wrapper in case they changed
-        if self._model_is_model_wrapper:
-            self._priors = self._model.priors
-
-        try:
-            return self._priors
-        except AttributeError:
-            return None
-
-    @priors.setter
-    def priors(self,priors):
-
-        priors = check_array(value=priors,
-                             variable_name="priors",
-                             expected_shape=(2,None),
-                             expected_shape_names="(2,num_param)")
-        
-        if self.num_params is None:
-            self._num_params = priors.shape[1]
-
-        if priors.shape[1] != self.num_params:
-            doc = inspect.getdoc(Fitter.priors)
-            err = f"incorrectly specified priors. \n\n{doc}\n\n"
-            raise ValueError(err)
-
-        if np.sum(np.isinf(priors)) > 0:
-            doc = inspect.getdoc(Fitter.priors)
-            err = f"priors cannot be infinite. \n\n{doc}\n\n"
-            raise ValueError(err)
-
-        self._priors = priors
-
-        # Update the underlying guesses in each FitParameter instance
-        if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].prior = priors[:,i]
-
-        self._fit_has_been_run = False
-
-    @property
-    def names(self):
-        """
-        Parameter names for fit parameters.
-
-        Should be an array of unique strings the same length as the number of
-        parameters. 
-        """
-
-        # Grab the bounds from the model wrapper in case they changed
-        if self._model_is_model_wrapper:
-            self._names = self._model.names
-
-        try:
-            return self._names
-        except AttributeError:
-            return None
-
-    @names.setter
-    def names(self,names):
-
-        # If the user sends in a naked string, make it into a list of strings
-        if issubclass(type(names),str):
-            names = [names]
-
-        # Force to be an array of strings
-        names = np.array(names,dtype=str)
-        
-        if len(names) != len(set(names)):
-            doc = inspect.getdoc(Fitter.names)
-            err = f"parameter names must all be unique. \n\n{doc}\n\n"
-            raise ValueError(err)
-
-        if self.num_params is not None:
-            if names.shape[0] != self.num_params:
-                doc = inspect.getdoc(Fitter.names)
-                err = f"length of names ({names.shape[0]}) must match the number of parameters ({self.num_params}) \n\n{doc}\n\n"
-                raise ValueError(err)
-        else:
-            self._num_params = names.shape[0]
-
-        self._names = names
-
-        # Update the underlying guesses in each FitParameter instance
-        if self._model_is_model_wrapper:
-            for i, p in enumerate(self._model.position_to_param):
-                self._model.fit_parameters[p].name = names[i]
-
+             
     @property
     def y_obs(self):
         """
-        Observed y values for fit. This should be a 1D numpy array of floats 
-        the same length as the number of observations. 
+        Observed y values for fit. 
         """
 
         try:
@@ -598,164 +335,131 @@ class Fitter:
         except AttributeError:
             return None
 
-    @y_obs.setter
-    def y_obs(self,y_obs):
-        
-        y_obs = check_array(value=y_obs,
-                            variable_name="y_obs",
-                            expected_shape=(None,),
-                            expected_shape_names="(num_obs,)")
-        
-        if self.num_obs is None:
-            self._num_obs = y_obs.shape[0]
 
-        if y_obs.shape[0] != self.num_obs:
-            doc = inspect.getdoc(Fitter.y_obs)
-            err = f"incorrectly specified y_obs. \n\n{doc}\n\n"
+    @property
+    def y_std(self):
+        """
+        Estimated standard deviation on observed y values. 
+        """
+
+        try:
+            return self._y_std
+        except AttributeError:
+            return None
+
+    @property
+    def param_df(self):
+        """
+        Return a dataframe with fit parameters. 
+        """
+
+        return self._model.param_df
+    
+    @param_df.setter
+    def param_df(self,param_df):
+        self._model.param_df = param_df
+    
+    @property
+    def data_df(self):
+
+        out = {}
+        
+        y_obs = self.y_obs
+        if y_obs is not None:
+            out["y_obs"] = y_obs
+
+        y_std = self.y_std
+        if y_std is not None:
+            out["y_std"] = y_std
+
+        if self.success:
+            
+            estimate = np.array(self.fit_df.loc[self._model.unfixed_mask,
+                                                "estimate"],dtype=float).copy()
+            out["y_calc"] = self.model(estimate)
+            out["unweighted_residuals"] = self._unweighted_residuals(estimate)
+            out["weighted_residuals"] = self._weighted_residuals(estimate)
+
+        return pd.DataFrame(out)
+
+    @data_df.setter
+    def data_df(self,data_df):
+
+        # Read dataframe
+        data_df = read_spreadsheet(data_df)
+
+        # make sure it has y_obs and y_std
+        has_columns = np.sum(data_df.columns.isin(["y_obs","y_std"]))
+        if has_columns != 2:
+            err = "data_df must have both y_obs and y_std columns\n"
+            raise ValueError(err)
+        
+        # Go through each column
+        for c in ["y_obs","y_std"]:
+
+            # start with the pandas caster to numeric as this is smart and
+            # robust
+            try:
+                data_df[c] = pd.to_numeric(data_df[c])
+            except Exception as e:
+                err = f"Could not coerce all entries in the '{c}' column to float\n"
+                raise ValueError(err) from e
+            
+            # then do a direct cast to float
+            data_df[c] = data_df[c].astype(float)
+
+            if np.sum(np.isnan(data_df[c])) > 0:
+                err = "y_obs and y_std must not contain nan\n"
+                raise ValueError(err)
+            
+            if np.sum(np.isinf(data_df[c])) > 0:
+                err = "y_obs and y_std must be finite\n"
+                raise ValueError(err)
+
+        if np.sum(data_df["y_std"] <= 0) > 0:
+            err = "all y_std values must be >= 0\n"
             raise ValueError(err)
 
-        self._y_obs = y_obs
+        # Store y_obs and y_std
+        self._y_obs = data_df["y_obs"]
+        self._y_std = data_df["y_std"]
 
+        # new y_obs, fit has not been run yet
         self._fit_has_been_run = False
 
     @property
-    def y_stdev(self):
+    def non_fit_kwargs(self):
         """
-        Estimated standard deviation on observed y values. This should be a 1D
-        numpy array of floats the same length as the number of observations. 
+        Return a dictionary with the keyword arguments to pass to the function
+        that are not fit parameters.
         """
-
-        try:
-            return self._y_stdev
-        except AttributeError:
-            return None
-
-    @y_stdev.setter
-    def y_stdev(self,y_stdev):
-
-        y_stdev = check_array(value=y_stdev,
-                              variable_name="y_stdev",
-                              expected_shape=(None,),
-                              expected_shape_names="(num_obs,)")
         
-        if self.num_obs is None:
-            self._num_obs = y_stdev.shape[0]
+        return self._model.non_fit_kwargs
 
-        if y_stdev.shape[0] != self.num_obs:
-            doc = inspect.getdoc(Fitter.y_stdev)
-            err = f"incorrectly specified y_stdev. \n\n{doc}\n\n"
-            raise ValueError(err)
+    def _initialize_fit_df(self):
 
-        self._y_stdev = y_stdev
+        df = pd.DataFrame({"name":self.param_df["name"]})
+        df.index = df["name"]
+        df["estimate"] = np.nan
+        df["std"] = np.nan
+        df["low_95"] = np.nan
+        df["high_95"] = np.nan
+        df["guess"] = self.param_df["guess"]
+        df["fixed"] = self.param_df["fixed"]
+        df["lower_bound"] = self.param_df["lower_bound"]
+        df["upper_bound"] = self.param_df["upper_bound"]
+        df["prior_mean"] = self.param_df["prior_mean"]
+        df["prior_std"] = self.param_df["prior_std"]
 
-        self._fit_has_been_run = False
+        self._fit_df = df
 
-
-    @property
-    def num_params(self):
+    def _update_fit_df(self):
         """
-        Number of fit parameters.
-        """
-
-        if self._model_is_model_wrapper:
-            return len(self._model.guesses)
-
-        try:
-            return self._num_params
-        except AttributeError:
-            return None
-
-    @property
-    def num_obs(self):
-        """
-        Number of observations.
+        Should be redefined in subclass. This function should update 
+        self._fit_df. 
         """
 
-        try:
-            return self._num_obs
-        except AttributeError:
-            return None
-
-    @property
-    def estimate(self):
-        """
-        Estimates of fit parameters.
-        """
-
-        try:
-            return self._estimate
-        except AttributeError:
-            return None
-
-    @property
-    def stdev(self):
-        """
-        Standard deviations on estimates of fit parameters.
-        """
-
-        try:
-            return self._stdev
-        except AttributeError:
-            return None
-
-    @property
-    def ninetyfive(self):
-        """
-        Ninety-five perecent confidence intervals on the estimates.
-        """
-
-        try:
-            return self._ninetyfive
-        except AttributeError:
-            return None
-
-    @property
-    def fit_result(self):
-        """
-        Full fit results (will depend on exact fit type what is placed here).
-        """
-
-        try:
-            return self._fit_result
-        except AttributeError:
-            return None
-
-    @property
-    def success(self):
-        """
-        Whether the fit was successful.
-        """
-
-        try:
-            return self._success
-        except AttributeError:
-            return None
-
-    @property
-    def fit_info(self):
-        """
-        Information about fit run.
-        """
-
-        return None
-
-    @property
-    def samples(self):
-        """
-        Samples of fit parameters.
-        """
-
-        try:
-            return self._samples
-        except AttributeError:
-            return None
-
-    @property
-    def fit_type(self):
-        """
-        Fit type. 
-        """
-        return self._fit_type
+        raise NotImplementedError("should be implemented in subclass\n")
 
     @property
     def fit_df(self):
@@ -763,129 +467,20 @@ class Fitter:
         Return the fit results as a dataframe.
         """
 
-        if not self.success:
-            return None
-
-        out_dict = {"param":[],
-                    "estimate":[],
-                    "stdev":[],
-                    "low_95":[],
-                    "high_95":[],
-                    "guess":[],
-                    "prior_mean":[],
-                    "prior_std":[],
-                    "lower_bound":[],
-                    "upper_bound":[]}
-
-        if self._model_is_model_wrapper:
-
-            m = self._model
-
-            out_dict["fixed"] = []
-            for p in m.fit_parameters.keys():
-                out_dict["param"].append(m.fit_parameters[p].name)
-                out_dict["estimate"].append(m.fit_parameters[p].value)
-                out_dict["fixed"].append(m.fit_parameters[p].fixed)
-
-                if m.fit_parameters[p].fixed:
-                    for col in ["stdev","low_95","high_95","guess",
-                                "lower_bound","upper_bound",
-                                "prior_mean","prior_std"]:
-                        out_dict[col].append(None)
-                else:
-                    out_dict["stdev"].append(m.fit_parameters[p].stdev)
-
-                    if m.fit_parameters[p].ninetyfive is not None:
-                        out_dict["low_95"].append(m.fit_parameters[p].ninetyfive[0])
-                        out_dict["high_95"].append(m.fit_parameters[p].ninetyfive[1])
-                    else:
-                        out_dict["low_95"].append(np.nan)
-                        out_dict["high_95"].append(np.nan)
-
-                    out_dict["guess"].append(m.fit_parameters[p].guess)
-                    out_dict["lower_bound"].append(m.fit_parameters[p].bounds[0])
-                    out_dict["upper_bound"].append(m.fit_parameters[p].bounds[1])
-                    out_dict["prior_mean"].append(m.fit_parameters[p].prior[0])
-                    out_dict["prior_std"].append(m.fit_parameters[p].prior[1])
-
-        else:
-
-            for i in range(len(self.names)):
-
-                out_dict["param"].append(self.names[i])
-                out_dict["estimate"].append(self.estimate[i])
-                out_dict["stdev"].append(self.stdev[i])
-
-                if self.ninetyfive is not None:
-                    out_dict["low_95"].append(self.ninetyfive[0,i])
-                    out_dict["high_95"].append(self.ninetyfive[1,i])
-                else:
-                    out_dict["low_95"].append(np.nan)
-                    out_dict["high_95"].append(np.nan)
-
-                out_dict["guess"].append(self.guesses[i])
-                out_dict["lower_bound"].append(self.bounds[0,i])
-                out_dict["upper_bound"].append(self.bounds[1,i])
-                out_dict["prior_mean"].append(self.priors[0,i])
-                out_dict["prior_std"].append(self.priors[1,i])
-
-        return pd.DataFrame(out_dict)
-
-
-    def corner_plot(self,filter_params=("DUMMY_FILTER",),*args,**kwargs):
+        return self._fit_df
+        
+    @property
+    def samples(self):
         """
-        Create a "corner plot" that shows distributions of values for each
-        parameter, as well as cross-correlations between parameters.
-
-        Parameters
-        ----------
-        filter_params : list-like
-            strings used to search parameter names.  if the string matches,
-            the parameter is *excluded* from the plot.
+        Samples of fit parameters. If fit has been run and generated samples, 
+        this will be a float numpy array with a shape (num_samples,num_param). 
+        Otherwise, is None. 
         """
 
-        # Don't return anything if this is the base class
-        if self.fit_type == "":
+        try:
+            return self._samples
+        except AttributeError:
             return None
-
-        # If the user passes a string (instead of a list or tuple of patterns),
-        # convert it to a list up front.
-        if type(filter_params) is str:
-            filter_params = (filter_params,)
-
-        skip_pattern = re.compile("|".join(filter_params))
-
-        s = self.samples
-
-        # Make sure that fit actually returned samples. (Will fail, for example
-        # if Jacobian misbehaves in ML fit)
-        if len(s) == 0:
-            err = "\n\nFit did not produce samples for generation of a corner plot.\nCheck warnings.\n"
-            raise RuntimeError(err)
-
-        keep_indexes = []
-        corner_range = []
-        names = []
-        est_values = []
-        for i in range(s.shape[1]):
-
-            # look for patterns to skip
-            if skip_pattern.search(self.names[i]):
-                print("not doing corner plot for parameter ",self.names[i])
-                continue
-
-            names.append(self.names[i])
-            keep_indexes.append(i)
-            corner_range.append(tuple([np.min(s[:,i])-0.5,np.max(s[:,i])+0.5]))
-
-            est_values.append(self.estimate[i])
-
-        to_plot = s[:,np.array(keep_indexes,dtype=int)]
-
-        fig = corner.corner(to_plot,labels=names,range=corner_range,
-                            truths=est_values,*args,**kwargs)
-
-        return fig
 
     def write_samples(self,output_file):
         """
@@ -948,7 +543,7 @@ class Fitter:
                 err = f"'{sample_file}' does not appear to be a pickle file.\n"
                 raise pickle.UnpicklingError(err)
 
-        # Check sanity of sample_array; update num_params if not specified
+        # Check sanity of sample_array;
         try:
             sample_array = np.array(sample_array,dtype=float)
         except Exception as e:
@@ -956,14 +551,122 @@ class Fitter:
             raise ValueError(err) from e
         
         if len(sample_array.shape) != 2:
-            err = "sample_array should have dimensions (num_samples,num_param)\n"
+            err = "sample_array should have dimensions (num_samples,num_params)\n"
             raise ValueError(err)
 
         if sample_array.shape[1] != self.num_params:
-            err = "sample_array should have dimensions (num_samples,num_param)\n"
+            err = "sample_array should have dimensions (num_samples,num_params)\n"
             raise ValueError(err)
 
         # Concatenate the new samples to the existing samples
         self._samples = np.concatenate((self.samples,sample_array))
 
-        self._update_estimates()
+        self._update_fit_df()
+
+    def get_sample_df(self,num_samples=100):
+        """
+        Create a dataframe with y_calc for samples from parameter uncertainty as
+        columns. The output dataframe will have the columns 'y_obs', 'y_std',
+        'y_calc', 's0', 's1', ... 'sn', where 'y_calc' is the calculated value
+        using the ``self.fit_df["estimate"]`` parameters and s0 through sn are
+        calculated values using parameters sampled from the estimated 
+        likelihood surface. If no samples have been generated, the dataframe
+        will omit the s0-sn columns. 
+
+        Parameters
+        ----------
+        num_samples : int
+            number of samples to take. 
+
+        Returns
+        -------
+        sample_df : pandas.DataFrame
+            dataframe with y_obs, y_calc, and values sampled from likelihood
+            surface. 
+        """
+
+        num_samples = check_int(value=num_samples,
+                                variable_name="num_samples",
+                                minimum_allowed=0)
+
+        # Out dictionary
+        out = {}
+        
+        # Get y_obs if defined
+        y_obs = self.y_obs
+        if y_obs is not None:
+            out["y_obs"] = y_obs
+
+        # get y_std if defined
+        y_std = self.y_std
+        if y_std is not None:
+            out["y_std"] = y_std
+
+        # get y_calc if fit was successful
+        if self.success:
+            estimate = np.array(self.fit_df["estimate"],dtype=float).copy()
+            out["y_calc"] = self.model(estimate)
+
+        samples = self.samples
+        if samples is not None:
+            
+            N = samples.shape[0]
+            fmt_string = _pretty_zeropad_str(N)
+
+            for i in range(0,N,N//(num_samples-1)):
+                key = fmt_string.format(i)
+                out[key] = self.model(self.samples[i])
+    
+        return pd.DataFrame(out)
+
+    @property
+    def num_params(self):
+        """
+        Number of fit parameters. If model has not been defined, will be None. 
+        """
+
+        self._model.finalize_params()
+        return np.sum(self._model.unfixed_mask)
+
+    @property
+    def num_obs(self):
+        """
+        Number of observations. If y_obs has not been defined, will be None. 
+        """
+
+        try:
+            return self._y_obs.shape[0]
+        except AttributeError:
+            return None
+
+    @property
+    def success(self):
+        """
+        Whether the fit was successful when run (True or False). If no fit has
+        been attempted, will be None.
+        """
+
+        try:
+            return self._success
+        except AttributeError:
+            return None
+
+    @property
+    def fit_info(self):
+        """
+        Should be implemented in subclass. Information about fit run as a 
+        dictionary. 
+        """
+
+        raise NotImplementedError("should be implemented in subclass\n")
+    
+    @property
+    def fit_result(self):
+        """
+        Full fit results (will depend on exact fit type what is placed here).
+        """
+
+        try:
+            return self._fit_result
+        except AttributeError:
+            return None

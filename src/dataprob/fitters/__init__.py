@@ -1,4 +1,3 @@
-
-from .ml import MLFitter
-from .bootstrap import BootstrapFitter
-from .bayesian import BayesianFitter
+"""
+Code for performing regression and sampling analyses on model parameters.
+"""
