@@ -12,10 +12,11 @@ build:
     python: "3.12"
 
 python:
-  - method: pip
+  install:
+    - method: pip
     path: .
     extra_requirements:
-       - docs
+    - docs
       
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
