@@ -56,4 +56,8 @@ test = [
   "pytest",
   "genbadge"
  ]
+docs = [
+  "pydata-sphinx-theme"
+]
+
 
