@@ -70,7 +70,7 @@ def _core_test(method,**method_kwargs):
     # Generate data
     T = 298
     R = 0.001987
-    err = 0.1
+    err = 0.2
     num_points = 50
     osmolyte = np.linspace(0,8,num_points)
 

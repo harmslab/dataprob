@@ -6,14 +6,14 @@
 
 ..
     # example links
-.. _linear-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/linear.ipynb
-.. _binding-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/binding.ipynb
-.. _michaelis-menten-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/michaelis-menten.ipynb
-.. _lagged-exponential-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/lagged-exponential.ipynb
-.. _multi-gaussian-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/multi-gaussian.ipynb
-.. _periodic-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/periodic.ipynb
-.. _polynomial-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/polynomial.ipynb
-.. _linear-extrapolation-folding-example: https://githubtocolab.com/harmslab/dataprob/examples/blob/main/notebooks/linear-extrapolation-folding.ipynb
+.. _linear-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear.ipynb
+.. _binding-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/binding.ipynb
+.. _michaelis-menten-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/michaelis-menten.ipynb
+.. _lagged-exponential-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/lagged-exponential.ipynb
+.. _multi-gaussian-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/multi-gaussian.ipynb
+.. _periodic-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/periodic.ipynb
+.. _polynomial-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/polynomial.ipynb
+.. _linear-extrapolation-folding-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear-extrapolation-folding.ipynb
 
 .. 
     # least squares links

@@ -5494,16 +5494,19 @@
 ./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:85:24: E231 missing whitespace after ':'
 ./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:86:21: E128 continuation line under-indented for visual indent
 ./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:86:24: E231 missing whitespace after ':'
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:96:5: E303 too many blank lines (2)
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:97:9: E128 continuation line under-indented for visual indent
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:98:9: E128 continuation line under-indented for visual indent
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:104:1: W293 blank line contains whitespace
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:106:32: E231 missing whitespace after ','
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:110:32: E231 missing whitespace after ','
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:113:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:114:1: W293 blank line contains whitespace
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:117:1: E302 expected 2 blank lines, found 1
-./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:122:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:96:31: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:97:31: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:99:30: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:100:30: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:103:5: E303 too many blank lines (2)
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:106:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:111:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:113:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:117:32: E231 missing whitespace after ','
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:120:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:121:1: W293 blank line contains whitespace
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:124:1: E302 expected 2 blank lines, found 1
+./tests/dataprob/test_integration/test_linear-extrapolation-folding.py:129:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_linear.py:2:52: W291 trailing whitespace
 ./tests/dataprob/test_integration/test_linear.py:12:1: E302 expected 2 blank lines, found 1
 ./tests/dataprob/test_integration/test_linear.py:12:22: E231 missing whitespace after ','
@@ -6079,10 +6082,10 @@
 2     E117 over-indented
 2     E122 continuation line missing indentation or outdented
 55    E127 continuation line over-indented for visual indent
-48    E128 continuation line under-indented for visual indent
+46    E128 continuation line under-indented for visual indent
 27    E222 multiple spaces after operator
 1     E225 missing whitespace around operator
-3797  E231 missing whitespace after ','
+3801  E231 missing whitespace after ','
 15    E261 at least two spaces before inline comment
 3     E262 inline comment should start with '# '
 4     E265 block comment should start with '# '
@@ -6100,6 +6103,6 @@
 3     F841 local variable 'patterns' is assigned to but never used
 840   W291 trailing whitespace
 42    W292 no newline at end of file
-876   W293 blank line contains whitespace
+877   W293 blank line contains whitespace
 12    W391 blank line at end of file
-6075
+6078
