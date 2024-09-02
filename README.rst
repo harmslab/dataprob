@@ -29,7 +29,7 @@ Simple example
 
 The following code generates noisy linear data and uses dataprob to find 
 the maximum likelihood estimate of its slope and intercept. 
-`Run on Google Colab <simple-example_>`_.
+`Run on Google Colab <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/simple-example.ipynb>`_.
 
 .. code-block:: python
     
@@ -64,12 +64,12 @@ the maximum likelihood estimate of its slope and intercept.
 
 The plots will be:
 
-.. image:: _static/simple-example_plot-summary.svg
+.. image:: docs/source/_static/simple-example_plot-summary.svg
     :align: center
     :alt: data.plot_summary result
     :width: 75%
 
-.. image:: _static/simple-example_plot-corner.svg
+.. image:: docs/source/_static/simple-example_plot-corner.svg
     :align: center
     :alt: data.plot_corner result
     :width: 75%
@@ -138,15 +138,15 @@ self-contained demonstrations in which dataprob is used to analyze various
 classes of experimental data. The links below launch each notebook in Google
 Colab:
 
-+ `api-example.ipynb <api-example_>`_: shows various features of the API when analyzing a linear model
-+ `linear.ipynb <linear-example_>`_: fit a linear model to noisy data (2 parameter, linear)
-+ `binding.ipynb <binding-example_>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
-+ `michaelis-menten.ipynb <michaelis-menten-example_>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
-+ `lagged-exponential.ipynb <lagged-exponential-example_>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
-+ `multi-gaussian.ipynb <multi-gaussian-example_>`_: two overlapping normal distributions (6 parameter, Gaussian)
-+ `periodic.ipynb <periodic-example_>`_: periodic data (3 parameter, sine) 
-+ `polynomial.ipynb <polynomial-example_>`_: nonlinear data with no obvious form (5 parameter, polynomial)
-+ `linear-extrapolation-folding.ipynb <linear-extrapolation-folding-example_>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
++ `api-example.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/api-example.ipynb>`_: shows various features of the API when analyzing a linear model
++ `linear.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear.ipynb>`_: fit a linear model to noisy data (2 parameter, linear)
++ `binding.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/binding.ipynb>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
++ `michaelis-menten.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/michaelis-menten.ipynb>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
++ `lagged-exponential.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/lagged-exponential.ipynb>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
++ `multi-gaussian.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/multi-gaussian.ipynb>`_: two overlapping normal distributions (6 parameter, Gaussian)
++ `periodic.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/periodic.ipynb>`_: periodic data (3 parameter, sine) 
++ `polynomial.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/polynomial.ipynb>`_: nonlinear data with no obvious form (5 parameter, polynomial)
++ `linear-extrapolation-folding.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear-extrapolation-folding.ipynb>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
 
 
 Documentation
