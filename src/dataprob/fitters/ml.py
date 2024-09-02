@@ -37,8 +37,7 @@ class MLFitter(Fitter):
             or in the data_df dataframe. 
         y_std : numpy.ndarray
             standard deviation of each observation. nan values are not allowed.
-            If not specified, all points are assigned an uncertainty of
-            0.1*mean(y_obs). 
+            y_std must either be specified here or in the data_df dataframe. 
         num_samples : int
             number of samples for generating corner plot
         **least_squares_kwargs : 

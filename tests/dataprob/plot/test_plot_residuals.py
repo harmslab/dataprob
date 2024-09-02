@@ -114,9 +114,18 @@ def test_plot_residuals():
     assert ax_out is ax
     plt.close(fig)
 
+    # bad ax pass
     with pytest.raises(ValueError):
         plot_residuals(f,ax="not_an_ax")
-    
+
+    # stick a nan into one of the samples -- should work fine
+    f._samples[0,:] = np.nan
+    fig, ax = plt.subplots(1,figsize=(6,6))
+    fig_out, ax_out = plot_residuals(f,ax=ax)
+    assert fig_out is fig
+    assert ax_out is ax
+    plt.close(fig)
+
 
 
 

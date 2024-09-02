@@ -3,15 +3,17 @@ Fitter base class allowing different classes of fits.
 """
 
 from dataprob.util.check import check_array
-from dataprob.util.check import check_float
 from dataprob.util.check import check_int
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.wrap_function import wrap_function
 from dataprob.util.read_spreadsheet import read_spreadsheet
 
+from dataprob.util.get_fit_quality import get_fit_quality
+
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 import pickle
 import os
@@ -25,6 +27,7 @@ def _pretty_zeropad_str(N):
     num_digits = len(f"{N}") + 1
     fmt_string = "s{:0" + f"{num_digits}" + "d}"
     return fmt_string
+
 
 class Fitter:
     """
@@ -149,8 +152,7 @@ class Fitter:
             or in the data_df dataframe. 
         y_std : numpy.ndarray
             standard deviation of each observation. nan values are not allowed.
-            If not specified, all points are assigned an uncertainty of
-            0.1*mean(y_obs). 
+            y_std must either be specified here or in the data_df dataframe. 
         **kwargs : any remaining keyword arguments are passed as **kwargs to
             the core engine (optimize.least_squares or emcee.EnsembleSampler)
         """
@@ -421,8 +423,8 @@ class Fitter:
             raise ValueError(err)
 
         # Store y_obs and y_std
-        self._y_obs = data_df["y_obs"]
-        self._y_std = data_df["y_std"]
+        self._y_obs = np.array(data_df["y_obs"],dtype=float)
+        self._y_std = np.array(data_df["y_std"],dtype=float)
 
         # new y_obs, fit has not been run yet
         self._fit_has_been_run = False
@@ -469,6 +471,25 @@ class Fitter:
 
         return self._fit_df
         
+    @property
+    def fit_quality(self):
+        """
+        """
+
+        if not self.success:
+            return None
+
+        estimate = np.array(self.fit_df.loc[self._model.unfixed_mask,
+                                            "estimate"],dtype=float).copy()
+
+        out_df = get_fit_quality(residuals=self._weighted_residuals(estimate),
+                                 num_param=estimate.shape[0],
+                                 lnL=self.ln_like(estimate))
+
+        return out_df
+
+
+
     @property
     def samples(self):
         """

@@ -662,6 +662,18 @@ def test_Fitter_fit_df():
                            "guess","fixed","lower_bound","upper_bound",
                            "prior_mean","prior_std"])
 
+def test_Fitter_fit_quality():
+
+    def test_fcn(a=1,b=2,x="array"): return x*a + b
+    x = np.arange(10)
+    
+    f = Fitter(some_function=test_fcn,
+               non_fit_kwargs={"x":x})
+
+    # nothing done yet
+    assert f.fit_quality is None
+
+
 
 def test_Fitter_samples():
     

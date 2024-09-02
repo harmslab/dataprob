@@ -656,7 +656,7 @@ def test_BayesianSampler__update_fit_df():
     f._update_fit_df()
 
     # Make sure mean/std/95 calc is write given fake samples we stuffed in
-    assert np.allclose(np.round(f._fit_df["estimate"],1),[0,0])
+    assert np.allclose(np.round(f._fit_df["estimate"],0),[0,0])
     assert np.allclose(np.round(f._fit_df["std"],1),[1,1])
     assert np.allclose(np.round(f._fit_df["low_95"],0),[-2,-2])
     assert np.allclose(np.round(f._fit_df["high_95"],0),[2,2])

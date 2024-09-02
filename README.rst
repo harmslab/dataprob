@@ -6,27 +6,30 @@ dataprob
 
 .. image:: docs/badges/coverage-badge.svg
 
+dataprob was designed to allow scientists to easily fit user-defined models to 
+experimental data. It allows maximum likelihood, bootstrap, and Bayesian
+analyses with a simple and consistent interface. 
 
-dataprob was designed to allow experimentalists to fit parameters from arbitrary
-models to experimental data. 
+Design principles
+=================
 
 + **ease of use:** Users write a python function that describes their model, 
-  then load in their experimental data as a dataframe. A full analysis can
-  be run with two python commands. 
-+ **dataframe centric:** Users use a dataframe to specify parameter bounds,
+  then load in their experimental data as a dataframe. 
++ **dataframe centric:** Uses a pandas dataframe to specify parameter bounds,
   guesses, fixedness, and priors. Observed data can be passed in as a
-  dataframe or numpy vector. All outputs are simple pandas dataframes. 
+  dataframe or numpy vector. All outputs are pandas dataframes. 
 + **consistent experience:** Users can run maximum-likelihood, bootstrap 
   resampling, or Bayesian MCMC analyses with an identical interface and nearly
   identical diagnostic outputs. 
-+ **interpretable:** Provides simple diagnostic plots and runs tests assessing
-  fit results, flagging problems with residuals and co-varying parameters. 
++ **interpretable:** Provides diagnostic plots and runs tests to validate
+  fit results. 
 
 Simple example
 ==============
 
 The following code generates noisy linear data and uses dataprob to find 
 the maximum likelihood estimate of its slope and intercept. 
+`Run on Google Colab <simple-example_>`_.
 
 .. code-block:: python
     
@@ -54,9 +57,23 @@ the maximum likelihood estimate of its slope and intercept.
           y_std=0.5)
 
     # 4. Access results
-    print(f.fit_df)
     fig = dataprob.plot_summary(f)
     fig = dataprob.plot_corner(f)
+    print(f.fit_df)
+    print(f.fit_quality)
+
+The plots will be:
+
+.. image:: _static/simple-example_plot-summary.svg
+    :align: center
+    :alt: data.plot_summary result
+    :width: 75%
+
+.. image:: _static/simple-example_plot-corner.svg
+    :align: center
+    :alt: data.plot_corner result
+    :width: 75%
+
 
 The ``f.fit_df`` dataframe will look something like:
 
@@ -68,24 +85,42 @@ The ``f.fit_df`` dataframe will look something like:
 | ``b`` | ``b`` | 5.644    | 0.274 |  4.465 | 6.822   | ...   | ``NaN``   |
 +-------+-------+----------+-------+--------+---------+-------+-----------+
 
-The plots will be:
+The ``f.fit_quality`` dataframe will look something like:
 
-.. image:: docs/source/_static/simple-example_plot-summary.svg
++---------------+---------------------------------------------+---------+---------+
+| name          | description                                 | is_good | value   |
++===============+=============================================+=========+=========+
+| num_obs       | number of observations                      | True    | 25.000  |
++---------------+---------------------------------------------+---------+---------+
+| num_param     | number of fit parameters                    | True    | 2.000   |
++---------------+---------------------------------------------+---------+---------+
+| lnL           | log likelihood                              | True    | -18.761 |
++---------------+---------------------------------------------+---------+---------+
+| chi2          | chi^2 goodness-of-fit                       | True    | 0.241   |
++---------------+---------------------------------------------+---------+---------+
+| reduced_chi2  | reduced chi^2                               | True    | 1.192   |
++---------------+---------------------------------------------+---------+---------+
+| mean0_resid   | t-test for residual mean != 0               | True    | 1.000   |
++---------------+---------------------------------------------+---------+---------+
+| durbin-watson | Durbin-Watson test for correlated residuals | True    | 2.265   |
++---------------+---------------------------------------------+---------+---------+
+| ljung-box     | Ljung-Box test for correlated residuals     | True    | 0.943   |
++---------------+---------------------------------------------+---------+---------+
 
-.. image:: docs/source/_static/simple-example_plot-corner.svg
+
 
 Installation
 ============
 
 We recommend installing dataprob with pip:
 
-.. code-block:: bash
+.. code-block:: shell
 
     pip install dataprob
 
 To install from source and run tests:
 
-.. code-block:: bash
+.. code-block:: shell
 
     git clone https://github.com/harmslab/dataprob.git
     cd dataprob
@@ -101,16 +136,18 @@ A good way to learn how to use the library is by working through examples. The
 following notebooks are included in the `dataprob/examples/` directory. They are
 self-contained demonstrations in which dataprob is used to analyze various
 classes of experimental data. The links below launch each notebook in Google
-colab:
+Colab:
 
-+ `linear.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear.ipynb>`_: fit a linear model to noisy data (2 parameter, linear)
-+ `binding.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/binding.ipynb>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
-+ `michaelis-menten.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/michaelis-menten.ipynb>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
-+ `lagged-exponential.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/lagged-exponential.ipynb>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
-+ `multi-gaussian.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/multi-gaussian.ipynb>`_: two overlapping normal distributions (6 parameter, Gaussian)
-+ `periodic.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/periodic.ipynb>`_: periodic data (3 parameter, sine) 
-+ `polynomial.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/polynomial.ipynb>`_: nonlinear data with no obvious form (5 parameter, polynomial)
-+ `linear-extrapolation-folding.ipynb <https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear-extrapolation-folding.ipynb>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
++ `api-example.ipynb <api-example_>`_: shows various features of the API when analyzing a linear model
++ `linear.ipynb <linear-example_>`_: fit a linear model to noisy data (2 parameter, linear)
++ `binding.ipynb <binding-example_>`_: a single-site binding interaction (2 parameter, sigmoidal curve)
++ `michaelis-menten.ipynb <michaelis-menten-example_>`_: Michaelis-Menten model of enzyme kinetics (2 parameter, sigmoidal curve)
++ `lagged-exponential.ipynb <lagged-exponential-example_>`_: bacterial growth curve with initial lag phase (3 parameter, exponential)
++ `multi-gaussian.ipynb <multi-gaussian-example_>`_: two overlapping normal distributions (6 parameter, Gaussian)
++ `periodic.ipynb <periodic-example_>`_: periodic data (3 parameter, sine) 
++ `polynomial.ipynb <polynomial-example_>`_: nonlinear data with no obvious form (5 parameter, polynomial)
++ `linear-extrapolation-folding.ipynb <linear-extrapolation-folding-example_>`_: protein equilibrium unfolding data (6 parameter, linear embedded in sigmoidal)
+
 
 Documentation
 =============

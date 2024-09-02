@@ -3,9 +3,15 @@
 .. _pop-std: https://en.wikipedia.org/wiki/Bessel%27s_correction
 .. _float-number: https://en.wikipedia.org/wiki/Floating-point_arithmetic
 .. _pandas-dataframe: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html
+.. _kde: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html
+.. _overfit: https://en.wikipedia.org/wiki/Overfitting
+.. _durbin-watson: https://en.wikipedia.org/wiki/Durbin–Watson_statistic
+.. _ljung-box: https://en.wikipedia.org/wiki/Ljung–Box_test
 
 ..
     # example links
+.. _api-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/api-example.ipynb
+.. _simple-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/simple-example.ipynb
 .. _linear-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/linear.ipynb
 .. _binding-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/binding.ipynb
 .. _michaelis-menten-example: https://githubtocolab.com/harmslab/dataprob/blob/main/examples/michaelis-menten.ipynb
