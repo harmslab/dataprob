@@ -15,6 +15,8 @@ from dataprob.util.check import check_float
 from dataprob.util.check import check_bool
 from dataprob.util.check import check_array
 
+from dataprob.util.stats import get_kde_max
+
 import emcee
 
 import numpy as np
@@ -214,8 +216,7 @@ class BayesianSampler(Fitter):
             or in the data_df dataframe. 
         y_std : numpy.ndarray
             standard deviation of each observation. nan values are not allowed.
-            If not specified, all points are assigned an uncertainty of
-            0.1*mean(y_obs). 
+            y_std must either be specified here or in the data_df dataframe. 
         num_walkers : int, default=100
             number of markov chains to use in the analysis
         use_ml_guess : bool, default=True
@@ -334,7 +335,7 @@ class BayesianSampler(Fitter):
         """
 
         # Get mean and standard deviation
-        estimate = np.mean(self._samples,axis=0)
+        estimate = get_kde_max(self._samples)
         std = np.std(self._samples,axis=0)
 
         # Calculate 95% confidence intervals

@@ -200,6 +200,29 @@ def test_MLFitter__update_fit_df():
     assert np.array_equal(f.fit_df["lower_bound"],[-10,-np.inf])
     assert np.array_equal(f.fit_df["upper_bound"],[10,np.inf])
 
+def test_MLFitter_fit_quality():
+
+    def linear_fcn(m,b,x): return m*x + b
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x) + np.random.normal(0,0.1,10),
+                            "y_std":0.1*np.ones(10)})
+
+    f = MLFitter(some_function=linear_fcn,
+                 fit_parameters=["m","b"],
+                 non_fit_kwargs={"x":x})
+    f.data_df = data_df
+
+    assert f.fit_quality is None
+
+    # run containing fit function from base class; that sets fit_has_been_run to
+    # true.
+    f.fit()
+    assert f._fit_has_been_run is True
+
+    # make sure this runs. test of outputs is in util/test_get_fit_quality
+    assert issubclass(type(f.fit_quality),pd.DataFrame)
+
+
 def test_MLFitter_samples():
 
     def linear_fcn(m,b,x): return m*x + b

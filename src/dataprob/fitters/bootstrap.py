@@ -4,6 +4,7 @@ Fitter subclass for performing bootstrap analyses.
 
 from dataprob.fitters.base import Fitter
 from dataprob.util.check import check_int
+from dataprob.util.stats import get_kde_max
 
 import numpy as np
 import scipy
@@ -34,8 +35,7 @@ class BootstrapFitter(Fitter):
             or in the data_df dataframe. 
         y_std : numpy.ndarray
             standard deviation of each observation. nan values are not allowed.
-            If not specified, all points are assigned an uncertainty of
-            0.1*mean(y_obs). 
+            y_std must either be specified here or in the data_df dataframe. 
         num_bootstrap : int
             Number of bootstrap samples to run
         **least_squares_kwargs : 
@@ -148,15 +148,15 @@ class BootstrapFitter(Fitter):
         """
         
         samples = self.samples
-        good_mask = np.logical_not(np.isnan(samples[:,0]))
+        good_mask = np.sum(np.isnan(samples),axis=1) == 0
         samples = samples[good_mask,:]
-        if samples.shape[0] < 2:
-            err = f"_update_fit_df requires at least two non-nan samples. The\n"
+        if samples.shape[0] < self.samples.shape[1] + 1:
+            err = f"_update_fit_df requires at least num_param + 1 non-nan samples. The\n"
             err += f".samples array has {samples.shape[0]} non-nan parameters.\n"
             raise ValueError(err)
 
         # Get mean and standard deviation
-        estimate = np.mean(samples,axis=0)
+        estimate = get_kde_max(self._samples)
         std = np.std(samples,axis=0)
 
         # Calculate 95% confidence intervals

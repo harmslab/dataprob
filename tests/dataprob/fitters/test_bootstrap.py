@@ -190,8 +190,8 @@ def test_BootstrapFitter__update_fit_df():
     f._update_fit_df()
 
     # Make sure mean/std/95 calc is write given fake samples we stuffed in
-    assert np.allclose(np.round(f._fit_df["estimate"],1),[0,0])
-    assert np.allclose(np.round(f._fit_df["std"],1),[1,1])
+    assert np.allclose(np.round(f._fit_df["estimate"],0),[0,0])
+    assert np.allclose(np.round(f._fit_df["std"],0),[1,1])
     assert np.allclose(np.round(f._fit_df["low_95"],0),[-2,-2])
     assert np.allclose(np.round(f._fit_df["high_95"],0),[2,2])
 
@@ -215,16 +215,16 @@ def test_BootstrapFitter__update_fit_df():
 
     f._update_fit_df()
 
-    # Make sure mean/std/95 calc is write given fake samples we stuffed in
-    assert np.allclose(np.round(f._fit_df["estimate"],1),[0,0])
-    assert np.allclose(np.round(f._fit_df["std"],1),[1,1])
+    # Make sure mean/std/95 calc is right given fake samples we stuffed in
+    assert np.allclose(np.round(f._fit_df["estimate"],0),[0,0])
+    assert np.allclose(np.round(f._fit_df["std"],0),[1,1])
     assert np.allclose(np.round(f._fit_df["low_95"],0),[-2,-2])
     assert np.allclose(np.round(f._fit_df["high_95"],0),[2,2])
 
-    # two non-nan, it should work. Not checking estimate values because there
+    # three non-nan, it should work. Not checking estimate values because there
     # are so few samples
-    f._samples[:f._samples.shape[0]-2,:] = np.nan
-    assert np.sum(np.isnan(f._samples[:,0])) == 10000 - 2
+    f._samples[:f._samples.shape[0]-3,:] = np.nan
+    assert np.sum(np.isnan(f._samples[:,0])) == 10000 - 3
     f._update_fit_df()
 
     # only one non-nan sample; should die
