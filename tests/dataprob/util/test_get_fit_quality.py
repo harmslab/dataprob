@@ -1,5 +1,6 @@
 import pytest
 
+from dataprob.util.get_fit_quality import _get_success
 from dataprob.util.get_fit_quality import _get_num_obs
 from dataprob.util.get_fit_quality import _get_num_param
 from dataprob.util.get_fit_quality import _get_lnL
@@ -12,6 +13,28 @@ from dataprob.util.get_fit_quality import get_fit_quality
 
 import numpy as np
 import pandas as pd
+
+def test__get_success():
+
+    out_dict = {"name":[],
+                "description":[],
+                "is_good":[],
+                "value":[],
+                "message":[]}
+    
+    out_dict = _get_success(True,out_dict)
+    assert out_dict["name"][0] == "success"
+    assert out_dict["description"][0] == "fit success status"
+    assert out_dict["value"][0] is True
+    assert out_dict["message"][0] == ""
+    assert out_dict["is_good"][0] is True
+
+    out_dict = _get_success(False,out_dict)
+    assert out_dict["name"][1] == "success"
+    assert out_dict["description"][1] == "fit success status"
+    assert out_dict["value"][1] is False
+    assert out_dict["message"][1] == ""
+    assert out_dict["is_good"][1] is False
 
 def test__get_num_obs():
 
@@ -247,10 +270,12 @@ def test_get_fit_quality():
     # Just make sure this runs; output checked in other tests
     out = get_fit_quality(residuals=r,
                           num_param=n,
-                          lnL=lnL)
+                          lnL=lnL,
+                          success=True)
     assert issubclass(type(out),pd.DataFrame)
-    assert len(out) == 8
+    assert len(out) == 9
     assert np.array_equal(out.columns,["description","is_good","value","message"])
+    assert out.loc["success","value"] is True
     assert out.loc["lnL","value"] == -5
     assert out.loc["num_param","value"] == 1
 

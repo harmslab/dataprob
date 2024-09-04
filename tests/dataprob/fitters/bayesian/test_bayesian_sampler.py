@@ -11,8 +11,7 @@ from dataprob.fitters.bayesian._prior_processing import find_normalization
 from dataprob.fitters.bayesian._prior_processing import reconcile_bounds_and_priors
 from dataprob.fitters.bayesian._prior_processing import find_uniform_value
 
-from dataprob.model_wrapper.model_wrapper import ModelWrapper
-
+import warnings
 
 def test_BayesianSampler__init__():
 
@@ -317,6 +316,69 @@ def test_BayesianSampler_ln_prob():
     with pytest.raises(ValueError):
         f.ln_prob([1,2,3])
 
+def test_BayesianSampler__sample_to_convergence():
+
+    def test_fcn(m,b,x): return m*x + b
+
+    # ------
+    # test no convergence 
+
+    f = BayesianSampler(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+    f._y_obs = np.arange(10)*5 + 2 + np.random.normal(0,1,10)
+    f._y_std = 1.0
+
+    num_walkers = 100
+    num_steps = 100
+
+    f._setup_priors()
+    f._initial_state = np.ones((100,2))
+    f._initial_state[:,0] = np.random.normal(5,0.1,100)
+    f._initial_state[:,1] = np.random.normal(2,0.1,100)
+        
+    # Build sampler object
+    f._fit_result = emcee.EnsembleSampler(nwalkers=num_walkers,
+                                          ndim=f._initial_state.shape[1],
+                                          log_prob_fn=f._ln_prob)
+    f._num_steps = num_steps
+
+    # Cannot converge -- check for warning and setting success to False
+    f._max_convergence_cycles = 1
+    with pytest.warns():
+        f._sample_to_convergence()
+    assert f._success is False
+
+    # ------
+    # test convergence
+    f = BayesianSampler(some_function=test_fcn,
+                        non_fit_kwargs={"x":np.arange(10)})
+    f._y_obs = np.arange(10)*5 + 2 + np.random.normal(0,1,10)
+    f._y_std = 1.0
+
+    num_walkers = 100
+    num_steps = 100
+
+    f._setup_priors()
+    f._initial_state = np.ones((100,2))
+    f._initial_state[:,0] = np.random.normal(5,0.1,100)
+    f._initial_state[:,1] = np.random.normal(2,0.1,100)
+        
+    # Build sampler object
+    f._fit_result = emcee.EnsembleSampler(nwalkers=num_walkers,
+                                          ndim=f._initial_state.shape[1],
+                                          log_prob_fn=f._ln_prob)
+    f._num_steps = num_steps
+
+    # converges -- no warning, set to False
+    f._max_convergence_cycles = 10
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        f._sample_to_convergence()
+    assert f._success is True
+
+
+
+
 def test_BayesianSampler_fit():
 
     def test_fcn(m,b,x): return m*x + b
@@ -330,15 +392,17 @@ def test_BayesianSampler_fit():
           y_std=y_std,
           num_walkers=10,
           use_ml_guess=True,
-          num_steps=10,
+          num_steps=100,
           burn_in=0.1,
+          max_convergence_cycles=10,
           num_threads=1)
 
     assert f._num_walkers == 10
     assert f._use_ml_guess is True
-    assert f._num_steps == 10
+    assert f._num_steps == 100
     assert np.isclose(f._burn_in,0.1)
     assert f._num_threads == 1
+    assert f._max_convergence_cycles == 10
     
     # check num threads passing
     with pytest.raises(NotImplementedError):
@@ -380,7 +444,13 @@ def test_BayesianSampler_fit():
         f.fit(y_obs=y_obs,
               y_std=y_std,
               num_threads=-2)
-        
+
+    with pytest.raises(ValueError):
+        f.fit(y_obs=y_obs,
+              y_std=y_std,
+              max_convergence_cycles=0)
+
+    
     with pytest.raises(TypeError):
         f.fit(y_obs=y_obs,
               y_std=y_std,
@@ -409,18 +479,17 @@ def test_BayesianSampler__fit():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
+    f.fit(num_walkers=100,
           use_ml_guess=True,
-          num_steps=10,
+          num_steps=100,
           burn_in=0.1,
-          num_threads=1)
+          num_threads=1,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
-    assert f._initial_state.shape == (10,2)
-    assert np.array_equal(f.samples.shape,[90,2]) 
-    assert f._lnprob.shape == (90,)
+    assert f._initial_state.shape == (100,2)
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
@@ -442,18 +511,17 @@ def test_BayesianSampler__fit():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
+    f.fit(num_walkers=100,
           use_ml_guess=False,
-          num_steps=10,
+          num_steps=100,
           burn_in=0.1,
-          num_threads=1)
+          num_threads=1,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
     # look for non-ML guess
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
-    assert f._initial_state.shape == (10,2)
-    assert np.array_equal(f.samples.shape,[90,2]) 
-    assert f._lnprob.shape == (90,)
+    assert f._initial_state.shape == (100,2)
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
@@ -472,12 +540,15 @@ def test_BayesianSampler__fit():
     assert f.samples is None
 
     # run containing fit function from base class; that sets fit_has_been_run to
-    # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=9,
-          use_ml_guess=True,
-          num_steps=20,
-          burn_in=0.1,
-          num_threads=1)
+    # true. Make sure containing function ran completely. Warning comes about
+    # because it will not converge.
+    with pytest.warns():
+        f.fit(num_walkers=9,
+              use_ml_guess=True,
+              num_steps=20,
+              burn_in=0.1,
+              num_threads=1,
+              max_convergence_cycles=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -485,7 +556,7 @@ def test_BayesianSampler__fit():
     assert f._initial_state.shape == (9,2)
     assert np.array_equal(f.samples.shape,[162,2]) 
     assert f._lnprob.shape == (162,)
-    assert f._success is True
+    assert f._success is False
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
     # -------------------------------------------------------------------------
@@ -503,12 +574,15 @@ def test_BayesianSampler__fit():
     assert f.samples is None
 
     # run containing fit function from base class; that sets fit_has_been_run to
-    # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
-          use_ml_guess=True,
-          num_steps=10,
-          burn_in=0.5,
-          num_threads=1)
+    # true. Make sure containing function ran completely. Warning comes about
+    # because it will not converge. 
+    with pytest.warns():
+        f.fit(num_walkers=10,
+            use_ml_guess=True,
+            num_steps=10,
+            burn_in=0.5,
+            num_threads=1,
+            max_convergence_cycles=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -516,7 +590,7 @@ def test_BayesianSampler__fit():
     assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[50,2]) 
     assert f._lnprob.shape == (50,)
-    assert f._success is True
+    assert f._success is False
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
     # -------------------------------------------------------------------------
@@ -540,18 +614,17 @@ def test_BayesianSampler__fit():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
+    f.fit(num_walkers=100,
           use_ml_guess=False,
-          num_steps=10,
+          num_steps=100,
           burn_in=0.1,
-          num_threads=1)
+          num_threads=1,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
-    assert f._initial_state.shape == (10,1)
-    assert np.array_equal(f.samples.shape,[90,1]) 
-    assert f._lnprob.shape == (90,)
+    assert f._initial_state.shape == (100,1)
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
     assert f.fit_df.loc["b","estimate"] == f.fit_df.loc["b","guess"]
@@ -575,18 +648,17 @@ def test_BayesianSampler__fit():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
+    f.fit(num_walkers=100,
           use_ml_guess=True,
-          num_steps=10,
+          num_steps=100,
           burn_in=0.1,
-          num_threads=1)
+          num_threads=1,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
-    assert f._initial_state.shape == (10,1)
-    assert np.array_equal(f.samples.shape,[90,1]) 
-    assert f._lnprob.shape == (90,)
+    assert f._initial_state.shape == (100,1)
     assert f._success is True
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
     assert f.fit_df.loc["b","estimate"] == f.fit_df.loc["b","guess"]
@@ -606,12 +678,15 @@ def test_BayesianSampler__fit():
     assert f.samples is None
 
     # run containing fit function from base class; that sets fit_has_been_run to
-    # true. Make sure containing function ran completely. 
-    f.fit(num_walkers=10,
-          use_ml_guess=True,
-          num_steps=10,
-          burn_in=0.1,
-          num_threads=1)
+    # true. Make sure containing function ran completely. Warning comes about
+    # because it will not have converged. 
+    with pytest.warns():
+        f.fit(num_walkers=10,
+            use_ml_guess=True,
+            num_steps=10,
+            burn_in=0.1,
+            num_threads=1,
+            max_convergence_cycles=1)
     assert f._fit_has_been_run is True
 
     # These outputs are determined within ._fit
@@ -619,21 +694,23 @@ def test_BayesianSampler__fit():
     assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[90,2]) 
     assert f._lnprob.shape == (90,)
-    assert f._success is True
+    assert f._success is False
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
-    # now run again
-    f.fit(num_walkers=10,
-          use_ml_guess=True,
-          num_steps=10,
-          burn_in=0.1,
-          num_threads=1)
+    # now run again. Warning because not converged. 
+    with pytest.warns():
+        f.fit(num_walkers=10,
+            use_ml_guess=True,
+            num_steps=10,
+            burn_in=0.1,
+            num_threads=1,
+            max_convergence_cycles=1)
 
     assert issubclass(type(f._fit_result),emcee.ensemble.EnsembleSampler)
     assert f._initial_state.shape == (10,2)
     assert np.array_equal(f.samples.shape,[180,2]) 
     assert f._lnprob.shape == (180,)
-    assert f._success is True
+    assert f._success is False
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
 
@@ -701,9 +778,10 @@ def test_BayesianSampler__update_fit_df():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit(num_walkers=10,
-          num_steps=10,
-          use_ml_guess=False)
+    f.fit(num_walkers=100,
+          num_steps=100,
+          use_ml_guess=False,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
     # now fit_df should have been updated with guesses etc. 
@@ -726,12 +804,14 @@ def test_BayesianSampler__update_fit_df():
 
     # run containing fit function from base class; that sets fit_has_been_run to
     # true.
-    f.fit(num_walkers=10,
-          num_steps=10,
-          use_ml_guess=False)
+    f.fit(num_walkers=100,
+          num_steps=100,
+          use_ml_guess=False,
+          max_convergence_cycles=10)
     assert f._fit_has_been_run is True
 
-    assert f.samples.shape == (90,2)
+    assert f.samples.shape[0] > 90
+    assert f.samples.shape[1] == 2
     f._samples = f._samples[:5,:]
     f._update_fit_df()
 
@@ -756,16 +836,19 @@ def test_BayesianSampler_fit_info():
     f.fit(y_obs=y_obs,
           y_std=y_std,
           num_walkers=10,
-          num_steps=10,
-          burn_in=0.1)
+          num_steps=100,
+          burn_in=0.1,
+          max_convergence_cycles=10)
 
     assert f.fit_info["Num walkers"] == f._num_walkers
     assert f.fit_info["Use ML guess"] == f._use_ml_guess
     assert f.fit_info["Num steps"] == f._num_steps
     assert f.fit_info["Burn in"] == f._burn_in
     assert f.fit_info["Num threads"] == f._num_threads
+    assert f.fit_info["Max convergence cycles"] == 10
 
-    assert f.fit_info["Final sample number"] == 90
+    # This will be some kind of big number after running to convergence
+    assert f.fit_info["Final sample number"] > 100 
     f._samples = np.zeros((100,2))
     assert f.fit_info["Final sample number"] == 100
     
@@ -773,22 +856,23 @@ def test_BayesianSampler_fit_info():
 def test_BayesianSampler___repr__():
     
     # Stupidly simple fitting problem. find slope
-    def model_to_wrap(m=1,x=np.array([1,2,3])): return m*x
+    def model_to_wrap(m=1): return m*np.array([1,2,3])
     
     # Run _fit_has_been_run, success branch
     f = BayesianSampler(some_function=model_to_wrap)
     f.fit(y_obs=np.array([2,4,6]),
-          y_std=[0.1,0.1,0.1],
-          num_steps=10)
+          y_std=[0.1,0.9,0.11],
+          num_steps=100,
+          max_convergence_cycles=10)
 
     out = f.__repr__().split("\n")
-    assert len(out) == 23
+    assert len(out) == 24
 
     # hack, run _fit_has_been_run, _fit_failed branch
     f._success = False
 
     out = f.__repr__().split("\n")
-    assert len(out) == 18 
+    assert len(out) == 19 
 
     # Run not _fit_has_been_run
     f = BayesianSampler(some_function=model_to_wrap)

@@ -39,6 +39,7 @@
 .. _credible-interval: https://en.wikipedia.org/wiki/Credible_interval
 .. _emcee: https://emcee.readthedocs.io/en/stable/
 .. _emcee-ensemble-sampler: https://emcee.readthedocs.io/en/stable/user/sampler/
+.. _emcee-autocorr: https://emcee.readthedocs.io/en/stable/tutorials/autocorr/
 
 .. 
     # pyplot links

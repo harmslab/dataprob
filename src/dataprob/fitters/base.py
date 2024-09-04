@@ -13,7 +13,6 @@ from dataprob.util.get_fit_quality import get_fit_quality
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 import pickle
 import os
@@ -484,7 +483,8 @@ class Fitter:
 
         out_df = get_fit_quality(residuals=self._weighted_residuals(estimate),
                                  num_param=estimate.shape[0],
-                                 lnL=self.ln_like(estimate))
+                                 lnL=self.ln_like(estimate),
+                                 success=self.success)
 
         return out_df
 

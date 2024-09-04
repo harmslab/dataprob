@@ -9,7 +9,7 @@
 project = 'dataprob'
 copyright = '2024, Michael J. Harms'
 author = 'Michael J. Harms'
-release = '0.9.0'
+release = '0.9.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
