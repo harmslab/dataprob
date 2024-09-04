@@ -93,6 +93,8 @@ The ``f.fit_quality`` dataframe will look something like:
 +---------------+---------------------------------------------+---------+---------+
 | name          | description                                 | is_good | value   |
 +===============+=============================================+=========+=========+
+| success       | fit success status                          | True    | True    |
++---------------+---------------------------------------------+---------+---------+
 | num_obs       | number of observations                      | True    | 25.000  |
 +---------------+---------------------------------------------+---------+---------+
 | num_param     | number of fit parameters                    | True    | 2.000   |
@@ -762,6 +764,8 @@ interpret the results. The results for the "bad model" fit are shown below:
 +---------------+---------------------------------------------+---------+---------+
 | index         | description                                 | is_good | value   |
 +===============+=============================================+=========+=========+
+| success       | fit success status                          | True    | True    | 
++---------------+---------------------------------------------+---------+---------+
 | num_obs       | number of observations                      | True    | 30.0    | 
 +---------------+---------------------------------------------+---------+---------+
 | num_param     | number of floating fit parameters           | True    | 2.0     | 
@@ -779,8 +783,9 @@ interpret the results. The results for the "bad model" fit are shown below:
 | ljung-box     | Ljung-Box test for correlated residuals     | False   | 0.000   |
 +---------------+---------------------------------------------+---------+---------+
 
-The first-three entries describe the model: 
+The first four entries describe the model: 
 
++ Whether or not the fit terminated successfully
 + The number of floating parameters
 + The number of observations in ``y_obs``
 + The log likelihood of the parameters in ``f.fit_df["estimate"]`` 
@@ -1263,6 +1268,13 @@ bounds is truncated. The trimmed Gaussian is renormalized to account for the
 loss of density. Compound priors are specified when a user sets ``prior_mean``,
 ``prior_std``, and at least one of ``lower_bound`` and ``upper_bound``. 
 
+.. note::
+
+  We **strongly** recommend setting priors on your parameters, at least in the
+  form of upper and lower bounds. It is very rare that one has no idea what a
+  reasonable parameter value is. Defined priors ensures the sampler spends time
+  in reasonable regions of parameter space and thus converges. 
+
 Implementation
 --------------
 
@@ -1287,6 +1299,37 @@ parameter space.
     f.fit(y_obs=y_obs,
           y_std=0.1,
           moves=emcee.moves.StretchMove()) # <- change emcee move
+
+The MCMC `EnsembleSampler <emcee-ensemble-sampler_>`_ automatically assesses
+paramter estimate convergence by calculating the `parameter autocorrelation times <emcee-autocorr_>`_. 
+This is the number of steps over which the current value of the parameter no
+longer predicts the final value of the parameter. Its built-in convergence
+criterion is :math:`50 \tau`, where :math:`\tau` is the autocorrelation time. If
+the convergence criterion is not met, dataprob will warn the user and 
+``f.fit_quality`` will have ``success`` set to ``False``. 
+
+dataprob can be configured to run MCMC until convergence. It does so by running
+multiple cycles of MCMC, checking for convergence after each run. To use this
+feature, set ``max_convergence_cycles`` to more than its default value of ``1``
+when calling ``f.fit()``. In empirical tests, we've found a value of ``10``
+usually leads to convergence. 
+
+.. code:: python
+
+    def linear(m,b):
+        return m*np.arange(10) + b
+    
+    f = dataprob.setup(linear,
+                       method="mcmc")
+    f.fit(y_obs=y_obs,
+          y_std=0.1,
+          max_convergence_cycles=10) # <---
+
+.. warning::
+
+  Depending on model complexity, convergence can take a long time. This is 
+  why we set the default value of ``max_convergence_cyles`` to ``1``. 
+
 
 Outputs
 -------

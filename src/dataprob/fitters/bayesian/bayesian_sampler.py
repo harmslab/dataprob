@@ -23,6 +23,10 @@ import numpy as np
 from scipy import stats
 
 import multiprocessing
+import sys
+import warnings
+
+
 
 class BayesianSampler(Fitter):
     """
@@ -195,6 +199,92 @@ class BayesianSampler(Fitter):
         
         return self._ln_prob(param)
 
+    def _sample_to_convergence(self):
+        """
+        Run the sampler up to _max_convergence_cycles times in an effort go 
+        get converged parameter estimates. This is based on emcee's estimated
+        autocorrelation time for the parameters. The convergence criterion is
+        50x the longest autocorrelation time. 
+        """
+
+        # Print status to standard error (like the progress bars)
+        print(f"Running 1 of up to {self._max_convergence_cycles} sampler iterations",
+            flush=True,
+            file=sys.stderr)
+
+        # Run initial sampler pass
+        self._fit_result.run_mcmc(initial_state=self._initial_state,
+                                  nsteps=self._num_steps,
+                                  progress=True)
+
+        # Initialize control variables
+        success = False
+        counter = 1
+
+        # Loop until we reach max_convergence_cycles
+        while counter < self._max_convergence_cycles:
+
+            # Current number of steps
+            num_steps = self._fit_result.get_chain().shape[1]
+            
+            # Get the parameter correlation time. 
+            try:
+
+                # Get largest correlation time--this limits our final sampling. If 
+                # this runs without error, break out of the loop and declare 
+                # success. 
+                max_corr = np.max(self._fit_result.get_autocorr_time())
+                print(f"   Converged correlation time: {max_corr:.2f} iterations\n",
+                    flush=True,
+                    file=sys.stderr)
+                success = True
+                break
+
+            except emcee.autocorr.AutocorrError as e:
+                # emcee throws an AutocorrError if it is not converged yet. Get the
+                # maximum of its current (unreliable) guess. 
+                max_corr = np.max(e.__dict__["tau"])
+                print(f"   Estimated correlation time: {max_corr:.2f} iterations\n",
+                        flush=True,
+                        file=sys.stderr)
+                
+            # Figure out how many steps to add to get to the target correlation time
+            # (max_corr * 50). This number is hard-coded into the acorr estimator. 
+            next_iteration = int(np.ceil(max_corr)*50)
+            next_iteration = next_iteration - num_steps
+
+            # Run next sampling, starting from previous state
+            print(f"Running {counter + 1} of up to {self._max_convergence_cycles} sampler iterations",
+                flush=True,
+                file=sys.stderr)
+            
+            self._fit_result.run_mcmc(initial_state=None,
+                                      nsteps=next_iteration,
+                                      progress=True)
+
+            # Update the counter
+            counter += 1
+
+        # Final number of steps taken
+        num_steps = self._fit_result.get_chain().shape[1]
+
+        # If we converged, write this message out
+        if success:
+            print(f"\nTook {num_steps} steps ({num_steps/max_corr:.1f}x the correlation time)\n",
+                flush=True,
+                file=sys.stderr)
+            
+        # If we failed to converge, warn about this. 
+        else:
+            w = f"\n\nParameter correlation time did not converge after "
+            w += f"{self._max_convergence_cycles} cycles.\n"
+            w += "Try increasing max_convergence_cycles when calling fit().\n\n"
+            warnings.warn(w)
+
+        # Record success (or not)
+        self._success = success
+
+
     def fit(self,
             y_obs=None,
             y_std=None,
@@ -203,6 +293,7 @@ class BayesianSampler(Fitter):
             num_steps=100,
             burn_in=0.1,
             num_threads=1,
+            max_convergence_cycles=1,
             **emcee_kwargs):
         """
         Perform Bayesian MCMC sampling of parameter values. 
@@ -226,9 +317,14 @@ class BayesianSampler(Fitter):
             number of steps to run each markov chain
         burn_in : float, default = 0.1
             fraction of samples to discard from the start of the run
-        num_threads : int
+        num_threads : int, default=1
             number of threads to use.  if `0`, use the total number of cpus. 
             [NOT YET IMPLEMENTED]
+        max_convergence_cycles : int, default=1
+            run this number of cycles in an attempt to get the parameter 
+            estimates to converge. Must be >= 1. convergence is detected by 
+            estimating the parameter autocorrelation time (in units of steps),
+            then aiming for 50 times more steps than the autocorrelation time. 
         **emcee_kwargs : 
             all remaining keyword arguments are passed to the initialization 
             function of emcee.EnsembleSampler
@@ -262,6 +358,11 @@ class BayesianSampler(Fitter):
             raise NotImplementedError(err)
         
         self._num_threads = num_threads
+
+        # max convergence time
+        self._max_convergence_cycles = check_int(value=max_convergence_cycles,
+                                                 variable_name="max_convergence_cycles",
+                                                 minimum_allowed=1)
 
         super().fit(y_obs=y_obs,
                     y_std=y_std,
@@ -305,9 +406,7 @@ class BayesianSampler(Fitter):
                                                  **kwargs)
 
         # Run sampler
-        self._fit_result.run_mcmc(initial_state=self._initial_state,
-                                  nsteps=self._num_steps,
-                                  progress=True)
+        self._sample_to_convergence()
     
         # Create numpy array of samples
         to_discard = int(round(self._burn_in*self._num_steps,0))
@@ -324,8 +423,6 @@ class BayesianSampler(Fitter):
         else:
             self._samples = np.concatenate((self._samples,new_samples))
             self._lnprob = np.concatenate((self._lnprob,new_lnprob))
-
-        self._success = True
 
         self._update_fit_df()
 
@@ -390,6 +487,9 @@ class BayesianSampler(Fitter):
         
         if hasattr(self,"_burn_in"):
             output["Burn in"] = self._burn_in
+        
+        if hasattr(self,"_max_convergence_cycles"):
+            output["Max convergence cycles"] = self._max_convergence_cycles
 
 
         if self.samples is not None:

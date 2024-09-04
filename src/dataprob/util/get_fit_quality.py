@@ -7,6 +7,32 @@ from dataprob.util.stats import ljung_box
 import pandas as pd
 from scipy import stats
 
+def _get_success(success,out_dict):
+    """
+    Get whether the fit was successful and append to out_dict. 
+    
+    Parameters
+    ----------
+    success : bool
+        whether or not the fit was successful, as determined by the Fitter
+        object. 
+    out_dict : dict
+        dictionary with 'name', 'description', 'value', 'is_good', and 'msg' 
+        keys pointing to list values
+
+    Returns
+    out_dict : dict
+        out_dict updated with results of this quality test.
+    """
+
+    out_dict["name"].append("success")
+    out_dict["description"].append("fit success status")
+    out_dict["value"].append(success)
+    out_dict["message"].append("")
+    out_dict["is_good"].append(success)
+    
+    return out_dict
+
 def _get_num_obs(num_obs,out_dict):
     """
     Get the number of observations and append to out_dict. 
@@ -317,7 +343,8 @@ def _get_ljung_box(residuals,num_param,out_dict):
 
 def get_fit_quality(residuals,
                     num_param,
-                    lnL):
+                    lnL,
+                    success):
     """
     Do a collection of small analyses assessing fit quality. 
     
@@ -329,6 +356,9 @@ def get_fit_quality(residuals,
         number of fit parameters
     lnL : float
         log likelihood at fit parameter estimates
+    success : bool
+        whether or not the fit was successful, as determined by the Fitter
+        object. 
     
     Returns
     -------
@@ -347,6 +377,9 @@ def get_fit_quality(residuals,
                 "value":[],
                 "message":[]}
     
+    out_dict = _get_success(success=success,
+                            out_dict=out_dict)
+
     out_dict = _get_num_obs(num_obs=num_obs,
                             out_dict=out_dict)
     

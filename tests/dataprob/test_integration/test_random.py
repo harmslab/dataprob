@@ -86,5 +86,6 @@ def test_bayesian():
     _core_test(method="mcmc",
                use_ml_guess=False,
                num_walkers=100,
-               num_steps=200)
+               num_steps=200,
+               max_convergence_cycles=10)
 

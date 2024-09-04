@@ -82,9 +82,9 @@ def test_ml():
 def test_bayesian():
 
     try:
-        _core_test(method="mcmc")
+        _core_test(method="mcmc",max_convergence_cycles=10)
     except AssertionError:
-        _core_test(method="mcmc")
+        _core_test(method="mcmc",max_convergence_cycles=10)
 
 @pytest.mark.slow
 def test_bootstrap():

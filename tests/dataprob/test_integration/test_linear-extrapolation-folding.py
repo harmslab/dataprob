@@ -82,8 +82,8 @@ def _core_test(method,**method_kwargs):
 
     test_fcn = linear_extrapolation
     non_fit_kwargs = {"osmolyte":osmolyte,
-                    "R":R,
-                    "T":T}
+                      "R":R,
+                      "T":T}
 
     # ------------------------------------------------------------------------
     # Run analysis
@@ -137,9 +137,9 @@ def test_ml():
 def test_bayesian():
 
     try:
-        _core_test(method="mcmc")
+        _core_test(method="mcmc",max_convergence_cycles=10)
     except AssertionError:
-        _core_test(method="mcmc")
+        _core_test(method="mcmc",max_convergence_cycles=10)
 
 @pytest.mark.slow
 def test_bootstrap():
