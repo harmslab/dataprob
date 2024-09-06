@@ -634,7 +634,12 @@ class Fitter:
             N = samples.shape[0]
             fmt_string = _pretty_zeropad_str(N)
 
-            for i in range(0,N,N//(num_samples-1)):
+            if num_samples >= N:
+                i_values = np.arange(N)
+            else:
+                i_values = range(0,N,N//(num_samples-1))
+
+            for i in i_values:
                 key = fmt_string.format(i)
                 out[key] = self.model(self.samples[i])
     

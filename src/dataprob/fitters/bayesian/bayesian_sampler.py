@@ -225,7 +225,7 @@ class BayesianSampler(Fitter):
         while counter < self._max_convergence_cycles:
 
             # Current number of steps
-            num_steps = self._fit_result.get_chain().shape[1]
+            num_steps = self._fit_result.get_chain().shape[0]
             
             # Get the parameter correlation time. 
             try:
@@ -266,7 +266,7 @@ class BayesianSampler(Fitter):
             counter += 1
 
         # Final number of steps taken
-        num_steps = self._fit_result.get_chain().shape[1]
+        num_steps = self._fit_result.get_chain().shape[0]
 
         # If we converged, write this message out
         if success:
