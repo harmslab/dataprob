@@ -761,6 +761,16 @@ def test_Fitter_get_sample_df():
     assert sample_df.columns[-1] == "s00999"
     assert len(sample_df.columns) == 13
 
+    # Ask for more samples in the dataframe than we have in the samples array
+    f = Fitter(some_function=test_fcn)
+    f._y_obs = y_obs
+    f._y_std = y_std
+    f._fit_df = pd.DataFrame({"estimate":[10,20]})
+    f._success = True
+    f._samples = np.ones((50,2),dtype=float)
+    sample_df = f.get_sample_df(num_samples=100)
+    assert len(sample_df.columns) == 53
+
 
 def test_Fitter_write_samples(tmpdir):
     

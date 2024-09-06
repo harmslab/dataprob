@@ -318,7 +318,7 @@ class ModelWrapper:
             self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
 
         try:
-            return self._model_to_fit(**self._mw_kwargs)
+            return np.array(self._model_to_fit(**self._mw_kwargs))
         except Exception as e:
             err = "\n\nThe wrapped model threw an error (see trace).\n\n"
             raise RuntimeError(err) from e
@@ -344,7 +344,7 @@ class ModelWrapper:
         for i in range(len(params)):
             self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
         
-        return self._model_to_fit(**self._mw_kwargs)
+        return np.array(self._model_to_fit(**self._mw_kwargs))
 
 
     @property
