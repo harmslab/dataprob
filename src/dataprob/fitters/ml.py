@@ -112,8 +112,7 @@ class MLFitter(Fitter):
                 high_95.append(c2[i])
 
         except np.linalg.LinAlgError:
-            w = "\n\nJacobian matrix was singular. Could not fit parameter\n"
-            w += "uncertainty.\n\n"
+            w = "\n\nJacobian matrix was singular. Could not find parameter uncertainty.\n\n"
             warnings.warn(w)
 
             std = np.nan*np.ones(len(estimate),dtype=float)
@@ -165,8 +164,7 @@ class MLFitter(Fitter):
             cov = np.linalg.inv(2*np.dot(J.T,J))
             chol_cov = np.linalg.cholesky(cov).T
         except np.linalg.LinAlgError:
-            w = "\n\nJacobian matrix was singular. Could not generate\n"
-            w += "parameter samples.\n\n"
+            w = "\n\nJacobian matrix was singular. Could not generate parameter samples.\n\n"
             warnings.warn(w)
 
             # Return empty array

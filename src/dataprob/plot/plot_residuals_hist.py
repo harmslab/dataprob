@@ -50,12 +50,11 @@ def plot_residuals_hist(f,
         matplotlib figure and axes on which the plot was done
     """
 
-
     # Validate inputs and prep for plotting
-    x_label, y_label, _ = get_plot_features(f,
-                                            x_label,
-                                            y_label,
-                                            num_samples=0)
+    _, x_label, y_label, _ = get_plot_features(f,
+                                               x_label,
+                                               y_label,
+                                               num_samples=0)
     
     plot_unweighted = check_bool(value=plot_unweighted,
                                  variable_name="plot_unweighted")
@@ -78,8 +77,20 @@ def plot_residuals_hist(f,
 
     # Figure out what to plot
     if plot_unweighted:
+
+        # Gracefully fail if no unweighted residuals in fitter
+        if "unweighted_residuals" not in f.data_df.columns:
+            fig = ax.get_figure()
+            return fig, ax
+
         residual = f.data_df["unweighted_residuals"]
     else:
+
+        # Gracefully fail if no weighted residuals in fitter
+        if "weighted_residuals" not in f.data_df.columns:
+            fig = ax.get_figure()
+            return fig, ax
+
         residual = f.data_df["weighted_residuals"]
 
     # Generate histogram

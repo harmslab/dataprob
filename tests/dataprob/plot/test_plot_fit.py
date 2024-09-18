@@ -20,9 +20,11 @@ def test_plot_fit():
 
     f = MLFitter(some_function=test_fcn)
 
-    # run on on-fit fitter
-    with pytest.raises(RuntimeError):
-        plot_fit(f)
+    # run on fitter prior to fit. Should fail gracefully
+    fig, ax = plot_fit(f)
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    assert issubclass(type(ax),matplotlib.axes.Axes)
+    plt.close(fig)
     
     f = MLFitter(some_function=test_fcn)
     f.fit(y_obs=y_obs,

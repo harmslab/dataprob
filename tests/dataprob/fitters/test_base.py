@@ -8,7 +8,6 @@ from dataprob.fitters.base import _pretty_zeropad_str
 
 import numpy as np
 import pandas as pd
-import matplotlib
 
 import os
 import pickle
@@ -54,9 +53,8 @@ def test_Fitter__init__():
     assert f.num_params == 2
     assert f.param_df.loc["m","guess"] == 1
     assert f.param_df.loc["b","guess"] == 0
-    assert issubclass(type(f._model),ModelWrapper)
-
     assert f._fit_has_been_run is False
+    assert issubclass(type(f._model),ModelWrapper)
 
     # Make sure fit_parameters, non_fit_kwargs are being passed
     def test_model(m,b,x): return m*x + b
@@ -67,6 +65,7 @@ def test_Fitter__init__():
     assert f.param_df.loc["m","guess"] == 10
     assert f.param_df.loc["b","guess"] == 20
     assert np.array_equal(f._model.non_fit_kwargs["x"],np.arange(10))
+    assert f._fit_has_been_run is False
 
     # make sure vector_first_arg is being passed
     kwargs = copy.deepcopy(base_kwargs)
@@ -79,6 +78,7 @@ def test_Fitter__init__():
     assert len(f._model._non_fit_kwargs) == 2
     assert f._model.non_fit_kwargs["b"] is None
     assert np.array_equal(f._model.non_fit_kwargs["x"],np.arange(10))
+    assert f._fit_has_been_run is False
 
     # Send in pre-wrapped model
     def test_model(m=10,b=1,x=[]): return m*x + b
@@ -87,6 +87,7 @@ def test_Fitter__init__():
     f = Fitter(some_function=mw)
     assert f.param_df.loc["m","guess"] == 10
     assert f.param_df.loc["b","guess"] == 1
+    assert f._fit_has_been_run is False
 
 def test_Fitter__sanity_check():
     
@@ -101,7 +102,7 @@ def test_Fitter__sanity_check():
     f = Fitter(**kwargs)
 
     # should always work
-    f._sanity_check("some error",["fit_has_been_run"])
+    f._sanity_check("some error",["fit_df"])
 
     # Won't work
     with pytest.raises(RuntimeError):
@@ -119,7 +120,7 @@ def test_Fitter__process_obs_args():
     base_kwargs = {"some_function":test_model,
                    "fit_parameters":{"m":{"guess":1},
                                      "b":{"guess":0}},
-                   "non_fit_kwargs":{"x":np.arange(10)},
+                   "non_fit_kwargs":{"x":np.arange(3)},
                    "vector_first_arg":False}
 
     kwargs = copy.deepcopy(base_kwargs)
@@ -240,12 +241,13 @@ def test_Fitter_fit():
     kwargs["names"] = None
     
     assert not hasattr(f,"_success")
+
     assert f._fit_has_been_run is False
-
+    
     f.fit(**kwargs)
-
-    assert f._success is None
+    
     assert f._fit_has_been_run is True
+    assert f._success is None
 
     # ----------------------------------------------------------------------
     # make sure _process_obs_args is running with incompatible y_obs argument
@@ -495,14 +497,16 @@ def test_Fitter_non_fit_kwargs():
 
 def test_Fitter_data_df():
     
+    # -------------------------------------------------------------------------
     # test getter
     
-    def test_fcn(a=1,b=2): return a*b
+    def test_fcn(a=1,b=2): return a*b*np.ones(10)
     f = Fitter(some_function=test_fcn)
 
     out_df = f.data_df
-    assert len(out_df) == 0
-
+    assert len(out_df) == 10
+    assert np.array_equal(out_df.columns,["y_calc"])
+    
     y_obs = np.arange(10,dtype=float)
     y_std = np.ones(10,dtype=float)
 
@@ -510,7 +514,10 @@ def test_Fitter_data_df():
     f._y_obs = y_obs
     out_df = f.data_df
     assert len(out_df) == 10
-    assert len(out_df.columns) == 1
+    assert len(out_df.columns) == 3
+    assert np.array_equal(out_df.columns,["y_obs",
+                                          "y_calc",
+                                          "unweighted_residuals"])
     assert np.array_equal(out_df["y_obs"],y_obs)
 
     f = Fitter(some_function=test_fcn)
@@ -518,7 +525,12 @@ def test_Fitter_data_df():
     f._y_std = y_std
     out_df = f.data_df
     assert len(out_df) == 10
-    assert len(out_df.columns) == 2
+    assert len(out_df.columns) == 5
+    assert np.array_equal(out_df.columns,["y_obs",
+                                          "y_std",
+                                          "y_calc",
+                                          "unweighted_residuals",
+                                          "weighted_residuals"])
     assert np.array_equal(out_df["y_obs"],y_obs)
     assert np.array_equal(out_df["y_std"],y_std)
     
@@ -547,10 +559,38 @@ def test_Fitter_data_df():
     assert np.array_equal(out_df["weighted_residuals"],
                           (y_calc - y_obs)/y_std)
 
+    # fit has not been run, but guesses are reasonable
+    def test_fcn(a=1,b=2): return a*b*np.ones(10)
+    f = Fitter(some_function=test_fcn)
+    f.data_df = pd.DataFrame({"y_obs":np.arange(10,dtype=float),
+                              "y_std":np.ones(10,dtype=float)})
+    f._model.param_df.loc["a","guess"] = 2
+    f._model.param_df.loc["b","guess"] = 2
+    
+    # y_calc comes from guesses not estimate
+    assert np.array_equal(f.data_df.columns,["y_obs",
+                                             "y_std",
+                                             "y_calc",
+                                             "unweighted_residuals",
+                                             "weighted_residuals"])
+    assert np.array_equal(f.data_df["y_calc"],4*np.ones(10))
+
+    # Guesses are bad -- should not have y_calc, residuals, or weighted_residuals
+    def test_fcn(a=1,b=2): return a*b*np.ones(10)
+    f = Fitter(some_function=test_fcn)
+    f.data_df = pd.DataFrame({"y_obs":np.arange(10,dtype=float),
+                              "y_std":np.ones(10,dtype=float)})
+    f._model.param_df.loc["a","guess"] = 2
+    f._model.param_df.loc["b","guess"] = np.nan
+
+    assert np.array_equal(f.data_df.columns,["y_obs",
+                                             "y_std"])
+
+    # -------------------------------------------------------------------------
     # set setter
+
     def test_fcn(a=1,b=2): return a*b
     f = Fitter(some_function=test_fcn)
-    f._fit_has_been_run = True # hack to True to check that it gets set to F
 
     tmp_df = pd.DataFrame({"y_obs":[1,2],
                            "y_std":[3,4]})
@@ -559,7 +599,7 @@ def test_Fitter_data_df():
     assert np.array_equal(f._y_std,[3,4])
     assert np.array_equal(f.data_df["y_obs"],[1,2])
     assert np.array_equal(f.data_df["y_std"],[3,4])
-    assert not f._fit_has_been_run
+    assert f._fit_has_been_run is False
 
     # missing column
     f = Fitter(some_function=test_fcn)
@@ -607,6 +647,9 @@ def test_Fitter_data_df():
                            "y_std":[0,4]})
     with pytest.raises(ValueError):
         f.data_df = tmp_df
+
+
+
 
     
 def test_Fitter__initialize_fit_df():
@@ -703,7 +746,7 @@ def test_Fitter_get_sample_df():
     f = Fitter(some_function=test_fcn)
     sample_df = f.get_sample_df()
     assert issubclass(type(sample_df),pd.DataFrame)
-    assert len(sample_df) == 0
+    assert np.array_equal(sample_df.columns,["y_calc"])
 
     # add y_obs, should be in dataframe by itself
     f._y_obs = y_obs
@@ -711,7 +754,7 @@ def test_Fitter_get_sample_df():
     assert issubclass(type(sample_df),pd.DataFrame)
     assert len(sample_df) == 10
     assert np.array_equal(sample_df["y_obs"],y_obs)
-    assert np.array_equal(sample_df.columns,["y_obs"])
+    assert np.array_equal(sample_df.columns,["y_obs","y_calc"])
 
     # add y_std, should now be in dataframe
     f._y_std = y_std
@@ -720,7 +763,7 @@ def test_Fitter_get_sample_df():
     assert len(sample_df) == 10
     assert np.array_equal(sample_df["y_obs"],y_obs)
     assert np.array_equal(sample_df["y_std"],y_std)
-    assert np.array_equal(sample_df.columns,["y_obs","y_std"])
+    assert np.array_equal(sample_df.columns,["y_obs","y_std","y_calc"])
 
     # Create a fitter that has apparently been run, but has no samples
     f = Fitter(some_function=test_fcn)

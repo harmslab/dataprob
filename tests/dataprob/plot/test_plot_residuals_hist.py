@@ -1,6 +1,7 @@
 
 import pytest
 
+import dataprob
 from dataprob.fitters.ml import MLFitter
 
 from dataprob.plot.plot_residuals_hist import plot_residuals_hist
@@ -8,6 +9,7 @@ from dataprob.plot.plot_residuals_hist import plot_residuals_hist
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
+import pandas as pd
 
 def test_plot_residuals_hist():
 
@@ -20,9 +22,12 @@ def test_plot_residuals_hist():
 
     f = MLFitter(some_function=test_fcn)
 
-    # run on no-fit fitter
-    with pytest.raises(RuntimeError):
-        plot_residuals_hist(f)
+    # run on no-fit fitter. Should work fine, even though it has nothing to 
+    # plot
+    fig, ax = plot_residuals_hist(f)
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    assert issubclass(type(ax),matplotlib.axes.Axes)
+    plt.close(fig)
     
     f = MLFitter(some_function=test_fcn)
     f.fit(y_obs=y_obs,
@@ -90,4 +95,25 @@ def test_plot_residuals_hist():
     with pytest.raises(ValueError):
         plot_residuals_hist(f,hist_bins="stupid_bins")
 
+    # Send in fitter without unweighted_residuals. It should not crash 
+    def test_fcn(m,b): return m*np.arange(100) + b
+    f = dataprob.setup(some_function=test_fcn)
+    f.data_df = pd.DataFrame({"y_obs":test_fcn(m=5,b=1),
+                              "y_std":np.ones(100)*0.1})
+    f.param_df.loc["m","guess"] = np.nan
+    assert np.array_equal(f.data_df.columns,["y_obs","y_std"])
+    fig, ax = plot_residuals_hist(f,plot_unweighted=True)    
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    assert issubclass(type(ax),matplotlib.axes.Axes)
 
+    # Send in fitter without residuals. It should work fine. 
+    def test_fcn(m,b): return m*np.arange(100) + b
+    f = dataprob.setup(some_function=test_fcn)
+    f.data_df = pd.DataFrame({"y_obs":test_fcn(m=5,b=1),
+                              "y_std":np.ones(100)*0.1})
+    f._y_std = None # <- nuke _y_std
+    assert np.array_equal(f.data_df.columns,["y_obs","y_calc","unweighted_residuals"])
+
+    fig, ax = plot_residuals_hist(f,plot_unweighted=False)    
+    assert issubclass(type(fig),matplotlib.figure.Figure)
+    assert issubclass(type(ax),matplotlib.axes.Axes)

@@ -38,11 +38,9 @@ def get_plot_features(f,
         validated number of samples 
     """
     
-    # Make sure fit was successful before trying to plot anything
-    if not f.success:
-        err = "fit has not been successfully run. cannot generate plot.\n"
-        raise RuntimeError(err)
-
+    # Check for plot success
+    has_fit_results = f.success is True
+    
     if x_label is not None:
         x_label = str(x_label)
 
@@ -54,15 +52,12 @@ def get_plot_features(f,
                             minimum_allowed=0)
     
     if f.samples is None:
-        err = "could not get samples from this fit. cannot plot\n"
-        raise ValueError(err)
+        num_samples = 0
     
-    if len(f.samples) < num_samples:
-        err = f"num_samples ({num_samples}) is more than the number of\n"
-        err += f"samples in the fitter ({len(f.samples)})\n"
-        raise ValueError(err)
+    if f.samples is not None and len(f.samples) < num_samples:
+        num_samples = len(f.samples)
 
-    return x_label, y_label, num_samples
+    return has_fit_results, x_label, y_label, num_samples
 
 def get_style(user_style,style_name):
     """
@@ -125,10 +120,21 @@ def get_vectors(f,x_axis=None):
     """
 
     # Grab y_obs, y_std, y_calc
-    y_obs = np.array(f.data_df["y_obs"],dtype=float).copy()
-    y_std = np.array(f.data_df["y_std"],dtype=float).copy()
-    y_calc = np.array(f.data_df["y_calc"],dtype=float).copy()
+    if "y_obs" in f.data_df.columns:
+        y_obs = np.array(f.data_df["y_obs"],dtype=float).copy()
+    else:
+        y_obs = np.ones(len(f.data_df))*np.nan
     
+    if "y_std" in f.data_df.columns:
+        y_std = np.array(f.data_df["y_std"],dtype=float).copy()
+    else:
+        y_std = np.ones(len(y_obs))*np.nan
+
+    if "y_calc" in f.data_df.columns:
+        y_calc = np.array(f.data_df["y_calc"],dtype=float).copy()
+    else:
+        y_calc = np.ones(len(y_obs))*np.nan
+
     # If no x-axis sent in, build one
     if x_axis is None:
         x_axis = np.arange(len(y_obs),dtype=float)
