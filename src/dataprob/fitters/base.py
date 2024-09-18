@@ -374,13 +374,36 @@ class Fitter:
             out["y_std"] = y_std
 
         if self.success:
-            
-            estimate = np.array(self.fit_df.loc[self._model.unfixed_mask,
-                                                "estimate"],dtype=float).copy()
+        
+            keep_mask = self._model.unfixed_mask
+
+            estimate = np.array(self.fit_df.loc[keep_mask,"estimate"],
+                                dtype=float).copy()
             out["y_calc"] = self.model(estimate)
             out["unweighted_residuals"] = self._unweighted_residuals(estimate)
             out["weighted_residuals"] = self._weighted_residuals(estimate)
 
+        else:
+                    
+            # Try to generate a y_calc vector from the guesses. If this crashes,
+            # it's okay; silently ignore and do not populate y_calc and 
+            # residuals columns.
+            try:        
+                keep_mask = np.logical_not(self._model.param_df["fixed"])
+                guesses = np.array(self._model.param_df.loc[keep_mask,"guess"],
+                                   dtype=float).copy()
+                
+                out["y_calc"] = self.model(guesses)
+                
+                # Put these after y_calc. Even if y_calc succeeds, these could
+                # fail if we don't have y_obs and y_std loaded. Build as much 
+                # as we can before crashing. 
+                out["unweighted_residuals"] = self._unweighted_residuals(guesses)
+                out["weighted_residuals"] = self._weighted_residuals(guesses)
+
+            except Exception as e:
+                pass
+        
         return pd.DataFrame(out)
 
     @data_df.setter
@@ -626,6 +649,9 @@ class Fitter:
         # get y_calc if fit was successful
         if self.success:
             estimate = np.array(self.fit_df["estimate"],dtype=float).copy()
+            out["y_calc"] = self.model(estimate)
+        else:
+            estimate = np.array(self.fit_df["guess"],dtype=float).copy()
             out["y_calc"] = self.model(estimate)
 
         samples = self.samples

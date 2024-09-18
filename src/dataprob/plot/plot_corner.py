@@ -7,6 +7,7 @@ import corner
 import numpy as np
 
 import re
+import warnings
 
 def plot_corner(f,filter_params=None,**kwargs):
     """
@@ -57,8 +58,9 @@ def plot_corner(f,filter_params=None,**kwargs):
 
     # Check for samples
     if f.samples is None:
-        err = "Fit does not have samples. Could not generate a corner plot.\n"
-        raise RuntimeError(err)
+        w = "Fit does not have samples. Could not generate a corner plot.\n"
+        warnings.warn(w)
+        return None
     
     # Go through samples
     keep_indexes = []

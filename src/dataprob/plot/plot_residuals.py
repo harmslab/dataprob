@@ -66,10 +66,10 @@ def plot_residuals(f,
         matplotlib figure and axes on which the plot was done
     """
 
-    x_label, y_label, num_samples = get_plot_features(f,
-                                                      x_label,
-                                                      y_label,
-                                                      num_samples)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label,
+                                                                   y_label,
+                                                                   num_samples)
     
     # Get styles for series
     y_obs_style = get_style(y_obs_style,"y_obs")
@@ -77,13 +77,42 @@ def plot_residuals(f,
     y_calc_style = get_style(y_calc_style,"y_calc")
     sample_point_style = get_style(sample_point_style,"sample_point")
     
-    x_axis, y_obs, y_std, _ = get_vectors(f,x_axis=x_axis)
-
     plot_y_residuals = check_bool(value=plot_y_residuals,
                                   variable_name="plot_y_residuals")
     
     plot_unweighted = check_bool(value=plot_unweighted,
                                  variable_name="plot_unweighted")
+
+    # -----------------------------------------------------------------------
+    # Generate plot
+
+    if ax is None:
+        fig, ax = plt.subplots(1,figsize=(6,6))
+
+    if not issubclass(type(ax),matplotlib.axes.Axes):
+        err = "ax should be a matplotlib Axes instance\n"
+        raise ValueError(err)
+
+    if plot_unweighted:
+        
+        # Gracefully fail if no unweighted residuals in fitter
+        if "unweighted_residuals" not in f.data_df.columns:
+            fig = ax.get_figure()
+            return fig, ax
+
+        residual = f.data_df["unweighted_residuals"]
+
+    else:
+
+        # Gracefully fail if no weighted residuals in fitter
+        if "weighted_residuals" not in f.data_df.columns:
+            fig = ax.get_figure()
+            return fig, ax
+
+        residual = f.data_df["weighted_residuals"]
+
+    # Get axis and observables
+    x_axis, y_obs, y_std, y_calc = get_vectors(f,x_axis=x_axis)
 
     # Get residual samples
     if num_samples > 0:
@@ -98,22 +127,6 @@ def plot_residuals(f,
         for c in sample_df.columns:
             if c[0] == "y": continue # skip y_obs, etc. 
             sample_df[c] = (sample_df[c] - y_obs)/denominator
-
-    
-    # -----------------------------------------------------------------------
-    # Generate plot
-
-    if ax is None:
-        fig, ax = plt.subplots(1,figsize=(6,6))
-
-    if not issubclass(type(ax),matplotlib.axes.Axes):
-        err = "ax should be a matplotlib Axes instance\n"
-        raise ValueError(err)
-
-    if plot_unweighted:
-        residual = f.data_df["unweighted_residuals"]
-    else:
-        residual = f.data_df["weighted_residuals"]
 
     x_left, x_right, y_bottom, y_top = get_plot_dimensions(x_axis,y_obs)
     mean_r = np.mean(residual)

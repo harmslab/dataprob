@@ -5,6 +5,7 @@ from dataprob.fitters.ml import MLFitter
 
 import numpy as np
 import matplotlib
+from matplotlib import pyplot as plt
 
 def test_plot_summary():
 
@@ -26,3 +27,4 @@ def test_plot_summary():
     # generate summary plot
     fig = plot_summary(f=f)
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)

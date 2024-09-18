@@ -223,9 +223,6 @@ class BayesianSampler(Fitter):
 
         # Loop until we reach max_convergence_cycles
         while counter < self._max_convergence_cycles:
-
-            # Current number of steps
-            num_steps = self._fit_result.get_chain().shape[0]
             
             # Get the parameter correlation time. 
             try:
@@ -235,29 +232,34 @@ class BayesianSampler(Fitter):
                 # success. 
                 max_corr = np.max(self._fit_result.get_autocorr_time())
                 print(f"   Converged correlation time: {max_corr:.2f} iterations\n",
-                    flush=True,
-                    file=sys.stderr)
+                      flush=True,
+                      file=sys.stderr)
                 success = True
                 break
 
             except emcee.autocorr.AutocorrError as e:
+
                 # emcee throws an AutocorrError if it is not converged yet. Get the
                 # maximum of its current (unreliable) guess. 
                 max_corr = np.max(e.__dict__["tau"])
-                print(f"   Estimated correlation time: {max_corr:.2f} iterations\n",
-                        flush=True,
-                        file=sys.stderr)
-                
-            # Figure out how many steps to add to get to the target correlation time
-            # (max_corr * 50). This number is hard-coded into the acorr estimator. 
-            next_iteration = int(np.ceil(max_corr)*50)
-            next_iteration = next_iteration - num_steps
 
+                # Figure out how many steps to add to get to the target correlation time
+                # (max_corr * 50). This number is hard-coded into the acorr estimator. 
+                need_at_least = int(np.ceil(max_corr)*50)
+
+                msg = f"   Rough estimate of correlation time: {max_corr:.2f} iterations. "
+                msg +=f"We need at least {need_at_least} samples.\n"
+                print(msg,flush=True,file=sys.stderr)
+                
             # Run next sampling, starting from previous state
             print(f"Running {counter + 1} of up to {self._max_convergence_cycles} sampler iterations",
-                flush=True,
-                file=sys.stderr)
+                  flush=True,
+                  file=sys.stderr)
             
+            # Current number of steps
+            current_num_steps = self._fit_result.get_chain().shape[0]
+            next_iteration = need_at_least - current_num_steps
+
             self._fit_result.run_mcmc(initial_state=None,
                                       nsteps=next_iteration,
                                       progress=True)
@@ -368,7 +370,6 @@ class BayesianSampler(Fitter):
                     y_std=y_std,
                     **emcee_kwargs)     
 
-
     def _fit(self,**kwargs):
         """
         Fit the parameters.
@@ -389,9 +390,29 @@ class BayesianSampler(Fitter):
         if self._use_ml_guess:
 
             ml_fit = MLFitter(some_function=self._model)
-            ml_fit.data_df = self.data_df
-            ml_fit.fit()
-            self._initial_state = ml_fit.samples[:self._num_walkers,:]
+            ml_fit.param_df = self.param_df.copy()
+            ml_fit.data_df = self.data_df.copy()
+
+            try:
+                ml_fit.fit(num_samples=self._num_walkers*100)
+            except Exception as e:
+                err = "\n\nInitial ml fit is failing. See error trace for details.\n\n"
+                raise RuntimeError(err) from e
+            
+            # Get samples
+            success = False
+            if ml_fit.samples is not None:
+                self._initial_state = ml_fit.samples[:self._num_walkers,:]
+                success = True
+
+            # If we are not getting samples out of the ml fitter.
+            if not success:
+                err = "\n\nml fitter is not returning parameter samples. This can\n"
+                err += "occur if the initial guesses are extremely far from\n"
+                err += "true values or if the model is not numerically stable.\n"
+                err += "Try changing your parameter guesses and/or parameter\n"
+                err += "bounds. Alternatively, set use_ml_guess = False.\n\n"
+                raise RuntimeError(err)
 
         # Generate walkers by sampling from the prior distribution. This will
         # only generate values for unfixed parameters. 

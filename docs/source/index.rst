@@ -280,7 +280,7 @@ One can even more finely control the assignment of fittable parameters: see the
 -------------------------------
 
 Once we have defined our model and assigned which parameters are fittable, we
-can control via seven attributes of each fittable parameter. These are stored in
+can control seven attributes of each fittable parameter. These are stored in
 ``f.param_df`` dataframe. Each row is a parameter; each column is an attribute. 
 
 .. code-block:: python

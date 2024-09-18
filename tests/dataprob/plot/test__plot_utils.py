@@ -12,6 +12,7 @@ from dataprob.plot._plot_utils import sync_axes
 
 import numpy as np
 from matplotlib import pyplot as plt
+import pandas as pd
 
 def test_get_plot_features():
 
@@ -21,24 +22,28 @@ def test_get_plot_features():
     f._success = False
     f._samples = np.ones((200,3),dtype=float)
 
-    with pytest.raises(RuntimeError):
-        get_plot_features(f,
-                          x_label=None,
-                          y_label=None,
-                          num_samples=1)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label=None,
+                                                                   y_label=None,
+                                                                   num_samples=1)
+    assert has_results is False
+    assert num_samples == 1
+
     f._success = True
-    x_label, y_label, num_samples = get_plot_features(f,
-                                                      x_label=None,
-                                                      y_label=None,
-                                                      num_samples=1)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label=None,
+                                                                   y_label=None,
+                                                                   num_samples=1)
+    assert has_results is True
     assert x_label is None
     assert y_label is None
     assert num_samples == 1
     
-    x_label, y_label, num_samples = get_plot_features(f,
-                                                      x_label=1,
-                                                      y_label="test",
-                                                      num_samples=100)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label=1,
+                                                                   y_label="test",
+                                                                   num_samples=100)
+    assert has_results is True
     assert x_label == "1"
     assert y_label == "test"
     assert num_samples == 100
@@ -52,25 +57,29 @@ def test_get_plot_features():
     
     # samples are None
     f._samples = None
-    with pytest.raises(ValueError):
-        get_plot_features(f,
-                          x_label=1,
-                          y_label="test",
-                          num_samples=10)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label=1,
+                                                                   y_label="test",
+                                                                   num_samples=10)
+    assert has_results is True
+    assert num_samples == 0
     
     # too many samples
     f._samples = np.ones((9,3),dtype=float)
-    with pytest.raises(ValueError):
-        get_plot_features(f,
-                          x_label=1,
-                          y_label="test",
-                          num_samples=10)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                    x_label=1,
+                                                                    y_label="test",
+                                                                    num_samples=10)
+    assert has_results is True
+    assert num_samples == 9
 
-    # should work now -- have enough samples
-    get_plot_features(f,
-                      x_label=1,
-                      y_label="test",
-                      num_samples=8)
+    # should work now without trimming -- have enough samples
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label=1,
+                                                                   y_label="test",
+                                                                   num_samples=8)
+    assert has_results is True
+    assert num_samples == 8
 
 
 def test_get_style():
@@ -110,6 +119,33 @@ def test_get_style():
         
 def test_get_vectors():
 
+    def test_fcn(m,b): return np.array([m + b])
+    f = MLFitter(some_function=test_fcn)
+
+    # Nothing has been run or added yet
+    x_axis, y_obs, y_std, y_calc = get_vectors(f=f,x_axis=None)
+    assert len(x_axis) == 1
+    assert len(y_obs) == 1
+    assert len(y_std) == 1
+    assert len(y_calc) == 1
+    assert x_axis[0] == 0
+    assert np.isnan(y_obs[0])
+
+    # hack so it only has y_obs
+    def test_fcn(m,b): return np.array(np.ones(3))
+    f = MLFitter(some_function=test_fcn)
+    f._y_obs = [1,2,3]
+
+    x_axis, y_obs, y_std, y_calc = get_vectors(f=f,x_axis=None)
+    assert len(x_axis) == 3
+    assert len(y_obs) == 3
+    assert len(y_std) == 3
+    assert len(y_calc) == 3
+    assert np.array_equal(x_axis,[0,1,2])
+    assert np.array_equal(y_obs,[1,2,3])
+    assert np.isnan(y_std[0])
+    assert np.array_equal(y_calc,[1,1,1])
+
     def test_fcn(m,b): return m*np.arange(10) + b
     f = MLFitter(some_function=test_fcn)
     y_obs_in = 2*np.arange(10) + 5
@@ -136,6 +172,36 @@ def test_get_vectors():
     assert np.array_equal(y_obs,y_obs_in)
     assert np.array_equal(y_std,y_std_in)
     assert y_calc.shape == y_obs.shape
+
+    # Make sure get_vectors sends out an array of nan if the fit has not
+    # been run. 
+    def test_fcn(m,b): return m*np.arange(10) + b
+    f = MLFitter(some_function=test_fcn)
+    y_obs_in = 2*np.arange(10) + 5
+    y_std_in = 0.1*np.ones(10)
+    f.data_df = pd.DataFrame({"y_obs":y_obs_in,
+                              "y_std":y_std_in})
+
+    assert not f.success
+    x_axis, y_obs, y_std, y_calc = get_vectors(f=f,
+                                               x_axis=None)
+    assert len(y_calc) == len(x_axis)
+    assert len(np.isnan(y_calc)) == len(y_calc)
+    
+    # Make sure get_vectors sends out an array of nan if the fit throws an 
+    # error 
+    def test_fcn(m,b): raise ValueError
+    f = MLFitter(some_function=test_fcn)
+    y_obs_in = 2*np.arange(10) + 5
+    y_std_in = 0.1*np.ones(10)
+    f.data_df = pd.DataFrame({"y_obs":y_obs_in,
+                              "y_std":y_std_in})
+    
+    assert not f.success
+    x_axis, y_obs, y_std, y_calc = get_vectors(f=f,
+                                               x_axis=None)
+    assert len(y_calc) == len(x_axis)
+    assert len(np.isnan(y_calc)) == len(y_calc)
 
 def test__get_edges():
 

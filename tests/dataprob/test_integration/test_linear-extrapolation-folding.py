@@ -10,6 +10,8 @@ import dataprob
 import numpy as np
 import matplotlib
 
+import warnings
+
 def _core_test(method,**method_kwargs):
     
     # ------------------------------------------------------------------------
@@ -92,27 +94,38 @@ def _core_test(method,**method_kwargs):
                        method=method,
                        non_fit_kwargs=non_fit_kwargs)
 
-    # Put some bounds in place to avoid numerical overflow
+    # Place bounds to promote relatively rapid convergence of the bayesian MCMC
+    # sampler. 
     f.param_df.loc["dG_unfold","lower_bound"] = 0
     f.param_df.loc["dG_unfold","upper_bound"] = 20
 
     f.param_df.loc["m_unfold","lower_bound"] = -10
     f.param_df.loc["m_unfold","upper_bound"] = 0
 
+    f.param_df.loc["b_native","lower_bound"] = 1.2
+    f.param_df.loc["b_native","guess"] = 1.5
+    f.param_df.loc["b_native","upper_bound"] = 1.8
+
+    f.param_df.loc["m_native","lower_bound"] = -2
+    f.param_df.loc["m_native","guess"] = -1
+    f.param_df.loc["m_native","upper_bound"] = 0
+
+    f.param_df.loc["b_denat","lower_bound"] = -0.1
+    f.param_df.loc["b_denat","guess"] = 0.1
+    f.param_df.loc["b_denat","upper_bound"] = 0.3
+    
+    f.param_df.loc["m_denat","lower_bound"] = -2
+    f.param_df.loc["m_denat","guess"] = -1
+    f.param_df.loc["m_denat","upper_bound"] = 0
 
     f.fit(y_obs=y_obs,
-          y_std=y_std,
-          **method_kwargs)
+        y_std=y_std,
+        **method_kwargs)
   
-    # This check should be added back in before final release. It is failing
-    # on windows with python3.11 -- and only there. I need to push into main
-    # to finalize docs; once that is done, come back and fix this before the 
-    # announcement release. --MJH 8/27/2024
-
     # make estimate lands between confidence intervals
-    #expected = np.array([gen_params[p] for p in f.fit_df.index])
-    #assert np.sum(expected < np.array(f.fit_df["low_95"])) == 0
-    #assert np.sum(expected > np.array(f.fit_df["high_95"])) == 0
+    expected = np.array([gen_params[p] for p in f.fit_df.index])
+    assert np.sum(expected < np.array(f.fit_df["low_95"])) == 0
+    assert np.sum(expected > np.array(f.fit_df["high_95"])) == 0
     
     fig = dataprob.plot_summary(f)
     assert issubclass(type(fig),matplotlib.figure.Figure)
@@ -145,6 +158,17 @@ def test_bayesian():
 def test_bootstrap():
 
     try:
-        _core_test(method="bootstrap")
+        
+        # Catch warnings because a bootstrap replicate often fails and that's 
+        # not a big deal. 
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _core_test(method="bootstrap")
+
     except AssertionError:
-        _core_test(method="bootstrap")
+        
+        # Catch warnings because a bootstrap replicate often fails and that's 
+        # not a big deal. 
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _core_test(method="bootstrap")

@@ -7,6 +7,7 @@ from dataprob.plot.plot_corner import plot_corner
 import numpy as np
 import pandas as pd
 import matplotlib
+from matplotlib import pyplot as plt
 
 
 def test_plot_corner():
@@ -36,20 +37,25 @@ def test_plot_corner():
     f._success = True
     fig = plot_corner(f)
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     # Send in filter parameter possibilities. It should gracefully handle all
     # of these cases. 
     fig = plot_corner(f,filter_params=None)
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
     
     fig = plot_corner(f,filter_params="blah")
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     fig = plot_corner(f,filter_params=["blah"])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     fig = plot_corner(f,filter_params=[1])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
     
     # filter all parameters
     with pytest.raises(ValueError):
@@ -58,30 +64,37 @@ def test_plot_corner():
     # filter one
     fig = plot_corner(f,filter_params=["a"])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     # filter other
     fig = plot_corner(f,filter_params=["b"])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
-    # Get rid of samples attribute. Should now fail 
+    # Get rid of samples attribute. Should now return None
     f._samples = None
-    with pytest.raises(RuntimeError):
+    with pytest.warns():
         fig = plot_corner(f,)
+    assert fig is None
 
     # put samples back in
     f._samples = fake_samples
     fig = plot_corner(f,filter_params=None)
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     # pass in labels
     fig = plot_corner(f,filter_params=None,labels=["x","y"])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     # pass in range
     fig = plot_corner(f,filter_params=None,range=[(-10,10),(-100,100)])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 
     # pass in truths
     fig = plot_corner(f,filter_params=None,truths=[1,2])
     assert issubclass(type(fig),matplotlib.figure.Figure)
+    plt.close(fig)
 

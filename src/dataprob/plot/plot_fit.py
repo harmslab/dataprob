@@ -9,6 +9,8 @@ from dataprob.plot._plot_utils import get_vectors
 import matplotlib
 from matplotlib import pyplot as plt
 
+import numpy as np
+
 def plot_fit(f,
              x_axis=None,
              x_label=None,
@@ -60,10 +62,10 @@ def plot_fit(f,
     """
 
     # Validate inputs and prep for plotting
-    x_label, y_label, num_samples = get_plot_features(f,
-                                                      x_label,
-                                                      y_label,
-                                                      num_samples)
+    has_results, x_label, y_label, num_samples = get_plot_features(f,
+                                                                   x_label,
+                                                                   y_label,
+                                                                   num_samples)
     
     # Get styles for series
     y_obs_style = get_style(y_obs_style,"y_obs")
@@ -71,8 +73,6 @@ def plot_fit(f,
     y_calc_style = get_style(y_calc_style,"y_calc")
     sample_line_style = get_style(sample_line_style,"sample_line")
 
-    # Get series information (as numpy arrays)                                            
-    x_axis, y_obs, y_std, y_calc = get_vectors(f,x_axis)
 
     # Define plot axis
     if ax is None:
@@ -82,6 +82,20 @@ def plot_fit(f,
         err = "ax should be a matplotlib Axes instance\n"
         raise ValueError(err)
     
+    # Get values to plot
+    x_axis, y_obs, y_std, y_calc = get_vectors(f,x_axis)
+    
+    good_mask = np.logical_not(np.isnan(y_obs))
+    x_axis = x_axis[good_mask]
+    y_obs = y_obs[good_mask]
+    y_std = y_std[good_mask]
+    y_calc = y_calc[good_mask]
+
+    # Gracefully return if there are no observations to plot
+    if len(y_obs) == 0:
+        fig = ax.get_figure()
+        return fig, ax
+
     # Create core plot
     ax.plot(x_axis,y_obs,**y_obs_style,label="y_obs")
     ax.errorbar(x=x_axis,y=y_obs,yerr=y_std,**y_std_style)

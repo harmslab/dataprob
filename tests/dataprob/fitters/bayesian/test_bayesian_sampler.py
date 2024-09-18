@@ -713,6 +713,35 @@ def test_BayesianSampler__fit():
     assert f._success is False
     assert np.sum(np.isnan(f.fit_df["estimate"])) == 0
 
+    # --------------------------------------------------------------------------
+    # Run test where the ml fit will throw an error. Should be caught. 
+    def bad_fcn(m,b,x): return np.ones(10)*np.nan
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+
+    f = BayesianSampler(some_function=bad_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
+    with pytest.raises(RuntimeError):
+        f.fit(use_ml_guess=True)
+
+    # --------------------------------------------------------------------------
+    # Run test where the ml fit will work, but the Jacobian will be singular
+    # so it cannot generate samples 
+    
+    def bad_fcn(m,b,x): return np.ones(10)
+    x = np.linspace(-5,5,10)
+    data_df = pd.DataFrame({"y_obs":linear_fcn(m=2,b=-1,x=x),
+                            "y_std":0.1*np.ones(10)})
+
+    f = BayesianSampler(some_function=bad_fcn,
+                        non_fit_kwargs={"x":x})
+    f.data_df = data_df
+    with pytest.raises(RuntimeError):
+        with pytest.warns():
+            f.fit(use_ml_guess=True)
+
 
 def test_BayesianSampler__update_fit_df():
     

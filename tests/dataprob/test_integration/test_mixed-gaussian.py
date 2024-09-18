@@ -55,7 +55,7 @@ def _core_test(method,**method_kwargs):
         return out
     
     gen_params = {"params":np.array([5,0.3,10,6,1.5,10]),
-                "num_gaussians":2}
+                  "num_gaussians":2}
 
     err = 0.2
     num_points = 50
@@ -78,8 +78,10 @@ def _core_test(method,**method_kwargs):
                     non_fit_kwargs=non_fit_kwargs,
                     vector_first_arg=True)
 
-    # Set some guesses
-    f.param_df.loc[["m0","s0","a0","m1","s1","a1"],"guess"] = [5,1,1,7,1,1]
+    # Set guesses and bounds to ensure stable and fast convergence
+    f.param_df.loc[["m0","s0","a0","m1","s1","a1"],"lower_bound"] = [ 3, 0,  5,  1, 0, 0]
+    f.param_df.loc[["m0","s0","a0","m1","s1","a1"],"guess"] =       [ 5, 1, 10,  7, 1, 5]
+    f.param_df.loc[["m0","s0","a0","m1","s1","a1"],"upper_bound"] = [10, 2, 20, 20, 5,20]
 
     f.fit(y_obs=y_obs,
           y_std=y_std,
