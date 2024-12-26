@@ -174,7 +174,7 @@ def test_VectorModelWrapper__finalize_params():
     # Check initial configuration after __init__
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 1
-    assert np.array_equal(mw._unfixed_mask,[True,True])
+    assert np.array_equal(mw._floating_mask,[True,True])
     assert len(mw._non_fit_kwargs) == 2
     assert mw._non_fit_kwargs["b"] is None
     assert mw._non_fit_kwargs["c"] == 3
@@ -185,7 +185,7 @@ def test_VectorModelWrapper__finalize_params():
 
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 10
-    assert np.array_equal(mw._unfixed_mask,[True,True])
+    assert np.array_equal(mw._floating_mask,[True,True])
     assert len(mw._non_fit_kwargs) == 2
     assert mw._non_fit_kwargs["b"] is None
     assert mw._non_fit_kwargs["c"] == 3
@@ -196,7 +196,7 @@ def test_VectorModelWrapper__finalize_params():
     # Check for expected output
     assert np.array_equal(mw._fit_params_in_order,["x","y"])
     assert mw._param_df.loc["x","guess"] == 10
-    assert np.array_equal(mw._unfixed_mask,[False,True])
+    assert np.array_equal(mw._floating_mask,[False,True])
     assert len(mw._non_fit_kwargs) == 2
     assert mw._non_fit_kwargs["b"] is None
     assert mw._non_fit_kwargs["c"] == 3
@@ -233,13 +233,9 @@ def test_VectorModelWrapper_model():
     with pytest.raises(ValueError):
         result = mw.model(params="stupid")
 
-    print("XNAY",mw.param_df)
-
     # basic check. Does it run with parameters sent in?
     result = mw.model([1,2,3])
     assert result == 6
-
-    print("HERE",mw.param_df)
 
     # basic check. no parameters sent in -- pulled from the parameter guessess
     result = mw.model(params=None)
@@ -250,11 +246,11 @@ def test_VectorModelWrapper_model():
     result = mw.model(params=None)
     assert result == 20 + 30 + 50
 
-    # Guesses override what we sent in 
+    # Guesses *do not* override what we sent in 
     mw.param_df.loc["a","fixed"] = True
     mw.param_df.loc["b","fixed"] = True
     result = mw.model(params=[1,2,3])
-    assert result == 20 + 30 + 3
+    assert result == 1 + 2 + 3
 
     # Should give fixed values for a and b plus what we sent in for c
     result = mw.model(params=[1000])
@@ -265,7 +261,7 @@ def test_VectorModelWrapper_model():
 
     # make sure it recognizes fix and guess
     assert mw.model([1000]) == 10 + 30 + 1000
-    assert mw.model([1,2,1000]) == 10 + 30 + 1000
+    assert mw.model([1,2,1000]) == 1 + 2 + 1000
 
     # Test error catching from model
     def test_fcn(x,z="test"): raise TypeError
@@ -273,6 +269,15 @@ def test_VectorModelWrapper_model():
                             fit_parameters={"a":20,"b":30,"c":50}) 
     with pytest.raises(RuntimeError):
         mw.model()
+
+    # edge cas where we send in number floating parameters and it dies
+    def model_to_test_wrap(x,d="test",e=3): raise ValueError
+    mw = VectorModelWrapper(model_to_test_wrap,
+                            fit_parameters={"a":20,"b":30,"c":50})
+    mw.param_df["fixed"] = [True,False,False]
+    with pytest.raises(RuntimeError):
+        mw.model([2,3])
+
 
     
 def test_VectorModelWrapper_fast_model():

@@ -74,6 +74,8 @@ def _build_columns(param_df,default_guess):
         param_df["prior_mean"] = np.nan
     if "prior_std" not in param_df.columns:
         param_df["prior_std"] = np.nan
+    if "parent" not in param_df.columns:
+        param_df["parent"] = pd.NA
 
     # ----------------------------------------------------------------------
     # Coerce column types
@@ -103,6 +105,18 @@ def _build_columns(param_df,default_guess):
         except Exception as e:
             err = f"Could not coerce all entries in the '{bc}' column to bool\n"
             raise ValueError(err) from e
+        
+    str_columns = ["parent"]
+    for sc in str_columns:
+
+        param_df[sc] = param_df[sc].astype(str)
+        
+        na_mask = param_df[sc] == "<NA>"
+        param_df.loc[na_mask,"parent"] = pd.NA
+
+        nan_mask = param_df[sc] == "nan"
+        param_df.loc[nan_mask,"parent"] = pd.NA
+
 
     return param_df
 
@@ -223,6 +237,73 @@ def _check_priors(param_df):
 
     return param_df
 
+def _check_and_update_parent(param_df):
+
+    # Force nan and <NA> strings into pd.NA
+    na_mask = param_df["parent"] == "<NA>"
+    param_df.loc[na_mask,"parent"] = pd.NA
+
+    nan_mask = param_df["parent"] == "nan"
+    param_df.loc[nan_mask,"parent"] = pd.NA
+
+    nan_mask = param_df["parent"] == "None"
+    param_df.loc[nan_mask,"parent"] = pd.NA
+
+    # Remove self parents. For example, if the parameter is named "K" and the
+    # parent is set to "K", the parameter parent is set to self. This allows us
+    # to make sure at least one parameter is not linked. 
+    parent_is_self = param_df.loc[:,"parent"] == param_df.loc[:,"name"]
+    param_df.loc[parent_is_self,"parent"] = pd.NA
+
+    # No parents defined, return. 
+    defined_mask = np.logical_not(pd.isna(param_df["parent"]))
+    if np.sum(defined_mask) == 0:
+        return param_df
+
+    # Make sure that the names in "parent" are all in the parameters list
+    allowed_names = set(param_df["name"])
+    defined_parents = set(param_df.loc[defined_mask,"parent"])
+    if not defined_parents.issubset(allowed_names):
+
+        bad_parents = defined_parents - allowed_names
+        err = "\nall parent entries must correspond to parameters in the 'name'\n"
+        err += "column.\n"
+
+        err += "\nBad parent entries are:"
+        err += f"\n{repr(bad_parents)}\n\n"
+
+        raise ValueError(err)
+    
+    # Make sure that there are no double-nested parameters. This also makes sure
+    # there is at least one non-parent, as there is no way to get all defined 
+    # with parents without a double-nest. 
+    has_a_parent = set(param_df.loc[defined_mask,"name"])
+    is_a_parent = set(param_df["name"][param_df["name"].isin(param_df["parent"])])
+    has_and_is_a_parent = has_a_parent.intersection(is_a_parent)
+
+    if len(has_and_is_a_parent):
+        err = "\nparameters cannot be a parent themselves and be referenced\n"
+        err += "as a parent of another parameter.\n"
+        
+        err += "\nBad parameters are:"
+        err += f"\n{repr(has_and_is_a_parent)}\n\n"
+
+        raise ValueError(err)
+
+    columns_to_copy = list(param_df.columns)
+    columns_to_copy.remove("name")
+    columns_to_copy.remove("parent")
+    
+    # Copy values from the parent into the 
+    for idx in param_df.index:
+        parent = param_df.loc[idx,"parent"]
+        if not pd.isna(parent):
+            row = np.array(param_df.loc[param_df["name"] == parent,columns_to_copy])[0]
+            param_df.loc[idx,columns_to_copy] = row
+
+    return param_df
+
+
 def _df_to_dict(df):
     """
     Convert a dataframe into a nested dictionary (out_dict[name][column]). This
@@ -298,6 +379,8 @@ def validate_dataframe(param_df,
     param_df = _check_guesses(param_df=param_df)
 
     param_df = _check_priors(param_df=param_df)
+
+    param_df = _check_and_update_parent(param_df=param_df)
 
 
     return param_df

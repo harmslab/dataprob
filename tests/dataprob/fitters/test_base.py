@@ -545,7 +545,7 @@ def test_Fitter_data_df():
     f._y_std = y_std
     f._success = True
     f._fit_df = pd.DataFrame({"estimate":[1,3]})
-    f._model._unfixed_mask = np.ones(2,dtype=bool)
+    f._model._floating_mask = np.ones(2,dtype=bool)
 
     # check final data_df
     out_df = f.data_df
@@ -649,9 +649,6 @@ def test_Fitter_data_df():
         f.data_df = tmp_df
 
 
-
-
-    
 def test_Fitter__initialize_fit_df():
     
     # test on fake class
@@ -663,15 +660,17 @@ def test_Fitter__initialize_fit_df():
                              "lower_bound":[-np.inf,0],
                              "upper_bound":[np.inf,100],
                              "prior_mean":[1,np.nan],
-                             "prior_std":[1,np.nan]}
+                             "prior_std":[1,np.nan],
+                             "parent":[pd.NA,pd.NA]}
     
     tc = TestClass()
     Fitter._initialize_fit_df(tc)
     assert np.array_equal(tc.param_df["name"],tc._fit_df["name"])
-    assert np.sum(np.isnan(tc._fit_df["estimate"]))
-    assert np.sum(np.isnan(tc._fit_df["std"]))
-    assert np.sum(np.isnan(tc._fit_df["low_95"]))
-    assert np.sum(np.isnan(tc._fit_df["high_95"]))
+    assert np.sum(np.isnan(tc._fit_df["estimate"])) == 2
+    assert np.sum(np.isnan(tc._fit_df["std"])) == 2
+    assert np.sum(np.isnan(tc._fit_df["low_95"])) == 2
+    assert np.sum(np.isnan(tc._fit_df["high_95"])) == 2
+    assert np.sum(pd.isna(tc._fit_df["parent"])) == 2
     
     columns = ["guess","fixed",
                "lower_bound","upper_bound",
@@ -680,12 +679,66 @@ def test_Fitter__initialize_fit_df():
         assert np.array_equal(tc.param_df[k],tc._fit_df[k],equal_nan=True)
     
 
-def test_Fitter__update_fit_df():
+def test_Fitter__get_fit_values():
 
     def test_fcn(a=1,b=2): return a*b
     f = Fitter(some_function=test_fcn)
     with pytest.raises(NotImplementedError):
-        f._update_fit_df()
+        f._get_fit_values()
+
+
+def test_Fitter__update_fit_df():
+
+    def test_fcn(a=1,b=2): return a*b
+    f = Fitter(some_function=test_fcn)
+    def yo(): return [0,1],[1,2],[2,3],[3,4]
+    f._get_fit_values = yo
+
+    assert np.array_equal(f._fit_df.columns,
+                          ["name","estimate","std","low_95","high_95",
+                           "guess","fixed","lower_bound","upper_bound",
+                           "prior_mean","prior_std","parent"])
+    
+    assert np.array_equal(np.isnan(f._fit_df["estimate"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["std"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["low_95"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["high_95"]),[True,True])
+    
+    f._update_fit_df()
+
+    assert np.array_equal(f._fit_df["estimate"],[0,1])
+    assert np.array_equal(f._fit_df["std"],[1,2])
+    assert np.array_equal(f._fit_df["low_95"],[2,3])
+    assert np.array_equal(f._fit_df["high_95"],[3,4])
+
+
+    # link b to a, so only a estimate is meaningful
+    def test_fcn(a=1,b=2): return a*b
+    f = Fitter(some_function=test_fcn)
+    def yo(): return [1],[2],[3],[4]
+    f._get_fit_values = yo
+    f._model.param_df["parent"] = [pd.NA,"a"]
+
+    f._model.finalize_params()
+
+    assert np.array_equal(f._fit_df.columns,
+                          ["name","estimate","std","low_95","high_95",
+                           "guess","fixed","lower_bound","upper_bound",
+                           "prior_mean","prior_std","parent"])
+    
+    assert np.array_equal(np.isnan(f._fit_df["estimate"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["std"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["low_95"]),[True,True])
+    assert np.array_equal(np.isnan(f._fit_df["high_95"]),[True,True])
+    assert np.array_equal(f._fit_df["guess"],[1,2])
+
+    f._update_fit_df()
+
+    assert np.array_equal(f._fit_df["estimate"],[1,1])
+    assert np.array_equal(f._fit_df["std"],[2,2])
+    assert np.array_equal(f._fit_df["low_95"],[3,3])
+    assert np.array_equal(f._fit_df["high_95"],[4,4])
+    assert np.array_equal(f._fit_df["guess"],[1,1])
 
 def test_Fitter_fit_df():
 
@@ -703,7 +756,7 @@ def test_Fitter_fit_df():
     assert np.array_equal(f.fit_df.columns,
                           ["name","estimate","std","low_95","high_95",
                            "guess","fixed","lower_bound","upper_bound",
-                           "prior_mean","prior_std"])
+                           "prior_mean","prior_std","parent"])
 
 def test_Fitter_fit_quality():
 

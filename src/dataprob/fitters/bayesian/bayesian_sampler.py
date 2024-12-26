@@ -105,7 +105,7 @@ class BayesianSampler(Fitter):
 
         # Grab lower and upper bounds. We pull them out of the dataframe so we
         # can use in prior calculations without any dictionary lookups. 
-        unfixed = self._model.unfixed_mask
+        unfixed = self._model.floating_mask
         self._lower_bounds = np.array(self.param_df.loc[unfixed,"lower_bound"],
                                       dtype=float).copy()
         self._upper_bounds = np.array(self.param_df.loc[unfixed,"upper_bound"],
@@ -447,7 +447,7 @@ class BayesianSampler(Fitter):
 
         self._update_fit_df()
 
-    def _update_fit_df(self):
+    def _get_fit_values(self):
         """
         Update samples based on the samples array.
         """
@@ -473,20 +473,7 @@ class BayesianSampler(Fitter):
             low_95.append(sorted_samples[lower])
             high_95.append(sorted_samples[upper])
 
-        # Get finalized parameters from param_df in case they were updated 
-        # after the model was set and the fit_df created. 
-        for col in ["guess","fixed","lower_bound","upper_bound","prior_mean",
-                    "prior_std"]:
-            self._fit_df[col] = self.param_df[col]
-
-        fixed = np.array(self._fit_df["fixed"],dtype=bool).copy()
-        unfixed = np.logical_not(fixed)
-
-        self._fit_df.loc[unfixed,"estimate"] = estimate
-        self._fit_df.loc[fixed,"estimate"] = self._fit_df.loc[fixed,"guess"]
-        self._fit_df.loc[unfixed,"std"] = std
-        self._fit_df.loc[unfixed,"low_95"] = low_95
-        self._fit_df.loc[unfixed,"high_95"] = high_95
+        return estimate, std, low_95, high_95
 
     
     @property

@@ -167,6 +167,9 @@ def setup(some_function,
         +---------------+-----------------------------------------------------+
         | 'prior_std'   | single float value; np.nan allowed (see below)      |
         +---------------+-----------------------------------------------------+
+        | 'parent'      | string parameter name pointing to the parameter to  | 
+        |               | link this parameter to.                             |
+        +---------------+-----------------------------------------------------+
 
         Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
         fields, declaring the prior mean and standard deviation. If both are
