@@ -4,6 +4,7 @@ Key public functions and methods for dataprob library.
 """
 
 from .fitters.setup import setup
+from .fitters.hmc import HMCFitter
 from .plot.plot_corner import plot_corner
 from .plot.plot_summary import plot_summary
 

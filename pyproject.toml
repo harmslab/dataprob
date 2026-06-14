@@ -32,11 +32,13 @@ dependencies = [
 requires-python = ">=3.10"
 authors = [
   {name = "Mike Harms", email = "harms@uoregon.edu"},
+  {name = "Evan LeGrand"},
 ]
 maintainers = [
-  {name = "Mike Harms", email = "harms@uoregon.edu"}
+  {name = "Mike Harms", email = "harms@uoregon.edu"},
+  {name = "Evan LeGrand"},
 ]
-description = "Do likelihood based parameter estimation using maximum likeihood and bayesian methods"
+description = "Do likelihood based parameter estimation using maximum likelihood and bayesian methods"
 readme = "README.rst"
 license = {file = "LICENSE"}
 keywords = ["likelihood", "maximum likelihood", "ML", "Bayesian", "MCMC", "monte carlo", "regression", "estimator"]
@@ -57,6 +59,7 @@ test = [
   "genbadge"
  ]
 docs = [
+  "sphinx",
   "pydata-sphinx-theme"
 ]
 

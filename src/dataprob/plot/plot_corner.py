@@ -5,6 +5,7 @@ values for all fit parameters.
 
 import corner
 import numpy as np
+import matplotlib.pyplot as plt
 
 import re
 import warnings
@@ -84,8 +85,10 @@ def plot_corner(f,filter_params=None,**kwargs):
         keep_indexes.append(i)
 
         # use nanmin in case there is a failed sample in there somewhere
-        corner_range.append(tuple([np.nanmin(f.samples[:,i])-0.5,
-                                   np.nanmax(f.samples[:,i])+0.5]))
+        s_min = np.nanmin(f.samples[:,i])
+        s_max = np.nanmax(f.samples[:,i])
+        margin = max(0.05 * (s_max - s_min), 1e-10)
+        corner_range.append((s_min - margin, s_max + margin))
         est_values.append(estimate)
 
     # make sure we kept at least one parameter
@@ -106,8 +109,26 @@ def plot_corner(f,filter_params=None,**kwargs):
         kwargs["range"] = corner_range
     if "truths" not in kwargs:
         kwargs["truths"] = est_values
+    if "bins" not in kwargs:
+        kwargs["bins"] = 50
 
-    # Call corner 
-    fig = corner.corner(to_plot,**kwargs)
+    # Call corner
+    # Workaround for corner crash on single-parameter plots: newer corner
+    # versions route through arviz_corner -> corner_impl -> overplot_lines,
+    # which tries axes[k, k] but with 1 param axes is a bare Axes (not
+    # subscriptable). Dropping truths avoids the overplot_lines call entirely.
+    if to_plot.shape[1] == 1:
+        kwargs.pop("truths", None)
+        if "fig" not in kwargs:
+            fig = plt.figure()
+            kwargs["fig"] = fig
+    
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Too few points to create valid contours")
+        fig = corner.corner(to_plot,**kwargs)
+
+    # If single parameter, corner returns Axes. Get figure from it.
+    if not hasattr(fig, "savefig") and hasattr(fig, "get_figure"):
+        fig = fig.get_figure()
 
     return fig

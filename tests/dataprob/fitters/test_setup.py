@@ -5,7 +5,7 @@ from dataprob.fitters.setup import setup
 
 from dataprob.fitters.ml import MLFitter
 from dataprob.fitters.bootstrap import BootstrapFitter
-from dataprob.fitters.bayesian.bayesian_sampler import BayesianSampler
+from dataprob.fitters.bayesian import EmceeFitter
 
 from dataprob.model_wrapper.model_wrapper import ModelWrapper
 from dataprob.model_wrapper.vector_model_wrapper import VectorModelWrapper
@@ -32,8 +32,8 @@ def test_setup():
     assert issubclass(type(f),BootstrapFitter)
 
     f = setup(some_function=test_fcn,
-              method="mcmc")
-    assert issubclass(type(f),BayesianSampler)
+              method="emcee")
+    assert issubclass(type(f),EmceeFitter)
 
     with pytest.raises(ValueError):
         f = setup(some_function=test_fcn,

@@ -25,13 +25,6 @@ class ModelWrapper:
     specifying 'fit_parameters'.
     """
 
-    # Attributes to hold the fit parameters and other arguments to pass
-    # to the model. These have to be defined across class because we are going
-    # to hijack __getattr__ and __setattr__ and need to look inside this as soon
-    # as we start setting attributes.
-    _param_df = pd.DataFrame({"name":[]})
-    _non_fit_kwargs = {}
-
     def __init__(self,
                  model_to_fit,
                  fit_parameters=None,
@@ -72,9 +65,7 @@ class ModelWrapper:
         self._default_guess = check_float(value=default_guess,
                                           variable_name="default_guess")
 
-        # Re-define these here so __setattr__ and __getattr__ end up looking at
-        # instance-level (__dict__) attributes rather than class-level
-        # attributes.
+        
         self._param_df = pd.DataFrame({"name":[]})
         self._non_fit_kwargs = {}
     
@@ -82,6 +73,7 @@ class ModelWrapper:
                          fit_parameters=fit_parameters,
                          non_fit_kwargs=non_fit_kwargs)
         
+
 
     def _load_model(self,model_to_fit,fit_parameters,non_fit_kwargs):
         """
@@ -174,7 +166,7 @@ class ModelWrapper:
         # make sure the user does not add or remove a key with the setter. 
         self._non_fit_kwargs_keys = set(self._non_fit_kwargs_keys)
 
-        # Finalize -- read to run the model
+        # Finalize -- ready to run the model
         self.finalize_params()
 
     def _validate_non_fit_kwargs(self):
@@ -203,6 +195,29 @@ class ModelWrapper:
             
             raise ValueError(err)
 
+    def _update_special_params(self):
+        """
+        Deal with fixed and linked parameters.  
+        """
+
+        # look for linked parameters
+        self._linked_mask = np.logical_not(pd.isna(self._param_df.loc[:,"parent"]))
+        if np.sum(self._linked_mask) > 0:
+            param_names = list(self._param_df.loc[self._linked_mask,"name"])
+            param_links = list(self._param_df.loc[self._linked_mask,"parent"])
+            self._linked_param_dict = dict(zip(param_names,param_links))
+        else:
+            self._linked_param_dict = {}
+
+        self._fixed_mask = np.array(self._param_df.loc[:,"fixed"],dtype=bool)
+        
+        # Get currently un-fixed parameters (fixed or linked count as fixed)
+        self._floating_mask = np.logical_and(np.logical_not(self._fixed_mask),
+                                            np.logical_not(self._linked_mask))
+        self._floating_mask = np.array(self._floating_mask,dtype=bool)
+        self._floating_param_names = np.array(self._param_df.loc[self._floating_mask,"name"]).copy()
+        self._num_floating = len(self._floating_param_names)
+
 
     def finalize_params(self):
         """
@@ -216,10 +231,9 @@ class ModelWrapper:
         self._param_df = validate_dataframe(param_df=self._param_df,
                                             param_in_order=self._fit_params_in_order,
                                             default_guess=self._default_guess)
-        
-        # Get currently un-fixed parameters
-        self._unfixed_mask = np.logical_not(self._param_df.loc[:,"fixed"])
-        self._unfixed_param_names = np.array(self._param_df.loc[self._unfixed_mask,"name"]).copy()
+        self._num_fittable = len(self._param_df)
+                
+        self._update_special_params()
 
         # Build a dictionary of keyword arguments to pass to the model when
         # called. 
@@ -276,10 +290,9 @@ class ModelWrapper:
     def model(self,params=None):
         """
         Model observable. This function takes a numpy array either the number of 
-        unfixed parameters long OR the total number of parameters long. If 
-        parameters are fixed, their values in a params array with all fit 
-        parameters are *ignored* and the fixed parameter guesses are used 
-        instead. 
+        unfixed and unlinked parameters long OR the total number of parameters
+        long. If params is as long as the total number of parameters, these 
+        override 
 
         Parameters
         ----------
@@ -292,42 +305,51 @@ class ModelWrapper:
         # user has fixed value or made a change that has not propagated properly
         self.finalize_params()
 
-        # Create all param vector
-        all_params = np.array(self._param_df["guess"],dtype=float).copy()
-
-        # no parameters specified, get all guesses
         if params is None:
-            params = all_params
+            params = np.array(self._param_df.loc[self._floating_mask,"guess"]).copy()
 
         # make sure the params array is a float array
         params = np.array(params,dtype=float)
 
-        # If this is as long as all_fit parameters, pull out only the fit 
-        # parameters we care about. 
-        if len(params) == len(all_params):
-            params = params[self._unfixed_mask]
+        if len(params) == self._num_fittable:
+
+            mw_kwargs = {}
+            keys = list(self._mw_kwargs.keys())
+
+            for i, k in enumerate(self._fit_params_in_order):
+                mw_kwargs[k] = params[i]
+                keys.remove(k)
+
+            for k in keys:
+                mw_kwargs[k] = self._mw_kwargs[k]
+
+            try:
+                return self._model_to_fit(**mw_kwargs)
+            except Exception as e:
+                err = "\n\nThe wrapped model threw an error (see trace).\n\n"
+                raise RuntimeError(err) from e
+            
+        if len(params) == self._num_floating:
+            
+            try:
+                return self.fast_model(params)
+            except Exception as e:
+                err = "\n\nThe wrapped model threw an error (see trace).\n\n"
+                raise RuntimeError(err) from e
         
-        if len(params) != np.sum(self._unfixed_mask):
-            err = f"params length ({len(params)}) must either correspond to\n"
-            err += f"the total number of parameters ({len(self._param_df)})\n"
-            err += f"or the number of unfixed parameters ({np.sum(self._unfixed_mask)}).\n"
-            raise ValueError(err)
 
-        # Update kwargs
-        for i in range(len(params)):
-            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
+        # If we get here, the number of parameters was not interpretable. 
+        err = f"params length ({len(params)}) must either correspond to\n"
+        err += f"the total number of parameters ({len(self._param_df)})\n"
+        err += f"or the number of unfixed parameters ({np.sum(self._floating_mask)}).\n"
+        raise ValueError(err)
 
-        try:
-            return np.array(self._model_to_fit(**self._mw_kwargs))
-        except Exception as e:
-            err = "\n\nThe wrapped model threw an error (see trace).\n\n"
-            raise RuntimeError(err) from e
-
-
+        
     def fast_model(self,params):
         """
         Calculate model result with minimal error checking. params *must* be
-        an array the same length as the number of unfixed parameters. 
+        an array the same length as the number of unfixed parameters. This 
+        assumes that self.finalize_params() was already run. 
 
         Parameters
         ----------
@@ -342,7 +364,11 @@ class ModelWrapper:
 
         # Update kwargs
         for i in range(len(params)):
-            self._mw_kwargs[self._unfixed_param_names[i]] = params[i]
+            self._mw_kwargs[self._floating_param_names[i]] = params[i]
+
+        # Update linked parameters
+        for k in self._linked_param_dict:
+            self._mw_kwargs[k] = self._mw_kwargs[self._linked_param_dict[k]]
         
         return np.array(self._model_to_fit(**self._mw_kwargs))
 
@@ -382,6 +408,9 @@ class ModelWrapper:
         +---------------+-----------------------------------------------------+
         | 'prior_std'   | single float value; np.nan allowed (see below)      |
         +---------------+-----------------------------------------------------+
+        | 'parent'      | string parameter name pointing to the parameter to  | 
+        |               | link this parameter to.                             |
+        +---------------+-----------------------------------------------------+
 
         Gaussian priors are specified using the 'prior_mean' and 'prior_std' 
         fields, declaring the prior mean and standard deviation. If both are
@@ -401,21 +430,69 @@ class ModelWrapper:
                                             param_in_order=self._fit_params_in_order)
         
     @property
+    def num_fittable(self):
+        
+        return self._num_fittable
+    
+    @property
+    def num_floating(self):
+
+        return self._num_floating
+
+    @property
     def non_fit_kwargs(self):
         """
         A dictionary with the function keyword arguments that are not fit 
-        paramters. 
+        parameters. 
         """
 
         return self._non_fit_kwargs
     
     @property
-    def unfixed_mask(self):
+    def floating_mask(self):
         """
-        Mask for param_df that returns only floating (unfixed) parameters.
+        Mask for param_df that returns only floating parameters. (Not fixed, 
+        not linked to a parent).
         """
 
-        return self._unfixed_mask
+        if hasattr(self,"_floating_mask"):
+            return self._floating_mask
+    
+        return None
+
+    @property
+    def fixed_mask(self):
+        """
+        Mask for param_df that returns only fixed parameters.
+        """
+
+        if hasattr(self,"_fixed_mask"):
+            return self._fixed_mask
+    
+        return None
+
+    @property
+    def linked_mask(self):
+        """
+        Mask for param_df that returns only linked parameters (those with a 
+        parent specified).
+        """
+
+        if hasattr(self,"_linked_mask"):
+            return self._linked_mask
+
+        return None
+    
+    @property
+    def linked_param_dict(self):
+        """
+        Dictionary keying linked parameters to their parents. 
+        """
+
+        if hasattr(self,"_linked_param_dict"):
+            return self._linked_param_dict
+
+        return {}
         
     def __repr__(self):
         """

@@ -6,6 +6,7 @@ from dataprob.model_wrapper._dataframe_processing import _build_columns
 from dataprob.model_wrapper._dataframe_processing import _check_bounds
 from dataprob.model_wrapper._dataframe_processing import _check_guesses
 from dataprob.model_wrapper._dataframe_processing import _check_priors
+from dataprob.model_wrapper._dataframe_processing import _check_and_update_parent
 
 from dataprob.model_wrapper._dataframe_processing import _df_to_dict
 
@@ -67,7 +68,8 @@ def test__build_columns():
                             default_guess=10)
     
     assert np.array_equal(out_df.columns,["name","guess","fixed","lower_bound",
-                                          "upper_bound","prior_mean","prior_std"])
+                                          "upper_bound","prior_mean","prior_std",
+                                          "parent"])
     assert np.array_equal(out_df["name"],["a","b"])
     assert np.array_equal(out_df["guess"],[10,10])
     assert np.array_equal(out_df["fixed"],[False,False])
@@ -75,6 +77,7 @@ def test__build_columns():
     assert np.array_equal(out_df["upper_bound"],[np.inf,np.inf])
     assert np.sum(np.isnan(out_df["prior_mean"])) == 2
     assert np.sum(np.isnan(out_df["prior_std"])) == 2
+    assert np.sum(pd.isnull(out_df["parent"])) == 2
 
     # make sure existing columns are left intact
     df = pd.DataFrame({"name":["a","b"],
@@ -87,7 +90,8 @@ def test__build_columns():
     out_df = _build_columns(param_df=df,
                             default_guess=10)
     assert np.array_equal(out_df.columns,["name","guess","fixed","lower_bound",
-                                          "upper_bound","prior_mean","prior_std"])
+                                          "upper_bound","prior_mean","prior_std",
+                                          "parent"])
     assert np.array_equal(out_df["name"],["a","b"])
     assert np.array_equal(out_df["guess"],[20,20])
     assert np.array_equal(out_df["fixed"],[False,True])
@@ -95,6 +99,7 @@ def test__build_columns():
     assert np.array_equal(out_df["upper_bound"],[200,200])
     assert np.array_equal(out_df["prior_mean"],[np.nan,20],equal_nan=True)
     assert np.array_equal(out_df["prior_std"],[np.nan,10],equal_nan=True)
+    assert np.sum(pd.isnull(out_df["parent"])) == 2
 
     # float coercion check
     df = pd.DataFrame({"name":["a","b"],
@@ -107,7 +112,8 @@ def test__build_columns():
     out_df = _build_columns(param_df=df,
                             default_guess=10)
     assert np.array_equal(out_df.columns,["name","guess","fixed","lower_bound",
-                                          "upper_bound","prior_mean","prior_std"])
+                                          "upper_bound","prior_mean","prior_std",
+                                          "parent"])
     assert np.array_equal(out_df["name"],["a","b"])
     assert np.array_equal(out_df["guess"],[20,20])
     assert np.array_equal(out_df["fixed"],[False,True])
@@ -115,6 +121,7 @@ def test__build_columns():
     assert np.array_equal(out_df["upper_bound"],[200,200])
     assert np.array_equal(out_df["prior_mean"],[np.nan,20],equal_nan=True)
     assert np.array_equal(out_df["prior_std"],[np.nan,10],equal_nan=True)
+    assert np.sum(pd.isnull(out_df["parent"])) == 2
     
     # We sent in guess above as an integer. Make sure it's being properly
     # coerced to a float. We sent in lower_bound as a float. It should also
@@ -154,7 +161,14 @@ def test__build_columns():
     with pytest.raises(ValueError):
         out_df = _build_columns(param_df=df,
                                 default_guess=10)
-        
+
+    df = pd.DataFrame({"name":["a","b"],
+                       "parent":[pd.NA,"a"]})
+    out_df = _build_columns(param_df=df,
+                            default_guess=10)
+    assert pd.isna(out_df.loc[0,"parent"])
+    assert out_df.loc[1,"parent"] == "a"
+
 def test__check_bounds():
 
     # check automatic nan assignment
@@ -285,6 +299,70 @@ def test__check_priors():
     with pytest.raises(ValueError):
         _check_priors(df)
     
+def test__check_and_update_parent():
+
+    # handle default incoming pd.NA
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":[pd.NA,pd.NA]})
+    df = _check_and_update_parent(test_df)
+    assert np.sum(pd.isna(df["parent"])) == 2
+
+    # set <NA> to pd.NA
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["<NA>","<NA>"]})
+    df = _check_and_update_parent(test_df)
+    assert np.sum(pd.isna(df["parent"])) == 2
+
+    # set nan to pd.NA
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["nan","nan"]})
+    df = _check_and_update_parent(test_df)
+    assert np.sum(pd.isna(df["parent"])) == 2
+
+    # Set self parent (a -> a) to pd.NA
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["a","nan"]})
+    df = _check_and_update_parent(test_df)
+    assert np.sum(pd.isna(df["parent"])) == 2
+
+    # Throw error because 'c' is not in 'name' column
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["c",pd.NA]})
+    df = test_df.copy()
+    with pytest.raises(ValueError):
+        df = _check_and_update_parent(test_df)
+    
+    # Throw an error because too much nesting
+    test_df = pd.DataFrame({"name":["a","b","c"],
+                            "parent":[pd.NA,"a","b"]})
+    df = test_df.copy()
+    with pytest.raises(ValueError):
+        df = _check_and_update_parent(test_df)
+
+    # Throw error because no non-parent
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["b","a"]})
+    with pytest.raises(ValueError):
+        df = _check_and_update_parent(param_df=test_df)
+        
+    # link b
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["b",pd.NA]})
+    df = _check_and_update_parent(test_df)
+    
+    # link b, checking copy
+    test_df = pd.DataFrame({"name":["a","b"],
+                            "parent":["b",pd.NA],
+                            "guess":[1,2],
+                            "xnay":[5,6]})
+    assert np.array_equal(test_df["guess"],[1,2])
+    assert np.array_equal(test_df["xnay"],[5,6])
+    df = _check_and_update_parent(test_df)
+    assert np.array_equal(df["guess"],[2,2])
+    assert np.array_equal(df["xnay"],[6,6])
+
+
+
 def test__df_to_dict():
 
     # name column check

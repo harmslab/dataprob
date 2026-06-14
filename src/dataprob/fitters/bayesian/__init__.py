@@ -1,3 +1,5 @@
 """
-Code for running Bayesian MCMC analyses.
+Sub-package for Bayesian fitters.
 """
+from .emcee import EmceeFitter
+from .pymc import PyMCFitter

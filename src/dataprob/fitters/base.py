@@ -109,11 +109,14 @@ class Fitter:
         # record y_obs if specified
         to_df = {}
         if y_obs is not None:
-            to_df["y_obs"] = y_obs
-        
-        # record y_std if specified
+            to_df["y_obs"] = np.asarray(y_obs, dtype=float)
+
+        # record y_std if specified; broadcast scalar to match y_obs length
         if y_std is not None:
-            to_df["y_std"] = y_std
+            y_std_arr = np.asarray(y_std, dtype=float)
+            if y_std_arr.ndim == 0 and "y_obs" in to_df:
+                y_std_arr = np.full(len(to_df["y_obs"]), float(y_std_arr))
+            to_df["y_std"] = y_std_arr
 
         # If both specified, turn into dataframe and store as data_df. Setter 
         # validates. 
@@ -134,7 +137,7 @@ class Fitter:
         else:
             pass
 
-                
+
     def fit(self,
             y_obs=None,
             y_std=None,
@@ -375,7 +378,7 @@ class Fitter:
 
         if self.success:
         
-            keep_mask = self._model.unfixed_mask
+            keep_mask = self._model.floating_mask
 
             estimate = np.array(self.fit_df.loc[keep_mask,"estimate"],
                                 dtype=float).copy()
@@ -474,16 +477,52 @@ class Fitter:
         df["upper_bound"] = self.param_df["upper_bound"]
         df["prior_mean"] = self.param_df["prior_mean"]
         df["prior_std"] = self.param_df["prior_std"]
+        df["parent"] = self.param_df["parent"]
 
         self._fit_df = df
 
-    def _update_fit_df(self):
+    def _get_fit_values(self):
         """
-        Should be redefined in subclass. This function should update 
-        self._fit_df. 
         """
 
-        raise NotImplementedError("should be implemented in subclass\n")
+        raise NotImplementedError("Should be implemented in subclass")
+
+
+    def _update_fit_df(self):
+        """
+        Update the fit dataframe with the fit results. 
+        """
+        
+        estimate, std, low_95, high_95 = self._get_fit_values()
+
+        # Get finalized parameters from param_df in case they were updated 
+        # after the model was set and the fit_df created. 
+        for col in ["guess","fixed","lower_bound","upper_bound","prior_mean",
+                    "prior_std","parent"]:
+            self._fit_df[col] = self.param_df[col]
+
+        # Copy floating (fit) parameters in
+        floating_mask = self._model.floating_mask
+        self._fit_df.loc[floating_mask,"estimate"] = estimate
+        self._fit_df.loc[floating_mask,"std"] = std
+        self._fit_df.loc[floating_mask,"low_95"] = low_95
+        self._fit_df.loc[floating_mask,"high_95"] = high_95
+
+        # Copy linked parameter values over
+        if len(self._model.linked_param_dict) > 0:
+            
+            map_to = list(self._model.linked_param_dict.keys())
+            map_from = list(self._model.linked_param_dict.values())
+            columns = ["estimate","std","low_95","high_95"]
+            
+            new_values = np.array(self._fit_df.loc[map_from,columns],
+                                    dtype=float)
+            self._fit_df.loc[map_to,columns] = new_values
+
+        # Copy fixed values in (just guess; rest nan)
+        fixed_mask = self._model.fixed_mask
+        self._fit_df.loc[fixed_mask,"estimate"] = self._fit_df.loc[fixed_mask,"guess"]
+
 
     @property
     def fit_df(self):
@@ -501,7 +540,7 @@ class Fitter:
         if not self.success:
             return None
 
-        estimate = np.array(self.fit_df.loc[self._model.unfixed_mask,
+        estimate = np.array(self.fit_df.loc[self._model.floating_mask,
                                             "estimate"],dtype=float).copy()
 
         out_df = get_fit_quality(residuals=self._weighted_residuals(estimate),
@@ -678,7 +717,7 @@ class Fitter:
         """
 
         self._model.finalize_params()
-        return np.sum(self._model.unfixed_mask)
+        return np.sum(self._model.floating_mask)
 
     @property
     def num_obs(self):
